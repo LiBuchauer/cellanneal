@@ -1,0 +1,284 @@
+import numpy as np
+
+import pandas as pd
+
+# functional requirements
+from scipy.spatial.distance import correlation
+
+# personalized dual_annealing function
+from .dual_annealing import dual_annealing
+
+# make sure that folder 'figures' exists, else create
+from pathlib import Path
+Path("figures").mkdir(parents=True, exist_ok=True)
+# same for results
+Path("results").mkdir(parents=True, exist_ok=True)
+
+def make_gene_dictionary(
+        sc_ref_df,
+        bulk_df,
+        disp_min=0.5,
+        bulk_min=1e-5,
+        bulk_max=0.01,
+        remove_mito=True,
+            ):
+    """ Finds highly variable genes across cell types and checks for expression
+    thresholds within each bulk separately, returns a dictionary of lists were
+    each list contains the identified gene for the bulk given as as they appear
+    __alphabetically sorted__ by column names.
+    If n_high_var_genes is given, this number of highly variable genes is returned. If
+    it is None, the default parameters for flavor='seurat' are used and the length of
+    the resulting gene list depends on availability."""
+    # order bulk columns alphabetically
+    bulk_df = bulk_df.sort_index(axis=1)
+    # first, find the most variable genes across cell types
+    high_var_genes= _find_high_var_genes(sc_ref_df, disp_min=disp_min)
+
+    print("{} highly variable genes identified in cell type reference.".format(len(high_var_genes)))
+    # now, for each bulk, we find the genes which comply with our expression thresholds,
+    # and then keep only those highly variable genes which do
+    # to ensure usage of correct gene list later one, store in dict
+    gene_dict = {}
+    for bulk in bulk_df.columns:
+        min_max_genes = _find_thr_genes(bulk_df[bulk], min_thr=bulk_min, max_thr=bulk_max, remove_mito=remove_mito)
+        thr_highvar_genes = [x for x in min_max_genes if x in high_var_genes]
+        gene_dict[bulk] = thr_highvar_genes
+        print("\t{} of these are within thresholds for sample {}".format(len(thr_highvar_genes), bulk))
+
+    return gene_dict
+
+
+def _find_high_var_genes(
+            sc_ref_df,
+            disp_min=0.5,
+            ):
+    """ Finds highly variable genes across cell types in sc_ref_df. The implementation
+    follows scanpy's highly_variable_genes procedure for flavor 'Seurat'."""
+    # normalize counts within each celltype to sum 1
+    sc_ref_norm = sc_ref_df.div(sc_ref_df.sum(axis=0), axis=1)
+
+    # calculate mean and variance of each gene across types
+    mean = np.mean(sc_ref_norm, axis=1)
+    mean_of_sq = np.multiply(sc_ref_norm, sc_ref_norm).mean(axis=1)
+    var = mean_of_sq - mean **2
+    # enforce R convention (unbiased estimator) for variance
+    var *= np.shape(sc_ref_norm)[1] / (np.shape(sc_ref_norm)[1] - 1)
+    # set entries equal to zero to small value to avoid div by 0 value
+    mean[mean == 0] = 1e-12
+    # caculate dispersion from var and mean
+    dispersion = var / mean
+
+    # for 'seurat' flavor, log versions of mean and dispersion are needed
+    dispersion[dispersion == 0] = np.nan
+    dispersion = np.log(dispersion)
+    mean = np.log1p(mean)
+
+    # collect in a dataframe
+    df = pd.DataFrame(index=sc_ref_norm.index)
+    df['means'] = mean
+    df['dispersions'] = dispersion
+
+    # group into 20 bins
+    df['mean_bin'] = pd.cut(df['means'], bins=20)
+    disp_grouped = df.groupby('mean_bin')['dispersions']
+    # mean and std of dispersion in each group
+    disp_mean_bin = disp_grouped.mean()
+    disp_std_bin = disp_grouped.std(ddof=1)
+
+    # retrieve those genes that have nan std, these are the ones where
+    # only a single gene fell in the bin and implicitly set them to have
+    # a normalized disperion of 1
+    one_gene_per_bin = disp_std_bin.isnull()
+    disp_std_bin[one_gene_per_bin.values] = disp_mean_bin[one_gene_per_bin.values].values
+    disp_mean_bin[one_gene_per_bin.values] = 0
+
+    # normalize dispersions with respect to mean and std within each gene's expression bin
+    df['dispersions_norm'] = ((df['dispersions'].values -
+                               disp_mean_bin[df['mean_bin'].values].values) /
+                              disp_std_bin[df['mean_bin'].values].values)
+
+    # check which genes pass dispersion and expression thresholds
+    dispersion_norm = df['dispersions_norm'].values.astype('float32')
+    dispersion_norm[np.isnan(dispersion_norm)] = 0  # similar to Seurat
+    # gene_subset = np.logical_and.reduce((
+    #                     mean > sc_min,
+    #                     mean < sc_max,
+    #                     dispersion_norm > disp_min))
+    dispersion_norm[np.isnan(dispersion_norm)] = 0  # similar to Seurat
+    gene_subset = (dispersion_norm > disp_min)
+
+    # write to df
+    df['highly_variable'] = gene_subset
+
+    # get list of gene names
+    high_var_genes = df.loc[df['highly_variable']].index.tolist()
+
+    return high_var_genes
+
+
+def _find_thr_genes(
+        series, # pandas series in which to find compliant genes
+        min_thr=1e-5, # minimum required expression
+        max_thr=0.01, # maximum allowed expression
+        remove_mito=True # if True, remove mitochondrial genes (starting with "mt-" or "MT-")
+               ):
+    """ Based on a pandas series containing gene expression values (not log!) of some kind, finds
+    for genes which are expressed above the minimum relative threshold, below the maximum relative
+    threshold, and, if requested, are not mitochondrial genes (start with any of "MT-", "Mt-", "mt-").
+    """
+    # check if input is a series
+    if type(series) is not pd.Series:
+        raise TypeError("The object you have passed to 'find_genes()' is not a pandas Series.")
+
+    # from original data, retain only genes which are expressed below the max_thr
+    colsum = series.sum()
+    subset_maxclear = (series < colsum*max_thr)
+    genes_maxclear =  subset_maxclear[subset_maxclear == True].index.tolist()
+
+    # ... and above the min threshold
+    subset_minclear = (series > colsum*min_thr)
+    genes_minclear =  subset_minclear[subset_minclear == True].index.tolist()
+
+    # find the intersection of all lists and return these genes
+    joint_genes = list(set.intersection(*map(set, [genes_minclear, genes_maxclear])))
+
+    # if required, remove mitochondrial genes
+    if remove_mito:
+        import re
+        mt = re.compile('mt-', re.I) # to allow for upper and lower case
+        joint_genes = [g for g in joint_genes if not bool(mt.match(g))]
+
+    return joint_genes
+
+
+# deconvolution functions
+def _rankdata(a):
+    """
+    Assign ranks to data, dealing with ties appropriately.
+    Ranks begin at 1. The average of the ranks that would have been assigned to
+    all the tied values is assigned to each value.
+
+    This function is a subset of scipy.stats.rankdata, to be found here
+    https://github.com/scipy/scipy/blob/v1.4.1/scipy/stats/stats.py .
+
+    Parameters
+    ----------
+    a : array_like
+        The array of values to be ranked. Must be 1D.
+
+    Returns
+    -------
+    ranks : ndarray
+         An array of length equal to the size of `a`, containing rank
+         scores.
+
+    """
+    arr = np.ravel(np.asarray(a))
+    sorter = np.argsort(arr, kind='quicksort')
+
+    inv = np.empty(sorter.size, dtype=np.intp)
+    inv[sorter] = np.arange(sorter.size, dtype=np.intp)
+
+    arr = arr[sorter]
+    obs = np.r_[True, arr[1:] != arr[:-1]]
+    dense = obs.cumsum()[inv]
+
+    # cumulative counts of each unique value
+    count = np.r_[np.nonzero(obs)[0], len(obs)]
+
+    # average method
+    return .5 * (count[dense] + count[dense - 1] + 1)
+
+
+# function that takes parameters specifying distribution and returns distance
+# of resulting mixed data to a single bulk composition
+def calculate_distance(
+                params,  # collection of independent heights of discerete dist
+                comp_vec_ranked,  # the gene expression vector with which to compare the resulting mixture
+                sc_data,  # single_cell data from which to mix new samples
+                ):
+    # create array of the contributions and normalise to sum 1
+    conv = np.array(params)
+    mixture = (conv/sum(conv)).reshape(1, len(conv))
+
+    # using this mixture, compute the countsums of the mixture from sc data
+    mixed_counts = np.dot(mixture, sc_data.T).T
+
+    # making this data compositional (normalizing it to match the bulk) is not
+    # necessary because we will only compare ranks which are not affected by this
+
+    # calculate Spearman correlation. The bulk vector has already been ranked,
+    # so we only need to rank the newly mixed vector here.
+    mixed_compositional_ranked = _rankdata(mixed_counts)
+    # calculate Pearson correlation on ranked data
+    dist = 1 - np.corrcoef(comp_vec_ranked, mixed_compositional_ranked, rowvar=False)[0][1]
+
+    return dist
+
+
+# define a function that returns the composition given the parameters of the distribution
+def return_mixture(
+            params
+            ):
+    # create array of the contributions and normalise to sum 1
+    conv = np.array(params)
+    mixture = conv/sum(conv)
+    return mixture
+
+
+# function to select genes according to given threshold and deconvolve the resulting mixture
+def deconvolve(
+            sc_ref_df,
+            bulk_df,
+            maxiter,
+            gene_dict,
+            no_local_search
+            ):
+    # sort bulk df columns alphabetically to ensure consistency
+    bulk_df = bulk_df.sort_index(axis=1)
+    # for each of the bulks, subset bulk and single-cell data according to the
+    # gene list, retain only raw data matrices after this (df --> np.array)
+    sc_list = []
+    bulk_comp_list = []  # compositional version of subset bulk data
+    bulk_ranked_list = []  # ranked version of subset bulk data
+
+    for b, bulk in enumerate(bulk_df.columns):
+
+        # first, subset and rank bulk data
+        bulk_sub = bulk_df[bulk].loc[gene_dict[bulk]].values
+        bulk_comp_list.append(bulk_sub)
+        bulk_ranked = _rankdata(bulk_sub)
+        bulk_ranked_list.append(bulk_ranked)
+
+        # next, subset sc data
+        sc_sub = sc_ref_df.loc[gene_dict[bulk]].values
+        sc_list.append(sc_sub)
+
+    # go through all mixtures and deconvolve them separately
+    mixt_results_list = []
+    for i, mixt in enumerate(bulk_df.columns):
+        print('Deconvolving sample {} ...'.format(mixt))
+        res = dual_annealing(calculate_distance, bounds=[[0,1] for x in range(len(sc_ref_df.columns))],
+                             maxiter=maxiter, args=[bulk_ranked_list[i], sc_list[i]], no_local_search=no_local_search)
+        mixt_results_list.append(res)
+
+    # grab the results, write them into a dataframe and return it
+    mixture_list = []
+    spears = []
+    pears = []
+    for i, res in enumerate(mixt_results_list):
+        mixture = return_mixture(res.x)
+        mixture_list.append(mixture)
+        # calculate final spearson correlations
+        mixed_counts = np.dot(mixture, sc_list[i].T).T
+        mixed_compositional = mixed_counts / mixed_counts.sum()
+        mixed_ranked = _rankdata(mixed_counts)
+        spears.append(1-correlation(mixed_ranked, bulk_ranked_list[i]))
+        pears.append(1-correlation(mixed_compositional, bulk_comp_list[i]))
+
+    data_out = np.hstack((np.array(mixture_list), np.array([spears, pears]).T))
+    cols_out = sc_ref_df.columns.tolist() + ['rho_Spearman', 'rho_Pearson']
+
+    all_mix_df = pd.DataFrame(data=data_out, columns=cols_out, index=bulk_df.columns)
+
+    return all_mix_df
