@@ -48,19 +48,58 @@ def make_gene_dictionary(
     return gene_dict
 
 
+def calc_gene_expression(
+                mix_vec,
+                bulk_vec,
+                sc_ref_df,
+                gene_list):
+    """ Given a mixing vector, a bulk expression vector and the list of genes
+    for this sample (i.e. all data only for one of the bulk samples),
+    calculates the mixed expression and the fold change compared to the
+    experimentally observed bulk expression and returns a dataframe with
+    these two values as well as the original bulk measurement."""
+
+    # subset sc_ref_df and bulk_vec to the genes supplied in gene_list
+    bulk_vec_sub = bulk_vec.loc[gene_list].values
+    bulk_vec_sub_comp = bulk_vec_sub / bulk_vec_sub.sum()
+    sc_ref_df_sub = sc_ref_df.loc[gene_list].values
+
+    # calculate the mixed gene expression vector
+    mixed_expression = np.dot(mix_vec, sc_ref_df_sub.T).T
+    mixed_expression_comp = mixed_expression / mixed_expression.sum()
+
+    # calculate fold change as experimental over mixed
+    exp_over_mixed = bulk_vec_sub_comp / mixed_expression_comp
+    log_exp_over_mixed = np.log10(exp_over_mixed)
+
+    # combine all into dataframe
+    data = np.vstack((bulk_vec_sub_comp,
+                      mixed_expression_comp,
+                      exp_over_mixed,
+                      log_exp_over_mixed)).T
+    gene_comp_df = pd.DataFrame(data=data,
+                                columns=['experimental bulk',
+                                         'cellanneal mixed bulk',
+                                         'fold change, exp/mixed',
+                                         'log10 fold change, exp/mixed'],
+                                index=gene_list)
+    return gene_comp_df
+
+
 def _find_high_var_genes(
             sc_ref_df,
             disp_min=0.5,
             ):
-    """ Finds highly variable genes across cell types in sc_ref_df. The implementation
-    follows scanpy's highly_variable_genes procedure for flavor 'Seurat'."""
+    """ Finds highly variable genes across cell types in sc_ref_df.
+    The implementation follows scanpy's highly_variable_genes procedure for
+    flavor 'Seurat'."""
     # normalize counts within each celltype to sum 1
     sc_ref_norm = sc_ref_df.div(sc_ref_df.sum(axis=0), axis=1)
 
     # calculate mean and variance of each gene across types
     mean = np.mean(sc_ref_norm, axis=1)
     mean_of_sq = np.multiply(sc_ref_norm, sc_ref_norm).mean(axis=1)
-    var = mean_of_sq - mean **2
+    var = mean_of_sq - mean ** 2
     # enforce R convention (unbiased estimator) for variance
     var *= np.shape(sc_ref_norm)[1] / (np.shape(sc_ref_norm)[1] - 1)
     # set entries equal to zero to small value to avoid div by 0 value
@@ -92,7 +131,8 @@ def _find_high_var_genes(
     disp_std_bin[one_gene_per_bin.values] = disp_mean_bin[one_gene_per_bin.values].values
     disp_mean_bin[one_gene_per_bin.values] = 0
 
-    # normalize dispersions with respect to mean and std within each gene's expression bin
+    # normalize dispersions with respect to mean and std within each
+    # gene's expression bin
     df['dispersions_norm'] = ((df['dispersions'].values -
                                disp_mean_bin[df['mean_bin'].values].values) /
                               disp_std_bin[df['mean_bin'].values].values)
@@ -117,35 +157,39 @@ def _find_high_var_genes(
 
 
 def _find_thr_genes(
-        series, # pandas series in which to find compliant genes
-        min_thr=1e-5, # minimum required expression
-        max_thr=0.01, # maximum allowed expression
-        remove_mito=True # if True, remove mitochondrial genes (starting with "mt-" or "MT-")
+        series,  # pandas series in which to find compliant genes
+        min_thr=1e-5,  # minimum required expression
+        max_thr=0.01,  # maximum allowed expression
+        remove_mito=True  # if True, remove mitochondrial genes (starting with "mt-" or "MT-")
                ):
-    """ Based on a pandas series containing gene expression values (not log!) of some kind, finds
-    for genes which are expressed above the minimum relative threshold, below the maximum relative
-    threshold, and, if requested, are not mitochondrial genes (start with any of "MT-", "Mt-", "mt-").
+    """ Based on a pandas series containing gene expression values
+    (not log!) of some kind, finds for genes which are expressed above the
+    minimum relative threshold, below the maximum relative threshold, and,
+    if requested, are not mitochondrial genes (start with any of "MT-", "Mt-",
+    "mt-").
     """
     # check if input is a series
     if type(series) is not pd.Series:
         raise TypeError("The object you have passed to 'find_genes()' is not a pandas Series.")
 
-    # from original data, retain only genes which are expressed below the max_thr
+    # from original data, retain only genes which are expressed below max_thr
     colsum = series.sum()
     subset_maxclear = (series < colsum*max_thr)
-    genes_maxclear =  subset_maxclear[subset_maxclear == True].index.tolist()
+    genes_maxclear = subset_maxclear[subset_maxclear == True].index.tolist()
+    # ! above, keep '==' and dont change to 'is' - will not work
 
     # ... and above the min threshold
     subset_minclear = (series > colsum*min_thr)
-    genes_minclear =  subset_minclear[subset_minclear == True].index.tolist()
+    genes_minclear = subset_minclear[subset_minclear == True].index.tolist()
 
     # find the intersection of all lists and return these genes
-    joint_genes = list(set.intersection(*map(set, [genes_minclear, genes_maxclear])))
+    joint_genes = list(set.intersection(*map(set, [genes_minclear,
+                                                   genes_maxclear])))
 
     # if required, remove mitochondrial genes
     if remove_mito:
         import re
-        mt = re.compile('mt-', re.I) # to allow for upper and lower case
+        mt = re.compile('mt-', re.I)  # to allow for upper and lower case
         joint_genes = [g for g in joint_genes if not bool(mt.match(g))]
 
     return joint_genes

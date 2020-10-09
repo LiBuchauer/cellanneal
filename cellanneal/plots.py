@@ -7,20 +7,26 @@ from scipy.spatial.distance import correlation
 import pandas as pd
 import os
 
-mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=['#e6194b', '#3cb44b', '#ffe119', '#4363d8',
-                                                    '#f58231', '#911eb4', '#46f0f0', '#f032e6',
-                                                    '#bcf60c', '#fabebe', '#008080', '#e6beff',
-                                                    '#9a6324', '#fffac8', '#800000', '#aaffc3',
-                                                    '#808000', '#ffd8b1', '#000075', '#808080'])
+mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=[
+            '#e6194b', '#3cb44b', '#ffe119', '#4363d8',
+            '#f58231', '#911eb4', '#46f0f0', '#f032e6',
+            '#bcf60c', '#fabebe', '#008080', '#e6beff',
+            '#9a6324', '#fffac8', '#800000', '#aaffc3',
+            '#808000', '#ffd8b1', '#000075', '#808080'])
+
 
 def plot_pies_from_df(mix_df,
                       save_path='figures/pies.pdf'):
 
     # for each mixture, plot a pie chart
-    plot_num = np.shape(mix_df)[0] +1
-    fig, axes = plt.subplots(int(np.ceil(plot_num/4)), 4, figsize=(12, 3*np.ceil(plot_num/4)))
+    plot_num = np.shape(mix_df)[0] + 1
+    fig, axes = plt.subplots(
+            int(np.ceil(plot_num/4)),
+            4,
+            figsize=(12, 3*np.ceil(plot_num/4)))
 
-    # if correlation values are included in the mix_df, the should not be part of the pie
+    # if correlation values are included in the mix_df,
+    # they should not be part of the pie
     corr_list = []
     if 'rho_Spearman' in mix_df.columns:
         corr_list.append('rho_Spearman')

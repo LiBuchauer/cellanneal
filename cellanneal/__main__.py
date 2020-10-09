@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .general import make_gene_dictionary, deconvolve
+from .general import make_gene_dictionary, deconvolve, calc_gene_expression
 from .plots import (plot_pies_from_df, plot_mix_heatmap,
                     plot_1D_lines, plot_repeats, plot_scatter)
 from .stability import repeat_annealing
@@ -111,17 +111,37 @@ def main():
 
     """ 3) Run cellanneal. """
     print('\n3. Running cellanneal ...')
-    all_mix_df = deconvolve(sc_ref_df=sc_ref_df,
-                     bulk_df=bulk_df,
-                     maxiter=maxiter,
-                     gene_dict=gene_dict,
-                     no_local_search=False)
+    all_mix_df = deconvolve(
+                    sc_ref_df=sc_ref_df,
+                    bulk_df=bulk_df,
+                    maxiter=maxiter,
+                    gene_dict=gene_dict,
+                    no_local_search=False)
 
     """ 4) Write results to file."""
     print('\n4. Writing results to file in folder "results" ...')
+    # first, write the mix matrix to csv
     output_name = 'results_' + bulk_import_path
     result_path = Path('results/') / output_name
     all_mix_df.to_csv(result_path, header=True, index=True, sep=',')
+
+    # next, write the actual and estimated gene expression to file,
+    # this has to be done per sample as the genes are sample specific
+    # a mix_df version without correlation entries is needed
+    all_mix_df_no_corr = all_mix_df[celltypes]
+    for sample_name in bulk_names:
+        gene_comp_df = calc_gene_expression(
+                            mix_vec=all_mix_df_no_corr.loc[sample_name],
+                            bulk_vec=bulk_df[sample_name],
+                            sc_ref_df=sc_ref_df,
+                            gene_list=gene_dict[sample_name])
+        # construct export path for this sample
+        sample_gene_name = 'expression_' + sample_name + '.csv'
+        sample_gene_path = Path('results/') / sample_gene_name
+        gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
+
+
+
 
     """ 5) Produce plots and save to folder"""
     print('\n5. Storing figures in folder "figures" ...')

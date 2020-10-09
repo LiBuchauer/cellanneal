@@ -1,6 +1,8 @@
 
 # User
 *.DS_Store
+examples/example_data/results
+examples/example_data/figures
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
