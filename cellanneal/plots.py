@@ -48,7 +48,7 @@ def plot_pies_from_df(mix_df,
     for i, ax in enumerate(axes.flatten()):
         try:
             mixture = plot_df.iloc[i]
-            pie = ax.pie(mixture)
+            pie = ax.pie(mixture, normalize=True)
             spearman = spear_list[i]
             pearson = pear_list[i]
             # calc spearman and pearson
@@ -187,7 +187,9 @@ def plot_scatter(mix_df,
     # for each mixture, plot a scatterplot of mixed vs real bulk
     plot_num = len(bulk_df.columns) + 1
 
-    fig, axes = plt.subplots(int(np.ceil(plot_num/4)), 4, figsize=(12, 3*np.ceil(plot_num/4)), sharex=False, sharey=True)
+    fig, axes = plt.subplots(int(np.ceil(plot_num/4)), 4,
+                             figsize=(12, 3*np.ceil(plot_num/4)),
+                             sharex=False, sharey=True)
 
     # onto each axis, plot a scatter after calculating mixture vector
     for i, ax in enumerate(axes.flatten()):
@@ -198,7 +200,8 @@ def plot_scatter(mix_df,
 
             # make compositional
             mixed_compositional = mixed_counts / mixed_counts.sum(axis=0)
-            scatter = ax.scatter(comp_vec, mixed_compositional, alpha=0.1, color='darkblue')
+            scatter = ax.scatter(comp_vec, mixed_compositional,
+                                 alpha=0.1, color='darkblue', rasterized=True)
 
             # calc spearman and pearson
             spearman = spearmanr(mixed_compositional, comp_vec)[0]
@@ -210,13 +213,17 @@ def plot_scatter(mix_df,
             ax.set_yscale('log')
             ax.set_xlim([5e-7, 0.02])
             ax.set_ylim([5e-7, 0.02])
-            ax.set_title(bulk_df.columns.tolist()[i] + '\n P_corr={}, S_corr={}'.format(np.round(pearson, 2), np.round(spearman, 2)))
+            ax.set_title(
+                bulk_df.columns.tolist()[i] +
+                '\n P_corr={}, S_corr={}'.format(np.round(pearson, 2),
+                                                 np.round(spearman, 2)))
 
         except (IndexError, ValueError):
             ax.set_visible(False)
 
     fig.tight_layout()
     plt.savefig(save_path, bbox_inches='tight')
+
 
 """
 2)

@@ -138,7 +138,7 @@ def main():
                             sc_ref_df=sc_ref_df,
                             gene_list=gene_dict[sample_name])
         # construct export path for this sample
-        sample_gene_name = 'expression_' + bulk_file_ID + sample_name + '.csv'
+        sample_gene_name = 'expression_' + bulk_file_ID + '_' + sample_name + '.csv'
         sample_gene_path = Path('results/') / sample_gene_name
         gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
 
