@@ -121,7 +121,9 @@ def main():
     """ 4) Write results to file."""
     print('\n4. Writing results to file in folder "results" ...')
     # first, write the mix matrix to csv
-    output_name = 'results_' + bulk_import_path
+    bulk_file_name = Path(bulk_import_path).name
+    bulk_file_ID = bulk_file_name.split(".")[0]
+    output_name = 'results_' + bulk_file_name
     result_path = Path('results/') / output_name
     all_mix_df.to_csv(result_path, header=True, index=True, sep=',')
 
@@ -136,28 +138,27 @@ def main():
                             sc_ref_df=sc_ref_df,
                             gene_list=gene_dict[sample_name])
         # construct export path for this sample
-        sample_gene_name = 'expression_' + sample_name + '.csv'
+        sample_gene_name = 'expression_' + bulk_file_ID + sample_name + '.csv'
         sample_gene_path = Path('results/') / sample_gene_name
         gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
-
-
 
 
     """ 5) Produce plots and save to folder"""
     print('\n5. Storing figures in folder "figures" ...')
     # plot results
     figure_path = Path('figures/')
-    pie_path = figure_path / 'pies_{}.pdf'.format(bulk_import_path.split('.')[-2])
+    pie_path = figure_path / 'pies_{}.pdf'.format(bulk_file_ID)
     plot_pies_from_df(all_mix_df, save_path=pie_path)
 
-    heat_path = figure_path / 'heat_{}.pdf'.format(bulk_import_path.split('.')[-2])
+    heat_path = figure_path / 'heat_{}.pdf'.format(bulk_file_ID)
     plot_mix_heatmap(all_mix_df, rownorm=False, save_path=heat_path)
 
-    line_path = figure_path / 'lines_{}.pdf'.format(bulk_import_path.split('.')[-2])
+    line_path = figure_path / 'lines_{}.pdf'.format(bulk_file_ID)
     plot_1D_lines(all_mix_df, line_path)
 
-    scatter_path = figure_path / 'scatter_{}.pdf'.format(bulk_import_path.split('.')[-2])
-    plot_scatter(all_mix_df, bulk_df, sc_ref_df, gene_dict, save_path=scatter_path)
+    scatter_path = figure_path / 'scatter_{}.pdf'.format(bulk_file_ID)
+    plot_scatter(all_mix_df, bulk_df, sc_ref_df, gene_dict,
+                 save_path=scatter_path)
 
     print('\nAll done! :-)\n')
 
