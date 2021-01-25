@@ -4,8 +4,6 @@ import matplotlib as mpl
 import seaborn as sns
 from scipy.stats import spearmanr
 from scipy.spatial.distance import correlation
-import pandas as pd
-import os
 
 mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=[
             '#e6194b', '#3cb44b', '#ffe119', '#4363d8',
@@ -52,7 +50,9 @@ def plot_pies_from_df(mix_df,
             spearman = spear_list[i]
             pearson = pear_list[i]
             # calc spearman and pearson
-            ax.set_title(plot_df.index.tolist()[i] + '\n S_corr={},\nP_corr={}'.format(spearman, pearson))
+            ax.set_title(
+                plot_df.index.tolist()[i] +
+                '\n S_corr={},\nP_corr={}'.format(spearman, pearson))
             plotted_a_pie = True
         except (IndexError, ValueError):
             ax.set_visible(False)
@@ -61,13 +61,16 @@ def plot_pies_from_df(mix_df,
         lax = axes.flatten()[i]
         lax.set_visible(True)
         lax.axis("off")
-        leg = lax.legend(pie[0], plot_df.columns, loc='best', ncol=2)
+        lax.legend(pie[0], plot_df.columns, loc='best', ncol=2)
     plt.savefig(save_path, bbox_inches='tight')
 
 
 def plot_mix_heatmap(mix_df, rownorm=False, save_path='figures/heatmap.pdf'):
-    fig, ax = plt.subplots(figsize=(10/np.shape(mix_df)[1]*np.shape(mix_df)[0], 0.5*np.shape(mix_df)[1]))
-    # if correlation values are included in the mix_df, the should not be part of the pie
+    fig, ax = plt.subplots(
+        figsize=(10/np.shape(mix_df)[1]*np.shape(mix_df)[0],
+                 0.5*np.shape(mix_df)[1]))
+    # if correlation values are included in the mix_df,
+    # they should not be part of the pie
     corr_list = []
     if 'rho_Spearman' in mix_df.columns:
         corr_list.append('rho_Spearman')
@@ -86,10 +89,14 @@ def plot_mix_heatmap(mix_df, rownorm=False, save_path='figures/heatmap.pdf'):
 
     if rownorm:
         tdf = plot_df.T.sort_index(0)
-        ax = sns.heatmap(tdf.div(tdf.max(axis=1), axis=0), linewidths=.5, square=True, cmap='viridis', cbar_kws={'shrink':0.7})
+        ax = sns.heatmap(tdf.div(tdf.max(axis=1), axis=0),
+                         linewidths=.5, square=True, cmap='viridis',
+                         cbar_kws={'shrink': 0.7})
         ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
     else:
-        ax = sns.heatmap(plot_df.T.sort_index(0), linewidths=.5, square=True, cmap='viridis', cbar_kws={'shrink':0.7})
+        ax = sns.heatmap(plot_df.T.sort_index(0),
+                         linewidths=.5, square=True, cmap='viridis',
+                         cbar_kws={'shrink': 0.7})
         ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
 
     bottom, top = ax.get_ylim()
@@ -104,8 +111,8 @@ def plot_1D_lines(
         mix_df,
         save_path='figures/lines.pdf'
         ):
-
-    # if correlation values are included in the mix_df, the should not be part of the pie
+    # if correlation values are included in the mix_df,
+    # they should not be part of the pie
     corr_list = []
     if 'rho_Spearman' in mix_df.columns:
         corr_list.append('rho_Spearman')
@@ -128,13 +135,13 @@ def plot_1D_lines(
     col_num = 5
     row_num = int(np.ceil(plot_num/col_num))
 
-
-    g = plot_df.plot(rot=90,
-                  subplots=True,
-                  layout=(row_num, col_num),
-                  figsize=(col_num*3, row_num*2.5),
-                  xticks=xticks,
-                  marker='o')
+    g = plot_df.plot(
+        rot=90,
+        subplots=True,
+        layout=(row_num, col_num),
+        figsize=(col_num*3, row_num*2.5),
+        xticks=xticks,
+        marker='o')
 
     # all y_axes should start at 0
     for plot in g.flatten():
@@ -174,7 +181,6 @@ def plot_scatter(mix_df,
     bulk_comp_list = []  # compositional version of subset bulk data
 
     for b, bulk in enumerate(bulk_df.columns):
-
         # first, subset bulk data
         bulk_sub = bulk_df[bulk].loc[gene_dict[bulk]].values
         bulk_sub = bulk_sub/np.sum(bulk_sub)
@@ -200,8 +206,9 @@ def plot_scatter(mix_df,
 
             # make compositional
             mixed_compositional = mixed_counts / mixed_counts.sum(axis=0)
-            scatter = ax.scatter(comp_vec, mixed_compositional,
-                                 alpha=0.1, color='darkblue', rasterized=True)
+            ax.scatter(comp_vec, mixed_compositional,
+                       alpha=0.1, color='darkblue',
+                       rasterized=True)
 
             # calc spearman and pearson
             spearman = spearmanr(mixed_compositional, comp_vec)[0]
@@ -229,7 +236,9 @@ def plot_scatter(mix_df,
 2)
 plots that display results of multiple annealing runs in order to show
 variability between them, the input is typically a long form dataframe
-produced by one of the functions in D_fun_stability."""
+produced by one of the functions in D_fun_stability.
+"""
+
 
 def plot_repeats(
         master_df,
@@ -237,25 +246,27 @@ def plot_repeats(
         save_path='figures/repeat_plot.pdf',
         ):
 
-    # plot catplot of requried kind via seaborn
-    if kind=='swarm':
-        g = sns.catplot(x='bulk',
-                    y='fraction',
-                    col='celltype',
-                    hue='run',
-                    data=master_df,
-                    kind=kind,
-                    col_wrap=4,
-                    sharey=False)
+    # plot catplot of required kind via seaborn
+    if kind == 'swarm':
+        g = sns.catplot(
+            x='bulk',
+            y='fraction',
+            col='celltype',
+            hue='run',
+            data=master_df,
+            kind=kind,
+            col_wrap=4,
+            sharey=False)
 
     else:
-        g = sns.catplot(x='bulk',
-                    y='fraction',
-                    col='celltype',
-                    data=master_df,
-                    kind=kind,
-                    col_wrap=4,
-                    sharey=False)
+        g = sns.catplot(
+            x='bulk',
+            y='fraction',
+            col='celltype',
+            data=master_df,
+            kind=kind,
+            col_wrap=4,
+            sharey=False)
 
     # all y_axes should start at 0
     for ax in g.axes:

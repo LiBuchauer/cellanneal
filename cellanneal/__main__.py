@@ -163,9 +163,25 @@ def main():
     print('\nAll done! :-)\n')
 
 
-
 def repeat():
-    """ Repeat anneal.
+    """ repeatanneal. Runs cellanneal a given number of times and averages
+    the results (takes the mean of cell fractions produced in each of the
+    runs). Plots and gene expression predictions as known from cellanneal
+    are produced for the mean result. Additional plots showing the spread
+    of the repeats are also produced.
+
+    Input:
+            bulk_data
+            celltype_data
+            bulk_min
+            bulk_max
+            disp_min
+            maxiter
+            N_repeat
+
+    Output:
+
+    Example:
 
 
     """
@@ -241,12 +257,15 @@ def repeat():
     """ 4) Write results to file."""
     print('\n4. Writing results to file in folder "results" ...')
     # all results
-    output_name = 'repeat_N={}_fraction={}_'.format(N_repeat, sample_fraction) + bulk_import_path
+    bulk_file_name = Path(bulk_import_path).name
+    bulk_file_ID = bulk_file_name.split(".")[0]
+
+    output_name = 'repeat_N={}_fraction={}_'.format(N_repeat, sample_fraction) + bulk_file_name
     result_path = Path('results/') / output_name
     master_df.to_csv(result_path, header=True, index=True, sep=',')
 
     # mean result
-    mean_name = 'mean_repeat_N={}_fraction={}_'.format(N_repeat, sample_fraction) + bulk_import_path
+    mean_name = 'mean_repeat_N={}_fraction={}_'.format(N_repeat, sample_fraction) + bulk_file_name
     result_path = Path('results/') / mean_name
     mean_df = master_df.groupby(['bulk', 'celltype']).mean()
     mean_df = mean_df.drop(['run'], axis=1)
@@ -256,7 +275,7 @@ def repeat():
     print('\n5. Storing figure in folder "figures" ...')
     # plot results
     figure_path = Path('figures/')
-    repeat_path = figure_path / 'boxes_repeat_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_import_path.split('.')[-2])
+    repeat_path = figure_path / 'boxes_repeat_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
     plot_repeats(master_df, save_path=repeat_path)
 
     print('\nAll done! :-)\n')
