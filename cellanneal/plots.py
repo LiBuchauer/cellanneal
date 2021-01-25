@@ -5,6 +5,7 @@ import seaborn as sns
 from scipy.stats import spearmanr
 from scipy.spatial.distance import correlation
 
+
 mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=[
             '#e6194b', '#3cb44b', '#ffe119', '#4363d8',
             '#f58231', '#911eb4', '#46f0f0', '#f032e6',
@@ -271,6 +272,7 @@ def plot_repeats(
     # all y_axes should start at 0
     for ax in g.axes:
         ax.set_ylim(bottom=0)
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
 
     # store
     plt.savefig(save_path, bbox_inches='tight')

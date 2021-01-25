@@ -125,6 +125,7 @@ def main():
     bulk_file_ID = bulk_file_name.split(".")[0]
     output_name = 'results_' + bulk_file_name
     result_path = Path('results/') / output_name
+    all_mix_df.sort_index(axis=0, inplace=True)
     all_mix_df.to_csv(result_path, header=True, index=True, sep=',')
 
     # next, write the actual and estimated gene expression to file,
@@ -140,6 +141,7 @@ def main():
         # construct export path for this sample
         sample_gene_name = 'expression_' + bulk_file_ID + '_' + sample_name + '.csv'
         sample_gene_path = Path('results/') / sample_gene_name
+        gene_comp_df.sort_index(axis=0, inplace=True)
         gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
 
 
@@ -260,22 +262,59 @@ def repeat():
     bulk_file_name = Path(bulk_import_path).name
     bulk_file_ID = bulk_file_name.split(".")[0]
 
-    output_name = 'repeat_N={}_fraction={}_'.format(N_repeat, sample_fraction) + bulk_file_name
+    output_name = 'repeat_individual_N={}_fraction={}_'.format(N_repeat, sample_fraction) + bulk_file_name
     result_path = Path('results/') / output_name
+    master_df.sort_index(axis=0, inplace=True)
     master_df.to_csv(result_path, header=True, index=True, sep=',')
 
     # mean result
-    mean_name = 'mean_repeat_N={}_fraction={}_'.format(N_repeat, sample_fraction) + bulk_file_name
+    mean_name = 'repeat_mean_N={}_fraction={}_'.format(N_repeat, sample_fraction) + bulk_file_name
     result_path = Path('results/') / mean_name
-    mean_df = master_df.groupby(['bulk', 'celltype']).mean()
-    mean_df = mean_df.drop(['run'], axis=1)
+    mean_df_long = master_df.groupby(['bulk', 'celltype']).mean()
+    mean_df_long = mean_df_long.drop(['run'], axis=1)
+    # the mean df is in long form currently, we want wide form
+    mean_df = pd.pivot_table(mean_df_long, index='bulk', columns='celltype')
+    mean_df.columns = mean_df.columns.droplevel(0)
+    mean_df.index.name = None
+    mean_df.sort_index(axis=0, inplace=True)
     mean_df.to_csv(result_path, header=True, index=True, sep=',')
+
+    # next, write the actual and estimated gene expression to file for the
+    # mean result, this has to be done per sample as the genes are sample-
+    # specific
+    # a mix_df version without correlation entries is needed
+    mean_df_no_corr = mean_df[celltypes]
+    for sample_name in bulk_names:
+        gene_comp_df = calc_gene_expression(
+                            mix_vec=mean_df_no_corr.loc[sample_name],
+                            bulk_vec=bulk_df[sample_name],
+                            sc_ref_df=sc_ref_df,
+                            gene_list=gene_dict[sample_name])
+        # construct export path for this sample
+        sample_gene_name = 'repeat_mean_expression_N={}_fraction={}_{}_{}.csv'.format(N_repeat, sample_fraction, bulk_file_ID, sample_name)
+        sample_gene_path = Path('results/') / sample_gene_name
+        gene_comp_df.sort_index(axis=0, inplace=True)
+        gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
 
     """ 5) Produce plot and save to folder"""
     print('\n5. Storing figure in folder "figures" ...')
-    # plot results
+    # plot results, first spread of repeated annealing
     figure_path = Path('figures/')
-    repeat_path = figure_path / 'boxes_repeat_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
+    repeat_path = figure_path / 'repeat_spread_boxplot_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
     plot_repeats(master_df, save_path=repeat_path)
+
+    # next, same plots as above, for mean expression of all repeats
+    pie_path = figure_path / 'repeat_mean_pies_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
+    plot_pies_from_df(mean_df, save_path=pie_path)
+
+    heat_path = figure_path / 'repeat_mean_heatmap_boxplot_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
+    plot_mix_heatmap(mean_df, rownorm=False, save_path=heat_path)
+
+    line_path = figure_path / 'repeat_mean_lines_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
+    plot_1D_lines(mean_df, line_path)
+
+    scatter_path = figure_path / 'repeat_mean_scatter_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
+    plot_scatter(mean_df, bulk_df, sc_ref_df, gene_dict,
+                 save_path=scatter_path)
 
     print('\nAll done! :-)\n')
