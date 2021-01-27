@@ -1,6 +1,7 @@
-"""This script defines the command line entry point for cell anneal and implements
-a pipeline including identification of highly variable genes, deconvolution of each
-bulk sample, ouput of deconvolution results and production of a set of plots."""
+"""This script defines the command line entry point for cell anneal and
+implements a pipeline including identification of highly variable genes,
+deconvolution of each bulk sample, ouput of deconvolution results and
+production of a set of plots."""
 
 import argparse
 from pathlib import Path
@@ -18,36 +19,41 @@ def init_parser(parser):
     """Initialize parser arguments."""
     parser.add_argument(
         'bulk_data', type=str,
-        help=("Path to bulk data file, csv format with sample names as columns and genes as rows.")
+        help=("""Path to bulk data file, csv format with sample names as
+            columns and genes as rows.""")
     )
 
     parser.add_argument(
         'celltype_data', type=str,
-        help=("Path to celltype reference data file, csv format with sample names as columns and genes as rows. ")
+        help=("""Path to celltype reference data file, csv format with sample
+            names as columns and genes as rows. """)
     )
 
     parser.add_argument(
         '--bulk_min', type=float, default=1e-5,
-        help=("Minimum relative expression in the bulk sample for a gene to be considered.")
+        help=("""Minimum relative expression in the bulk sample for a gene
+            to be considered.""")
     )
 
     parser.add_argument(
         '--bulk_max', type=float, default=0.01,
-        help=("Maximum relative expression in the bulk sample for a gene to be considered.")
+        help=("""Maximum relative expression in the bulk sample for a gene
+            to be considered.""")
     )
 
     parser.add_argument(
         '--disp_min', type=float, default=0.5,
-        help=("Minimum scaled dispersion (var/mean) relative to other genes of similar expression for a gene to be considered.")
+        help=("""Minimum scaled dispersion (var/mean) relative to other
+            genes of similar expression for a gene to be considered.""")
     )
 
     parser.add_argument(
         '--maxiter', type=int, default=1000,
-        help=("Number of initial values from which to run simulated annealing.")
+        help=("""Number of initial values from which to run simulated
+            annealing.""")
     )
 
     return parser
-
 
 
 def main():
@@ -73,7 +79,8 @@ def main():
 
     """
     # get a parser object, initialise the inputs and read them into args
-    my_parser = argparse.ArgumentParser(description=('cellanneal deconvolves bulk RNA-Seq data.'))
+    my_parser = argparse.ArgumentParser(
+        description=('cellanneal deconvolves bulk RNA-Seq data.'))
     args = init_parser(my_parser).parse_args()
 
     # grab the individual inputs for further use
@@ -90,7 +97,8 @@ def main():
     print('1A. Importing bulk data ...')
     bulk_df = pd.read_csv(bulk_import_path, index_col=0, header=0)
     bulk_names = bulk_df.columns.tolist()
-    print('{} bulk samples identified: {}\n'.format(len(bulk_names), bulk_names))
+    print('{} bulk samples identified: {}\n'.format(len(bulk_names),
+                                                    bulk_names))
 
     print('1B. Importing celltype reference data ...')
     # import single cell based reference
@@ -98,7 +106,8 @@ def main():
     celltypes = sc_ref_df.columns.tolist()
     print('{} cell types identified: {}\n'.format(len(celltypes), celltypes))
 
-    """ 2) Identify highly variable genes and genes that pass the thresholds for each bulk. """
+    """ 2) Identify highly variable genes and genes that pass the thresholds
+    for each bulk. """
     # produce lists of genes on which to base deconvolution
     print('2. Constructing gene sets ...')
     gene_dict = make_gene_dictionary(
@@ -139,11 +148,11 @@ def main():
                             sc_ref_df=sc_ref_df,
                             gene_list=gene_dict[sample_name])
         # construct export path for this sample
-        sample_gene_name = 'expression_' + bulk_file_ID + '_' + sample_name + '.csv'
+        sample_gene_name = 'expression_' + bulk_file_ID + '_' + \
+            sample_name + '.csv'
         sample_gene_path = Path('results/') / sample_gene_name
         gene_comp_df.sort_index(axis=0, inplace=True)
         gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
-
 
     """ 5) Produce plots and save to folder"""
     print('\n5. Storing figures in folder "figures" ...')
@@ -188,20 +197,24 @@ def repeat():
 
     """
     # get a parser object, initialise the inputs and read them into args
-    # in a first step, the same arguments as in the main function are required/allowed
-    my_parser = argparse.ArgumentParser(description=('cellanneal deconvolves bulk RNA-Seq data.'))
+    # in a first step, the same arguments as in the main function are
+    # required/allowed
+    my_parser = argparse.ArgumentParser(
+        description=('cellanneal deconvolves bulk RNA-Seq data.'))
     my_parser = init_parser(my_parser)
 
-    # however, we also need additional arguments for the subsampling which are unique
-    # unique to the repeat function and will be added below
+    # however, we also need additional arguments for the subsampling which
+    # are unique unique to the repeat function and will be added below
     my_parser.add_argument(
         '--N_repeat', type=int, default=10,
-        help=("Number of times a subset of genes is drawn and deconvolution is performed on that set of genes.")
+        help=("""Number of times a subset of genes is drawn and deconvolution
+            is performed on that set of genes.""")
     )
 
     my_parser.add_argument(
         '--sample_fraction', type=float, default=0.9,
-        help=("Fraction of the original gene list to include in each random sample, (0, 1].")
+        help=("""Fraction of the original gene list to include in each
+            random sample, (0, 1].""")
     )
 
     args = my_parser.parse_args()
@@ -216,7 +229,8 @@ def repeat():
     N_repeat = args.N_repeat
     sample_fraction = args.sample_fraction
 
-    print("\nWelcome to cellanneal Version 0.1.0!\n\nYou have chosen to repeatedly anneal on subsets of the full gene list.")
+    print("""\nWelcome to cellanneal Version 0.1.0!\n\nYou have chosen to
+    repeatedly anneal on subsets of the full gene list.""")
 
     """ 0. Check the inputs """
     if sample_fraction < 0 or sample_fraction > 1:
@@ -226,7 +240,8 @@ def repeat():
     print('1A. Importing bulk data ...')
     bulk_df = pd.read_csv(bulk_import_path, index_col=0, header=0)
     bulk_names = bulk_df.columns.tolist()
-    print('{} bulk samples identified: {}\n'.format(len(bulk_names), bulk_names))
+    print('{} bulk samples identified: {}\n'.format(len(bulk_names),
+                                                    bulk_names))
 
     print('1B. Importing celltype reference data ...')
     # import single cell based reference
@@ -234,7 +249,8 @@ def repeat():
     celltypes = sc_ref_df.columns.tolist()
     print('{} cell types identified: {}\n'.format(len(celltypes), celltypes))
 
-    """ 2) Identify highly variable genes and genes that pass the thresholds for each bulk. """
+    """ 2) Identify highly variable genes and genes that pass the thresholds
+    for each bulk. """
     # produce lists of genes on which to base deconvolution
     print('2. Constructing base gene sets ...')
     gene_dict = make_gene_dictionary(
@@ -262,13 +278,15 @@ def repeat():
     bulk_file_name = Path(bulk_import_path).name
     bulk_file_ID = bulk_file_name.split(".")[0]
 
-    output_name = 'repeat_individual_N={}_fraction={}_'.format(N_repeat, sample_fraction) + bulk_file_name
+    output_name = 'repeat_individual_N={}_fraction={}_'.format(
+        N_repeat, sample_fraction) + bulk_file_name
     result_path = Path('results/') / output_name
     master_df.sort_index(axis=0, inplace=True)
     master_df.to_csv(result_path, header=True, index=True, sep=',')
 
     # mean result
-    mean_name = 'repeat_mean_N={}_fraction={}_'.format(N_repeat, sample_fraction) + bulk_file_name
+    mean_name = 'repeat_mean_N={}_fraction={}_'.format(
+        N_repeat, sample_fraction) + bulk_file_name
     result_path = Path('results/') / mean_name
     mean_df_long = master_df.groupby(['bulk', 'celltype']).mean()
     mean_df_long = mean_df_long.drop(['run'], axis=1)
@@ -291,7 +309,9 @@ def repeat():
                             sc_ref_df=sc_ref_df,
                             gene_list=gene_dict[sample_name])
         # construct export path for this sample
-        sample_gene_name = 'repeat_mean_expression_N={}_fraction={}_{}_{}.csv'.format(N_repeat, sample_fraction, bulk_file_ID, sample_name)
+        sample_gene_name = """repeat_mean_expression_N={}_fraction=
+            {}_{}_{}.csv""".format(N_repeat, sample_fraction,
+                                   bulk_file_ID, sample_name)
         sample_gene_path = Path('results/') / sample_gene_name
         gene_comp_df.sort_index(axis=0, inplace=True)
         gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
@@ -300,20 +320,25 @@ def repeat():
     print('\n5. Storing figure in folder "figures" ...')
     # plot results, first spread of repeated annealing
     figure_path = Path('figures/')
-    repeat_path = figure_path / 'repeat_spread_boxplot_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
+    repeat_path = figure_path / """repeat_spread_boxplot_N={}_fraction=
+        {}_{}.pdf""".format(N_repeat, sample_fraction, bulk_file_ID)
     plot_repeats(master_df, save_path=repeat_path)
 
     # next, same plots as above, for mean expression of all repeats
-    pie_path = figure_path / 'repeat_mean_pies_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
+    pie_path = figure_path / """repeat_mean_pies_N={}_fraction=
+        {}_{}.pdf""".format(N_repeat, sample_fraction, bulk_file_ID)
     plot_pies_from_df(mean_df, save_path=pie_path)
 
-    heat_path = figure_path / 'repeat_mean_heatmap_boxplot_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
+    heat_path = figure_path / """repeat_mean_heatmap_boxplot_N={}_fraction=
+        {}_{}.pdf""".format(N_repeat, sample_fraction, bulk_file_ID)
     plot_mix_heatmap(mean_df, rownorm=False, save_path=heat_path)
 
-    line_path = figure_path / 'repeat_mean_lines_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
+    line_path = figure_path / """repeat_mean_lines_N={}_fraction=
+        {}_{}.pdf""".format(N_repeat, sample_fraction, bulk_file_ID)
     plot_1D_lines(mean_df, line_path)
 
-    scatter_path = figure_path / 'repeat_mean_scatter_N={}_fraction={}_{}.pdf'.format(N_repeat, sample_fraction, bulk_file_ID)
+    scatter_path = figure_path / """repeat_mean_scatter_N={}_fraction=
+        {}_{}.pdf""".format(N_repeat, sample_fraction, bulk_file_ID)
     plot_scatter(mean_df, bulk_df, sc_ref_df, gene_dict,
                  save_path=scatter_path)
 
