@@ -115,8 +115,7 @@ def main():
                     bulk_df,
                     disp_min=disp_min,
                     bulk_min=bulk_min,
-                    bulk_max=bulk_max,
-                    remove_mito=True)
+                    bulk_max=bulk_max)
 
     """ 3) Run cellanneal. """
     print('\n3. Running cellanneal ...')
@@ -258,8 +257,7 @@ def repeat():
                     bulk_df,
                     disp_min=disp_min,
                     bulk_min=bulk_min,
-                    bulk_max=bulk_max,
-                    remove_mito=True)
+                    bulk_max=bulk_max)
 
     """ 3) Run cellanneal. """
     print('\n3. Running cellanneal {} times...'.format(N_repeat))

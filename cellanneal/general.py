@@ -1,5 +1,4 @@
 import numpy as np
-
 import pandas as pd
 
 # functional requirements
@@ -14,6 +13,7 @@ Path("figures").mkdir(parents=True, exist_ok=True)
 # same for results
 Path("results").mkdir(parents=True, exist_ok=True)
 
+
 def make_gene_dictionary(
         sc_ref_df,
         bulk_df,
@@ -26,24 +26,30 @@ def make_gene_dictionary(
     thresholds within each bulk separately, returns a dictionary of lists were
     each list contains the identified gene for the bulk given as as they appear
     __alphabetically sorted__ by column names.
-    If n_high_var_genes is given, this number of highly variable genes is returned. If
-    it is None, the default parameters for flavor='seurat' are used and the length of
-    the resulting gene list depends on availability."""
+    If n_high_var_genes is given, this number of highly variable genes is
+    returned. If it is None, the default parameters for flavor='seurat' are
+    used and the length of the resulting gene list depends on availability."""
     # order bulk columns alphabetically
     bulk_df = bulk_df.sort_index(axis=1)
     # first, find the most variable genes across cell types
-    high_var_genes= _find_high_var_genes(sc_ref_df, disp_min=disp_min)
+    high_var_genes = find_high_var_genes(sc_ref_df, disp_min=disp_min)
 
-    print("{} highly variable genes identified in cell type reference.".format(len(high_var_genes)))
-    # now, for each bulk, we find the genes which comply with our expression thresholds,
-    # and then keep only those highly variable genes which do
+    print("""{} highly variable genes identified in cell type
+        reference.""".format(len(high_var_genes)))
+
+    # now, for each bulk, we find the genes which comply with our expression
+    # thresholds, and then keep only those highly variable genes which do
     # to ensure usage of correct gene list later one, store in dict
     gene_dict = {}
     for bulk in bulk_df.columns:
-        min_max_genes = _find_thr_genes(bulk_df[bulk], min_thr=bulk_min, max_thr=bulk_max, remove_mito=remove_mito)
+        min_max_genes = find_thr_genes(bulk_df[bulk],
+                                        min_thr=bulk_min,
+                                        max_thr=bulk_max,
+                                        remove_mito=remove_mito)
         thr_highvar_genes = [x for x in min_max_genes if x in high_var_genes]
         gene_dict[bulk] = thr_highvar_genes
-        print("\t{} of these are within thresholds for sample {}".format(len(thr_highvar_genes), bulk))
+        print("\t{} of these are within thresholds for sample {}".format(
+                len(thr_highvar_genes), bulk))
 
     return gene_dict
 
@@ -86,7 +92,7 @@ def calc_gene_expression(
     return gene_comp_df
 
 
-def _find_high_var_genes(
+def find_high_var_genes(
             sc_ref_df,
             disp_min=0.5,
             ):
@@ -156,11 +162,12 @@ def _find_high_var_genes(
     return high_var_genes
 
 
-def _find_thr_genes(
+def find_thr_genes(
         series,  # pandas series in which to find compliant genes
         min_thr=1e-5,  # minimum required expression
         max_thr=0.01,  # maximum allowed expression
-        remove_mito=True  # if True, remove mitochondrial genes (starting with "mt-" or "MT-")
+        remove_mito=True  # if True, remove mitochondrial genes
+        # (starting with "mt-" or "MT-")
                ):
     """ Based on a pandas series containing gene expression values
     (not log!) of some kind, finds for genes which are expressed above the
@@ -170,7 +177,8 @@ def _find_thr_genes(
     """
     # check if input is a series
     if type(series) is not pd.Series:
-        raise TypeError("The object you have passed to 'find_genes()' is not a pandas Series.")
+        raise TypeError("""The object you have passed to 'find_genes()' is not
+                a pandas Series.""")
 
     # from original data, retain only genes which are expressed below max_thr
     colsum = series.sum()
@@ -196,7 +204,7 @@ def _find_thr_genes(
 
 
 # deconvolution functions
-def _rankdata(a):
+def rankdata(a):
     """
     Assign ranks to data, dealing with ties appropriately.
     Ranks begin at 1. The average of the ranks that would have been assigned to
@@ -253,14 +261,15 @@ def calculate_distance(
 
     # calculate Spearman correlation. The bulk vector has already been ranked,
     # so we only need to rank the newly mixed vector here.
-    mixed_compositional_ranked = _rankdata(mixed_counts)
+    mixed_compositional_ranked = rankdata(mixed_counts)
     # calculate Pearson correlation on ranked data
     dist = 1 - np.corrcoef(comp_vec_ranked, mixed_compositional_ranked, rowvar=False)[0][1]
 
     return dist
 
 
-# define a function that returns the composition given the parameters of the distribution
+# define a function that returns the composition given the parameters of the
+# distribution
 def return_mixture(
             params
             ):
@@ -270,7 +279,8 @@ def return_mixture(
     return mixture
 
 
-# function to select genes according to given threshold and deconvolve the resulting mixture
+# function to select genes according to given threshold and deconvolve the
+# resulting mixture
 def deconvolve(
             sc_ref_df,
             bulk_df,
@@ -291,7 +301,7 @@ def deconvolve(
         # first, subset and rank bulk data
         bulk_sub = bulk_df[bulk].loc[gene_dict[bulk]].values
         bulk_comp_list.append(bulk_sub)
-        bulk_ranked = _rankdata(bulk_sub)
+        bulk_ranked = rankdata(bulk_sub)
         bulk_ranked_list.append(bulk_ranked)
 
         # next, subset sc data
@@ -302,8 +312,12 @@ def deconvolve(
     mixt_results_list = []
     for i, mixt in enumerate(bulk_df.columns):
         print('Deconvolving sample {} ...'.format(mixt))
-        res = dual_annealing(calculate_distance, bounds=[[0,1] for x in range(len(sc_ref_df.columns))],
-                             maxiter=maxiter, args=[bulk_ranked_list[i], sc_list[i]], no_local_search=no_local_search)
+        res = dual_annealing(
+                calculate_distance,
+                bounds=[[0, 1] for x in range(len(sc_ref_df.columns))],
+                maxiter=maxiter,
+                args=[bulk_ranked_list[i], sc_list[i]],
+                no_local_search=no_local_search)
         mixt_results_list.append(res)
 
     # grab the results, write them into a dataframe and return it
@@ -316,13 +330,14 @@ def deconvolve(
         # calculate final spearson correlations
         mixed_counts = np.dot(mixture, sc_list[i].T).T
         mixed_compositional = mixed_counts / mixed_counts.sum()
-        mixed_ranked = _rankdata(mixed_counts)
+        mixed_ranked = rankdata(mixed_counts)
         spears.append(1-correlation(mixed_ranked, bulk_ranked_list[i]))
         pears.append(1-correlation(mixed_compositional, bulk_comp_list[i]))
 
     data_out = np.hstack((np.array(mixture_list), np.array([spears, pears]).T))
     cols_out = sc_ref_df.columns.tolist() + ['rho_Spearman', 'rho_Pearson']
 
-    all_mix_df = pd.DataFrame(data=data_out, columns=cols_out, index=bulk_df.columns)
+    all_mix_df = pd.DataFrame(data=data_out, columns=cols_out,
+                              index=bulk_df.columns)
 
     return all_mix_df
