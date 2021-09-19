@@ -36,9 +36,10 @@ def open_file():
                 title="Choose bulk data.",
                 filetypes=[("csv file", "*.csv")])
         if file:
-                print("hello.")
-                bulk_df = pd.read_csv(file, index_col=0)
-                print(bulk_df.head())
+            print("hello.")
+            bulk_df = pd.read_csv(file, index_col=0)
+            print(bulk_df.head())
+
 # Browse data
 browse_text = tk.StringVar()
 browse_btn = tk.Button(
