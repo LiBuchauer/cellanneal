@@ -29,8 +29,8 @@ class cellgui:
         self.maxiter = 1000  # maximum annealing iterations
         self.maxiter_default = 1000
 
-        self.repeat = 10  # deconvolution repeats in case of repeatanneal
-        self.repeat_default = 10
+        self.N_repeat = 10  # deconvolution repeats in case of repeatanneal
+        self.N_repeat_default = 10
 
         # basic layout considerations
         self.canvas = tk.Canvas(root, width=800, height=600)
@@ -178,6 +178,29 @@ class cellgui:
                                         command=lambda: self.set_maxiter(),
                                         width=8)
         self.maxiter_set_button.grid(row=p_i+5, column=2, sticky=tk.W)
+
+        # for parameter N_repeat
+        # title label and current value
+        self.N_repeat_label = tk.Label(root, text="N_repeat", font="-weight bold")
+        self.N_repeat_label.grid(row=p_i+3, column=3, columnspan=2, sticky=tk.W+tk.E)
+        self.N_repeat_current_label = tk.Label(root, text="current value: {}".format(self.N_repeat), font="-slant italic")
+        self.N_repeat_current_label.grid(row=p_i+4, column=3, columnspan=2, sticky=tk.W+tk.E)
+
+        # entry field
+        self.N_repeat_entry = tk.Entry(
+                                    root,
+                                    width=8)
+        self.N_repeat_entry.grid(row=p_i+5, column=3, sticky=tk.E)
+
+        # set button
+        self.N_repeat_set_button = tk.Button(
+                                        root,
+                                        text='set',
+                                        command=lambda: self.set_N_repeat(),
+                                        width=8)
+        self.N_repeat_set_button.grid(row=p_i+5, column=4, sticky=tk.W)
+
+
         """ run deconvolution section """
 
     # methods
@@ -279,6 +302,25 @@ class cellgui:
             self.maxiter_current_label['text'] = "current value: {}".format(self.maxiter)
         else:
             messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "50", "587", "1000".""")
+
+    def set_N_repeat(self):
+        # get input and check validity
+        input = self.N_repeat_entry.get()
+        print(input)
+        # can it be interpreted as float?
+        try:
+            new_val = int(input)
+        except ValueError:
+            messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "5", "10", "21".""")
+            return 0
+        # check if value is >0
+        if new_val >= 1:
+            # update disp_min
+            self.N_repeat = new_val
+            # update display of current bulk_min
+            self.N_repeat_current_label['text'] = "current value: {}".format(self.N_repeat)
+        else:
+            messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "5", "10", "21".""")
 
 
 root = tk.Tk()
