@@ -2,9 +2,8 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import cellanneal
 import pandas as pd
-from tkinter.filedialog import askopenfile
+from tkinter.filedialog import askopenfile, askdirectory
 from tkinter import messagebox
-
 
 class cellgui:
 
@@ -14,7 +13,13 @@ class cellgui:
 
         # place holders for required data
         self.bulk_df = pd.DataFrame()
+        self.bulk_df_is_set = 0  # to check later whether data has been selected
         self.celltype_df = pd.DataFrame()
+        self.celltype_df_is_set = 0
+
+        # output path
+        self.output_folder_path = tk.StringVar()
+        self.output_path_is_set = 0
 
         # parameters for the deconvolution procedure, set to default values
         self.bulk_min = 1e-5  # minimum expression in bulk
@@ -34,10 +39,10 @@ class cellgui:
 
         # basic layout considerations
         self.canvas = tk.Canvas(root, width=800, height=600)
-        self.canvas.grid(columnspan=7, rowspan=11)
+        self.canvas.grid(columnspan=7, rowspan=12)
         # for easier grid layout changes
         i_i = 1  # start of import section
-        p_i = 4  # start of parameter section
+        p_i = 5  # start of parameter section
         d_i = 10  # start of deconv section
 
         """ logo """
@@ -51,7 +56,7 @@ class cellgui:
         logo_label.grid(column=3, row=0)
 
         """ main section labels, structure """
-        self.sec1_label = tk.Label(root, text="1) Import data.", font=('Helvetica', 14, 'bold'))
+        self.sec1_label = tk.Label(root, text="1) Select source data \nand output folder.", font=('Helvetica', 14, 'bold'))
         self.sec2_label = tk.Label(root, text="2) Set parameters. \n[optional]", font=('Helvetica', 14, 'bold'))
         self.sec3_label = tk.Label(root, text="3) Run deconvolution.", font=('Helvetica', 14, 'bold'))
         self.sec1_label.grid(row=i_i, column=0, sticky='w')
@@ -92,6 +97,20 @@ class cellgui:
                                         text="Browse file system",
                                         command=lambda: self.import_celltype_data())
         self.celltype_browse_button.grid(row=i_i+1, column=5, columnspan=2, sticky=tk.W+tk.E)
+
+        # select output folder
+        # label to indicate that we want celltype data here
+        self.output_folder_label = tk.Label(root, text="Select folder to store results.")
+        self.output_folder_label.grid(row=i_i+2, column=1, columnspan=2, sticky=tk.W)
+        # path entry field
+        self.output_folder_entry = tk.Entry(root, textvariable=self.output_folder_path)
+        self.output_folder_entry.grid(row=i_i+2, column=3, columnspan=2, sticky=tk.W+tk.E)
+        # file system browse button
+        self.celltype_browse_button = tk.Button(
+                                        root,
+                                        text="Browse file system",
+                                        command=lambda: self.select_output_folder())
+        self.celltype_browse_button.grid(row=i_i+2, column=5, columnspan=2, sticky=tk.W+tk.E)
 
         """ parameter section """
         # for parameter bulk_min
@@ -211,9 +230,14 @@ class cellgui:
                 title="Choose a csv file.",
                 filetypes=[("csv file", "*.csv")])
         if file:
-            self.bulk_df = pd.read_csv(file, index_col=0)
-            self.bulk_folder_path.set(file.name)
-            print(self.bulk_df.head())
+            try:
+                self.bulk_df = pd.read_csv(file, index_col=0)
+                self.bulk_folder_path.set(file.name)
+                print(file.name)
+                self.bulk_df_is_set = 1
+                print(self.bulk_df.head())
+            except:
+                messagebox.showerror("Import error", """Your bulk data file could not be imported. Please check the documentation for format requirements and look at the example bulk data file.""")
 
     def import_celltype_data(self):
         file = askopenfile(
@@ -222,9 +246,25 @@ class cellgui:
                 title="Choose a csv file.",
                 filetypes=[("csv file", "*.csv")])
         if file:
-            self.celltype_df = pd.read_csv(file, index_col=0)
-            self.celltype_folder_path.set(file.name)
-            print(self.celltype_df.head())
+            try:
+                self.celltype_df = pd.read_csv(file, index_col=0)
+                self.celltype_folder_path.set(file.name)
+                self.celltype_df_is_set = 1
+                print(self.celltype_df.head())
+            except:
+                messagebox.showerror("Import error", """Your celltype data file could not be imported. Please check the documentation for format requirements and look at the example celltype data file.""")
+
+    def select_output_folder(self):
+        folder = askdirectory(
+                parent=root,
+                title="Choose a folder.")
+        if folder:
+            print(folder)
+            self.output_folder_path.set(folder)
+            self.output_path_is_set = 1
+            print('1', self.output_folder_path.get())
+
+
 
     def set_bulk_min(self):
         # get input and check validity
