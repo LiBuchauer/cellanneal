@@ -245,7 +245,7 @@ def rankdata(a):
 # function that takes parameters specifying distribution and returns distance
 # of resulting mixed data to a single bulk composition
 def calculate_distance(
-                params,  # collection of independent heights of discerete dist
+                params,  # collection of independent heights of discrete dist
                 comp_vec_ranked,  # the gene expression vector with which to compare the resulting mixture
                 sc_data,  # single_cell data from which to mix new samples
                 ):

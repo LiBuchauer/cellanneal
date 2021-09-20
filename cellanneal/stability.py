@@ -1,18 +1,9 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
-from random import sample
+
 # functional requirements
 from .general import deconvolve
 
-"""
-
-1)
-Functions for testing reproducibility of deconvolution results vis a vis optimisation
-stochasticity and gene set differences
-
-"""
 
 def repeat_annealing(
         sc_ref_df,
@@ -20,7 +11,6 @@ def repeat_annealing(
         gene_dict,
         no_local_search,
         N_repeat=10,
-        sample_fraction=0.9,
         maxiter=1000
         ):
     """Function that allows to run the deconvolution process N_repeat
@@ -35,12 +25,15 @@ def repeat_annealing(
     # repeat deconvolution n times and collect results
     for i in range(N_repeat):
         print("\nRepeat number {}".format(i+1))
-        # now, draw new gene dictionary
+        # now, bootstrap a new gene dictionary (same length as original one)
         gene_dict_new = {}
         for key in list(gene_dict.keys()):
-            number_of_genes = int(sample_fraction * len(gene_dict[key]))
-            gene_dict_new[key] = sample(gene_dict[key], number_of_genes)
-        
+            number_of_genes = len(gene_dict[key])
+            gene_dict_new[key] = np.random.choice(
+                                            gene_dict[key],
+                                            size=number_of_genes,
+                                            replace=True)
+
         # deconvolve with the new gene dict
         all_mix_df = all_mix_df = deconvolve(sc_ref_df=sc_ref_df,
                               bulk_df=bulk_df,

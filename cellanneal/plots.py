@@ -47,13 +47,9 @@ def plot_pies_from_df(mix_df,
     for i, ax in enumerate(axes.flatten()):
         try:
             mixture = plot_df.iloc[i]
-            pie = ax.pie(mixture, normalize=True)
-            spearman = spear_list[i]
-            pearson = pear_list[i]
-            # calc spearman and pearson
+            pie = ax.pie(mixture)
             ax.set_title(
-                plot_df.index.tolist()[i] +
-                '\n S_corr={},\nP_corr={}'.format(spearman, pearson))
+                plot_df.index.tolist()[i])
             plotted_a_pie = True
         except (IndexError, ValueError):
             ax.set_visible(False)

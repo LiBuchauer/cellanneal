@@ -210,12 +210,6 @@ def repeat():
             is performed on that set of genes.""")
     )
 
-    my_parser.add_argument(
-        '--sample_fraction', type=float, default=0.9,
-        help=("""Fraction of the original gene list to include in each
-            random sample, (0, 1].""")
-    )
-
     args = my_parser.parse_args()
 
     # grab the individual inputs for further use
@@ -226,14 +220,9 @@ def repeat():
     disp_min = args.disp_min
     maxiter = args.maxiter
     N_repeat = args.N_repeat
-    sample_fraction = args.sample_fraction
 
     print("""\nWelcome to cellanneal Version 0.1.0!\n\nYou have chosen to
     repeatedly anneal on subsets of the full gene list.""")
-
-    """ 0. Check the inputs """
-    if sample_fraction < 0 or sample_fraction > 1:
-        sys.exit('Error: Please enter a sample_fraction between 0 and 1.')
 
     """ 1) Import bulk and cell type data """
     print('1A. Importing bulk data ...')
@@ -267,7 +256,6 @@ def repeat():
                     gene_dict,
                     no_local_search=False,
                     N_repeat=N_repeat,
-                    sample_fraction=sample_fraction,
                     maxiter=maxiter)
 
     """ 4) Write results to file."""
@@ -276,15 +264,15 @@ def repeat():
     bulk_file_name = Path(bulk_import_path).name
     bulk_file_ID = bulk_file_name.split(".")[0]
 
-    output_name = 'repeat_individual_N={}_fraction={}_'.format(
-        N_repeat, sample_fraction) + bulk_file_name
+    output_name = 'repeat_individual_N={}_'.format(
+        N_repeat) + bulk_file_name
     result_path = Path('results/') / output_name
     master_df.sort_index(axis=0, inplace=True)
     master_df.to_csv(result_path, header=True, index=True, sep=',')
 
     # mean result
-    mean_name = 'repeat_mean_N={}_fraction={}_'.format(
-        N_repeat, sample_fraction) + bulk_file_name
+    mean_name = 'repeat_mean_N={}_'.format(
+        N_repeat) + bulk_file_name
     result_path = Path('results/') / mean_name
     mean_df_long = master_df.groupby(['bulk', 'celltype']).mean()
     mean_df_long = mean_df_long.drop(['run'], axis=1)
@@ -307,9 +295,9 @@ def repeat():
                             sc_ref_df=sc_ref_df,
                             gene_list=gene_dict[sample_name])
         # construct export path for this sample
-        sample_gene_name = """repeat_mean_expression_N={}_fraction=
-            {}_{}_{}.csv""".format(N_repeat, sample_fraction,
-                                   bulk_file_ID, sample_name)
+        sample_gene_name = """repeat_mean_expression_N={}_{}_{}.csv""".format(N_repeat,
+                                bulk_file_ID,
+                                sample_name)
         sample_gene_path = Path('results/') / sample_gene_name
         gene_comp_df.sort_index(axis=0, inplace=True)
         gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
@@ -318,25 +306,23 @@ def repeat():
     print('\n5. Storing figure in folder "figures" ...')
     # plot results, first spread of repeated annealing
     figure_path = Path('figures/')
-    repeat_path = figure_path / """repeat_spread_boxplot_N={}_fraction=
-        {}_{}.pdf""".format(N_repeat, sample_fraction, bulk_file_ID)
+    repeat_path = figure_path / """repeat_spread_boxplot_N={}_{}.pdf""".format(
+        N_repeat, bulk_file_ID)
     plot_repeats(master_df, save_path=repeat_path)
 
     # next, same plots as above, for mean expression of all repeats
-    pie_path = figure_path / """repeat_mean_pies_N={}_fraction=
-        {}_{}.pdf""".format(N_repeat, sample_fraction, bulk_file_ID)
+    pie_path = figure_path / """repeat_mean_pies_N={}_{}.pdf""".format(
+        N_repeat, bulk_file_ID)
     plot_pies_from_df(mean_df, save_path=pie_path)
 
-    heat_path = figure_path / """repeat_mean_heatmap_boxplot_N={}_fraction=
-        {}_{}.pdf""".format(N_repeat, sample_fraction, bulk_file_ID)
+    heat_path = figure_path / """repeat_mean_heatmap_boxplot_N={}_{}.pdf""".format(N_repeat, bulk_file_ID)
     plot_mix_heatmap(mean_df, rownorm=False, save_path=heat_path)
 
-    line_path = figure_path / """repeat_mean_lines_N={}_fraction=
-        {}_{}.pdf""".format(N_repeat, sample_fraction, bulk_file_ID)
+    line_path = figure_path / """repeat_mean_lines_N={}_{}.pdf""".format(N_repeat, bulk_file_ID)
     plot_1D_lines(mean_df, line_path)
 
-    scatter_path = figure_path / """repeat_mean_scatter_N={}_fraction=
-        {}_{}.pdf""".format(N_repeat, sample_fraction, bulk_file_ID)
+    scatter_path = figure_path / """repeat_mean_scatter_N={}_{}.pdf""".format(
+        N_repeat, bulk_file_ID)
     plot_scatter(mean_df, bulk_df, sc_ref_df, gene_dict,
                  save_path=scatter_path)
 

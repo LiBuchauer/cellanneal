@@ -22,7 +22,7 @@ setup(
     long_description=long_description,
     packages=find_packages(),
 
-    # package dependendies
+    # package dependencies
     install_requires=[
             'numpy',
             'scipy',

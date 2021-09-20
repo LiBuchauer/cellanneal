@@ -43,3 +43,40 @@ directory3Select.grid(row=2)
 c = ttk.Button(gui, text="find", command=doStuff)
 c.grid(row=4,column=0)
 gui.mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def validate_bulk_min(self, new_text):
+        # !the validate function changes only what is shown, not the
+        # actual parameter values - these are altered when set is pressed
+        print('hello')
+        # if the user has cleared the field without providing new input,
+        # return to default value
+        if not new_text:
+            print('empty')
+            self.bulk_min_var.set(self.bulk_min_default)
+            self.bulk_min_entry.insert(0, self.bulk_min_var.get())
+            return True
+
+        try:
+            self.bulk_min_var.set(float(new_text))
+            self.bulk_min_entry.delete(0, 'end')
+            self.bulk_min_entry.insert(0, self.bulk_min_var.get())
+            print('true')
+            return True
+        except ValueError:  # if invalid, also return to default
+            self.bulk_min_var.set(self.bulk_min_default)
+            self.bulk_min_entry.delete(0, 'end')
+            self.bulk_min_entry.insert(0, self.bulk_min_var.get())
+            print('false')
+            return False

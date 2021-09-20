@@ -43,7 +43,7 @@ class cellgui:
         # for easier grid layout changes
         i_i = 1  # start of import section
         p_i = 5  # start of parameter section
-        d_i = 10  # start of deconv section
+        d_i = 11  # start of deconv section
 
         """ logo """
         logo = Image.open('logo.png')
