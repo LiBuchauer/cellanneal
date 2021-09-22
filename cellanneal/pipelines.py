@@ -8,7 +8,7 @@ from .stability import repeat_annealing
 
 def cellanneal_pipe(
         celltype_data_path,  # path object!
-        sc_ref_df,
+        celltype_df,
         bulk_data_path,  # path object!
         bulk_df,
         disp_min,
@@ -23,11 +23,11 @@ def cellanneal_pipe(
     for each bulk. """
     # extract names
     bulk_names = bulk_df.columns.tolist()
-    celltypes = sc_ref_df.columns.tolist()
+    celltypes = celltype_df.columns.tolist()
     # produce lists of genes on which to base deconvolution
     print('2. Constructing gene sets ...')
     gene_dict = make_gene_dictionary(
-                    sc_ref_df,
+                    celltype_df,
                     bulk_df,
                     disp_min=disp_min,
                     bulk_min=bulk_min,
@@ -36,7 +36,7 @@ def cellanneal_pipe(
     """ 3) Run cellanneal. """
     print('\n3. Running cellanneal ...')
     all_mix_df = deconvolve(
-                    sc_ref_df=sc_ref_df,
+                    celltype_df=celltype_df,
                     bulk_df=bulk_df,
                     maxiter=maxiter,
                     gene_dict=gene_dict,
@@ -76,7 +76,7 @@ def cellanneal_pipe(
         gene_comp_df = calc_gene_expression(
                             mix_vec=all_mix_df_no_corr.loc[sample_name],
                             bulk_vec=bulk_df[sample_name],
-                            sc_ref_df=sc_ref_df,
+                            celltype_df=celltype_df,
                             gene_list=gene_dict[sample_name])
         # construct export path for this sample
         sample_gene_name = 'expression_' + bulk_file_ID + '_' + \
@@ -96,7 +96,7 @@ def cellanneal_pipe(
     plot_mix_heatmap(all_mix_df, rownorm=False, save_path=heat_path)
 
     scatter_path = figure_folder_path / 'scatter_{}.pdf'.format(bulk_file_ID)
-    plot_scatter(all_mix_df, bulk_df, sc_ref_df, gene_dict,
+    plot_scatter(all_mix_df, bulk_df, celltype_df, gene_dict,
                  save_path=scatter_path)
 
     print('\nAll done! :-)\n')
@@ -104,7 +104,7 @@ def cellanneal_pipe(
 
 def repeatanneal_pipe(
         celltype_data_path,
-        sc_ref_df,
+        celltype_df,
         bulk_data_path,
         bulk_df,
         disp_min,
@@ -118,11 +118,11 @@ def repeatanneal_pipe(
     for each bulk. """
     # extract names
     bulk_names = bulk_df.columns.tolist()
-    celltypes = sc_ref_df.columns.tolist()
+    celltypes = celltype_df.columns.tolist()
     # produce lists of genes on which to base deconvolution
     print('2. Constructing base gene sets ...')
     gene_dict = make_gene_dictionary(
-                    sc_ref_df,
+                    celltype_df,
                     bulk_df,
                     disp_min=disp_min,
                     bulk_min=bulk_min,
@@ -131,7 +131,7 @@ def repeatanneal_pipe(
     """ 3) Run cellanneal. """
     print('\n3. Running cellanneal {} times...'.format(N_repeat))
     parent_df = repeat_annealing(
-                    sc_ref_df,
+                    celltype_df,
                     bulk_df,
                     gene_dict,
                     no_local_search=False,
@@ -186,7 +186,7 @@ def repeatanneal_pipe(
         gene_comp_df = calc_gene_expression(
                             mix_vec=mean_df_no_corr.loc[sample_name],
                             bulk_vec=bulk_df[sample_name],
-                            sc_ref_df=sc_ref_df,
+                            celltype_df=celltype_df,
                             gene_list=gene_dict[sample_name])
         # construct export path for this sample
         sample_gene_name = """expression_{}_{}.csv""".format(
@@ -210,7 +210,7 @@ def repeatanneal_pipe(
     plot_mix_heatmap(mean_df, rownorm=False, save_path=heat_path)
 
     scatter_path = figure_folder_path / 'scatter_{}.pdf'.format(bulk_file_ID)
-    plot_scatter(mean_df, bulk_df, sc_ref_df, gene_dict,
+    plot_scatter(mean_df, bulk_df, celltype_df, gene_dict,
                  save_path=scatter_path)
 
     print('\nAll done! :-)\n')

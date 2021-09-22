@@ -1,9 +1,11 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-import cellanneal
 import pandas as pd
 from tkinter.filedialog import askopenfile, askdirectory
 from tkinter import messagebox
+from pathlib import Path
+from cellanneal import cellanneal_pipe, repeatanneal_pipe
+
 
 class cellgui:
 
@@ -13,17 +15,19 @@ class cellgui:
 
         # place holders for required data
         self.bulk_df = pd.DataFrame()
-        self.bulk_df_is_set = 0  # to check later whether data has been selected
+        self.bulk_folder_path = tk.StringVar()
+        self.bulk_df_is_set = 0  # check later whether data has been selected
         self.celltype_df = pd.DataFrame()
+        self.celltype_folder_path = tk.StringVar()
         self.celltype_df_is_set = 0
 
         # output path
-        self.output_folder_path = tk.StringVar()
+        self.output_path = tk.StringVar()
         self.output_path_is_set = 0
 
         # parameters for the deconvolution procedure, set to default values
         self.bulk_min = 1e-5  # minimum expression in bulk
-        self.bulk_min_default = 1e-5  # default values are requried for reset functionality
+        self.bulk_min_default = 1e-5
 
         self.bulk_max = 0.01  # maximum expression in bulk
         self.bulk_max_default = 0.01
@@ -46,7 +50,7 @@ class cellgui:
         d_i = 11  # start of deconv section
 
         """ logo """
-        logo = Image.open('logo.png')
+        logo = Image.open('logo_orange.png')
         # convert pillow image to tkinter image
         logo = ImageTk.PhotoImage(logo)
         # place image inside label widget (both lines below are needed)
@@ -54,6 +58,17 @@ class cellgui:
         logo_label.image = logo
         # place the logo label inside the box using grid method
         logo_label.grid(column=3, row=0)
+
+        # for buttons belows
+        ca_button = Image.open('cellanneal_button.png')
+        ca_button = ImageTk.PhotoImage(ca_button)
+        ca_label = tk.Label(image=ca_button)  # is needed for display below, unclear why
+        ca_label.image = ca_button
+
+        ra_button = Image.open('repeatanneal_button.png')
+        ra_button = ImageTk.PhotoImage(ra_button)
+        ra_label = tk.Label(image=ra_button)  # is needed for display below, unclear why
+        ra_label.image = ra_button
 
         """ main section labels, structure """
         self.sec1_label = tk.Label(root, text="1) Select source data \nand output folder.", font=('Helvetica', 14, 'bold'))
@@ -65,7 +80,6 @@ class cellgui:
 
         """ data import section """
         # import bulk data
-        self.bulk_folder_path = tk.StringVar()
         # label to indicate that we want bulk data here
         self.bulk_data_label = tk.Label(
                                     root,
@@ -84,7 +98,6 @@ class cellgui:
         self.bulk_browse_button.grid(row=i_i, column=5, columnspan=2, sticky=tk.W+tk.E)
 
         # import celltype data
-        self.celltype_folder_path = tk.StringVar()
         # label to indicate that we want celltype data here
         self.celltype_data_label = tk.Label(root, text="Select celltype data (*.csv).")
         self.celltype_data_label.grid(row=i_i+1, column=1, columnspan=2, sticky=tk.W)
@@ -103,7 +116,7 @@ class cellgui:
         self.output_folder_label = tk.Label(root, text="Select folder to store results.")
         self.output_folder_label.grid(row=i_i+2, column=1, columnspan=2, sticky=tk.W)
         # path entry field
-        self.output_folder_entry = tk.Entry(root, textvariable=self.output_folder_path)
+        self.output_folder_entry = tk.Entry(root, textvariable=self.output_path)
         self.output_folder_entry.grid(row=i_i+2, column=3, columnspan=2, sticky=tk.W+tk.E)
         # file system browse button
         self.celltype_browse_button = tk.Button(
@@ -221,6 +234,35 @@ class cellgui:
 
 
         """ run deconvolution section """
+        # make button for cellanneal
+        self.cellanneal_button = tk.Button(
+                                        root,
+                                        text='cellanneal',
+                                        font="-weight bold ",
+                                        image=ca_button,
+                                        highlightbackground='#f47a60',
+                                        command=lambda: self.cellanneal())
+        self.cellanneal_button.grid(
+                                row=d_i,
+                                column=1,
+                                columnspan=2,
+                                sticky=tk.W+tk.E,
+                                padx=10, pady=10)
+
+        # make button for cellanneal
+        self.repeatanneal_button = tk.Button(
+                                        root,
+                                        text='repeatanneal',
+                                        font="-weight bold ",
+                                        image=ra_button,
+                                        command=lambda: self.repeatanneal(),
+                                        highlightbackground='#f47a60')
+        self.repeatanneal_button.grid(
+                                    row=d_i,
+                                    column=3,
+                                    columnspan=2,
+                                    sticky=tk.W+tk.E,
+                                    padx=10, pady=10)
 
     # methods
     def import_bulk_data(self):
@@ -233,9 +275,7 @@ class cellgui:
             try:
                 self.bulk_df = pd.read_csv(file, index_col=0)
                 self.bulk_folder_path.set(file.name)
-                print(file.name)
                 self.bulk_df_is_set = 1
-                print(self.bulk_df.head())
             except:
                 messagebox.showerror("Import error", """Your bulk data file could not be imported. Please check the documentation for format requirements and look at the example bulk data file.""")
 
@@ -250,7 +290,6 @@ class cellgui:
                 self.celltype_df = pd.read_csv(file, index_col=0)
                 self.celltype_folder_path.set(file.name)
                 self.celltype_df_is_set = 1
-                print(self.celltype_df.head())
             except:
                 messagebox.showerror("Import error", """Your celltype data file could not be imported. Please check the documentation for format requirements and look at the example celltype data file.""")
 
@@ -259,10 +298,8 @@ class cellgui:
                 parent=root,
                 title="Choose a folder.")
         if folder:
-            print(folder)
-            self.output_folder_path.set(folder)
+            self.output_path.set(folder)
             self.output_path_is_set = 1
-            print('1', self.output_folder_path.get())
 
 
 
@@ -327,7 +364,6 @@ class cellgui:
     def set_maxiter(self):
         # get input and check validity
         input = self.maxiter_entry.get()
-        print(input)
         # can it be interpreted as float?
         try:
             new_val = int(input)
@@ -346,7 +382,6 @@ class cellgui:
     def set_N_repeat(self):
         # get input and check validity
         input = self.N_repeat_entry.get()
-        print(input)
         # can it be interpreted as float?
         try:
             new_val = int(input)
@@ -361,6 +396,53 @@ class cellgui:
             self.N_repeat_current_label['text'] = "current value: {}".format(self.N_repeat)
         else:
             messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "5", "10", "21".""")
+
+    def cellanneal(self):
+        # check if input and output is set
+        if self.bulk_df_is_set == 0:
+            messagebox.showerror("Data error", """Please select a bulk data file in section 1).""")
+            return 0
+        if self.celltype_df_is_set == 0:
+            messagebox.showerror("Data error", """Please select a celltype data file in section 1).""")
+            return 0
+        if self.output_path_is_set == 0:
+            messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
+            return 0
+        # run cellanneal!
+        cellanneal_pipe(
+            celltype_data_path=Path(self.celltype_folder_path.get()),
+            celltype_df=self.celltype_df,
+            bulk_data_path=Path(self.bulk_folder_path.get()),  # path object!
+            bulk_df=self.bulk_df,
+            disp_min=self.disp_min,
+            bulk_min=self.bulk_min,
+            bulk_max=self.bulk_max,
+            maxiter=self.maxiter,
+            output_path=Path(self.output_path.get()))
+
+    def repeatanneal(self):
+        # check if input and output is set
+        if self.bulk_df_is_set == 0:
+            messagebox.showerror("Data error", """Please select a bulk data file in section 1).""")
+            return 0
+        if self.celltype_df_is_set == 0:
+            messagebox.showerror("Data error", """Please select a celltype data file in section 1).""")
+            return 0
+        if self.output_path_is_set == 0:
+            messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
+            return 0
+        # run cellanneal!
+        repeatanneal_pipe(
+            celltype_data_path=Path(self.celltype_folder_path.get()),
+            celltype_df=self.celltype_df,
+            bulk_data_path=Path(self.bulk_folder_path.get()),  # path object!
+            bulk_df=self.bulk_df,
+            disp_min=self.disp_min,
+            bulk_min=self.bulk_min,
+            bulk_max=self.bulk_max,
+            maxiter=self.maxiter,
+            N_repeat=self.N_repeat,
+            output_path=Path(self.output_path.get()))
 
 
 root = tk.Tk()

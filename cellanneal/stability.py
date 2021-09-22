@@ -6,7 +6,7 @@ from .general import deconvolve
 
 
 def repeat_annealing(
-        sc_ref_df,
+        celltype_df,
         bulk_df,
         gene_dict,
         no_local_search,
@@ -35,7 +35,7 @@ def repeat_annealing(
                                             replace=True)
 
         # deconvolve with the new gene dict
-        all_mix_df = all_mix_df = deconvolve(sc_ref_df=sc_ref_df,
+        all_mix_df = all_mix_df = deconvolve(celltype_df=celltype_df,
                               bulk_df=bulk_df,
                               gene_dict=gene_dict_new,
                               maxiter=maxiter, no_local_search=no_local_search)

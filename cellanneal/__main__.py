@@ -110,8 +110,8 @@ def main():
     print('1B. Importing celltype reference data ...')
     # import single cell based reference
     try:
-        sc_ref_df = pd.read_csv(celltype_data_path, index_col=0, header=0)
-        celltypes = sc_ref_df.columns.tolist()
+        celltype_df = pd.read_csv(celltype_data_path, index_col=0, header=0)
+        celltypes = celltype_df.columns.tolist()
         print('{} cell types identified: {}\n'.format(len(celltypes), celltypes))
     except:
         print("""Your celltype data file could not be imported.
@@ -121,7 +121,7 @@ def main():
     # start pipeline
     cellanneal_pipe(
         celltype_data_path,
-        sc_ref_df,
+        celltype_df,
         bulk_data_path,
         bulk_df,
         disp_min,
@@ -199,8 +199,8 @@ def repeat():
     print('1B. Importing celltype reference data ...')
     # import single cell based reference
     try:
-        sc_ref_df = pd.read_csv(celltype_data_path, index_col=0, header=0)
-        celltypes = sc_ref_df.columns.tolist()
+        celltype_df = pd.read_csv(celltype_data_path, index_col=0, header=0)
+        celltypes = celltype_df.columns.tolist()
         print('{} cell types identified: {}\n'.format(len(celltypes), celltypes))
     except:
         print("""Your celltype data file could not be imported.
@@ -210,7 +210,7 @@ def repeat():
     # start pipeline
     repeatanneal_pipe(
         celltype_data_path,
-        sc_ref_df,
+        celltype_df,
         bulk_data_path,
         bulk_df,
         disp_min,

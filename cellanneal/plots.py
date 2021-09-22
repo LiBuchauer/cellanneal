@@ -153,7 +153,7 @@ def plot_1D_lines(
 # function for pie plots from one lcm position set of results
 def plot_scatter(mix_df,
                  bulk_df,
-                 sc_ref_df,
+                 celltype_df,
                  gene_dict,
                  save_path='figures/scatter.pdf'):
     # if correlation values are included in the mix_df, remove
@@ -184,7 +184,7 @@ def plot_scatter(mix_df,
         bulk_comp_list.append(bulk_sub)
 
         # next, subset sc data
-        sc_sub = sc_ref_df.loc[gene_dict[bulk]].values
+        sc_sub = celltype_df.loc[gene_dict[bulk]].values
         sc_list.append(sc_sub)
 
     # for each mixture, plot a scatterplot of mixed vs real bulk

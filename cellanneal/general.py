@@ -9,7 +9,7 @@ from .dual_annealing import dual_annealing
 
 
 def make_gene_dictionary(
-        sc_ref_df,
+        celltype_df,
         bulk_df,
         disp_min=0.5,
         bulk_min=1e-5,
@@ -26,7 +26,7 @@ def make_gene_dictionary(
     # order bulk columns alphabetically
     bulk_df = bulk_df.sort_index(axis=1)
     # first, find the most variable genes across cell types
-    high_var_genes = find_high_var_genes(sc_ref_df, disp_min=disp_min)
+    high_var_genes = find_high_var_genes(celltype_df, disp_min=disp_min)
 
     print("""{} highly variable genes identified in cell type
         reference.""".format(len(high_var_genes)))
@@ -51,7 +51,7 @@ def make_gene_dictionary(
 def calc_gene_expression(
                 mix_vec,
                 bulk_vec,
-                sc_ref_df,
+                celltype_df,
                 gene_list):
     """ Given a mixing vector, a bulk expression vector and the list of genes
     for this sample (i.e. all data only for one of the bulk samples),
@@ -59,13 +59,13 @@ def calc_gene_expression(
     experimentally observed bulk expression and returns a dataframe with
     these two values as well as the original bulk measurement."""
 
-    # subset sc_ref_df and bulk_vec to the genes supplied in gene_list
+    # subset celltype_df and bulk_vec to the genes supplied in gene_list
     bulk_vec_sub = bulk_vec.loc[gene_list].values
     bulk_vec_sub_comp = bulk_vec_sub / bulk_vec_sub.sum()
-    sc_ref_df_sub = sc_ref_df.loc[gene_list].values
+    celltype_df_sub = celltype_df.loc[gene_list].values
 
     # calculate the mixed gene expression vector
-    mixed_expression = np.dot(mix_vec, sc_ref_df_sub.T).T
+    mixed_expression = np.dot(mix_vec, celltype_df_sub.T).T
     mixed_expression_comp = mixed_expression / mixed_expression.sum()
 
     # calculate fold change as experimental over mixed
@@ -87,14 +87,14 @@ def calc_gene_expression(
 
 
 def find_high_var_genes(
-            sc_ref_df,
+            celltype_df,
             disp_min=0.5,
             ):
-    """ Finds highly variable genes across cell types in sc_ref_df.
+    """ Finds highly variable genes across cell types in celltype_df.
     The implementation follows scanpy's highly_variable_genes procedure for
     flavor 'Seurat'."""
     # normalize counts within each celltype to sum 1
-    sc_ref_norm = sc_ref_df.div(sc_ref_df.sum(axis=0), axis=1)
+    sc_ref_norm = celltype_df.div(celltype_df.sum(axis=0), axis=1)
 
     # calculate mean and variance of each gene across types
     mean = np.mean(sc_ref_norm, axis=1)
@@ -276,7 +276,7 @@ def return_mixture(
 # function to select genes according to given threshold and deconvolve the
 # resulting mixture
 def deconvolve(
-            sc_ref_df,
+            celltype_df,
             bulk_df,
             maxiter,
             gene_dict,
@@ -299,7 +299,7 @@ def deconvolve(
         bulk_ranked_list.append(bulk_ranked)
 
         # next, subset sc data
-        sc_sub = sc_ref_df.loc[gene_dict[bulk]].values
+        sc_sub = celltype_df.loc[gene_dict[bulk]].values
         sc_list.append(sc_sub)
 
     # go through all mixtures and deconvolve them separately
@@ -308,7 +308,7 @@ def deconvolve(
         print('Deconvolving sample {} ...'.format(mixt))
         res = dual_annealing(
                 calculate_distance,
-                bounds=[[0, 1] for x in range(len(sc_ref_df.columns))],
+                bounds=[[0, 1] for x in range(len(celltype_df.columns))],
                 maxiter=maxiter,
                 args=[bulk_ranked_list[i], sc_list[i]],
                 no_local_search=no_local_search)
@@ -329,7 +329,7 @@ def deconvolve(
         pears.append(1-correlation(mixed_compositional, bulk_comp_list[i]))
 
     data_out = np.hstack((np.array(mixture_list), np.array([spears, pears]).T))
-    cols_out = sc_ref_df.columns.tolist() + ['rho_Spearman', 'rho_Pearson']
+    cols_out = celltype_df.columns.tolist() + ['rho_Spearman', 'rho_Pearson']
 
     all_mix_df = pd.DataFrame(data=data_out, columns=cols_out,
                               index=bulk_df.columns)
