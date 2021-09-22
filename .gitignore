@@ -4,7 +4,9 @@
 examples/example_data/results/
 examples/example_data/figures/
 results/
-figures
+figures/
+deconvolution_results/
+genewise_comparison/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

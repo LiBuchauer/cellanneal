@@ -7,12 +7,6 @@ from scipy.spatial.distance import correlation
 # personalized dual_annealing function
 from .dual_annealing import dual_annealing
 
-# make sure that folder 'figures' exists, else create
-from pathlib import Path
-Path("figures").mkdir(parents=True, exist_ok=True)
-# same for results
-Path("results").mkdir(parents=True, exist_ok=True)
-
 
 def make_gene_dictionary(
         sc_ref_df,

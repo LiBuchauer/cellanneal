@@ -19,13 +19,13 @@ import sys
 def init_parser(parser):
     """Initialize parser arguments."""
     parser.add_argument(
-        'bulk_data', type=str,
+        'bulk_data_path', type=str,
         help=("""Path to bulk data file, csv format with sample names as
             columns and genes as rows.""")
     )
 
     parser.add_argument(
-        'celltype_data', type=str,
+        'celltype_data_path', type=str,
         help=("""Path to celltype reference data file, csv format with sample
             names as columns and genes as rows. """)
     )
@@ -71,8 +71,8 @@ def main():
     used to find the optimal mixture.
 
     Input:
-            bulk_data
-            celltype_data
+            bulk_data_path
+            celltype_data_path
             output_path
             bulk_min
             bulk_max
@@ -91,40 +91,44 @@ def main():
     args = init_parser(my_parser).parse_args()
 
     # grab the individual inputs for further use
-    bulk_import_path = Path(args.bulk_data)
-    sc_ref_import_path = Path(args.celltype_data)
+    bulk_data_path = Path(args.bulk_data_path)
+    celltype_data_path = Path(args.celltype_data_path)
     output_path = Path(args.output_path)
     bulk_min = args.bulk_min
     bulk_max = args.bulk_max
     disp_min = args.disp_min
     maxiter = args.maxiter
 
-    print("\nWelcome to cellanneal Version 0.1.0!\n")
+    print("\nWelcome to cellanneal!\n")
 
     """ 1) Import bulk and cell type data """
     print('1A. Importing bulk data ...')
     try:
-        bulk_df = pd.read_csv(bulk_import_path, index_col=0, header=0)
+        bulk_df = pd.read_csv(bulk_data_path, index_col=0, header=0)
         bulk_names = bulk_df.columns.tolist()
         print('{} bulk samples identified: {}\n'.format(len(bulk_names),
                                                         bulk_names))
     except:
-        print("""Your bulk data file could not be imported. Please check the documentation for format requirements and look at the example bulk data file.""")
+        print("""Your bulk data file could not be imported.
+        Please check the documentation for format requirements
+        and look at the example bulk data file.""")
 
     print('1B. Importing celltype reference data ...')
     # import single cell based reference
     try:
-        sc_ref_df = pd.read_csv(sc_ref_import_path, index_col=0, header=0)
+        sc_ref_df = pd.read_csv(celltype_data_path, index_col=0, header=0)
         celltypes = sc_ref_df.columns.tolist()
         print('{} cell types identified: {}\n'.format(len(celltypes), celltypes))
     except:
-        print("""Your celltype data file could not be imported. Please check the documentation for format requirements and look at the example celltype data file.""")
+        print("""Your celltype data file could not be imported.
+        Please check the documentation for format requirements
+        and look at the example celltype data file.""")
 
     # start pipeline
     cellanneal_pipe(
-        sc_ref_import_path,
+        celltype_data_path,
         sc_ref_df,
-        bulk_import_path,
+        bulk_data_path,
         bulk_df,
         disp_min,
         bulk_min,
@@ -134,9 +138,9 @@ def main():
 
 
 def cellanneal_pipe(
-        sc_ref_import_path,  # path object!
+        celltype_data_path,  # path object!
         sc_ref_df,
-        bulk_import_path,  # path object!
+        bulk_data_path,  # path object!
         bulk_df,
         disp_min,
         bulk_min,
@@ -145,6 +149,7 @@ def cellanneal_pipe(
         output_path):  # path object!
     """ Serves as entrypoint into cellanneal pipeline for both gui and cli
     once all data and parameters have been collected. """
+
     """ 2) Identify highly variable genes and genes that pass the thresholds
     for each bulk. """
     # extract names
@@ -173,8 +178,8 @@ def cellanneal_pipe(
 
     # make top level folder for all results from this run
     # get timestamp for labelling
-    timestamp = time.asctime().replace(' ', '_')
-    bulk_file_name = bulk_import_path.name
+    timestamp = time.asctime().replace(' ', '_').replace(':', '-')
+    bulk_file_name = bulk_data_path.name
     bulk_file_ID = bulk_file_name.split(".")[0]
     top_folder_name = 'cellanneal_' + bulk_file_ID + '_' + timestamp
     top_folder_path = output_path / top_folder_name
@@ -221,14 +226,12 @@ def cellanneal_pipe(
     heat_path = figure_folder_path / 'heat_{}.pdf'.format(bulk_file_ID)
     plot_mix_heatmap(all_mix_df, rownorm=False, save_path=heat_path)
 
-    # line_path = figure_folder_path / 'lines_{}.pdf'.format(bulk_file_ID)
-    # plot_1D_lines(all_mix_df, line_path)
-
     scatter_path = figure_folder_path / 'scatter_{}.pdf'.format(bulk_file_ID)
     plot_scatter(all_mix_df, bulk_df, sc_ref_df, gene_dict,
                  save_path=scatter_path)
 
     print('\nAll done! :-)\n')
+
 
 def repeat():
     """ repeatanneal. Runs cellanneal a given number of times and averages
@@ -238,8 +241,9 @@ def repeat():
     of the repeats are also produced.
 
     Input:
-            bulk_data
-            celltype_data
+            bulk_data_path
+            celltype_data_path
+            output_path
             bulk_min
             bulk_max
             disp_min
@@ -270,32 +274,72 @@ def repeat():
     args = my_parser.parse_args()
 
     # grab the individual inputs for further use
-    bulk_import_path = args.bulk_data
-    sc_ref_import_path = args.celltype_data
+    bulk_data_path = Path(args.bulk_data_path)
+    celltype_data_path = Path(args.celltype_data_path)
+    output_path = Path(args.output_path)
     bulk_min = args.bulk_min
     bulk_max = args.bulk_max
     disp_min = args.disp_min
     maxiter = args.maxiter
     N_repeat = args.N_repeat
 
-    print("""\nWelcome to cellanneal Version 0.1.0!\n\nYou have chosen to
-    repeatedly anneal on subsets of the full gene list.""")
+    print("""\nWelcome to cellanneal!\n\n
+    You have chosen to repeatedly anneal on subsets of the full gene list.""")
 
     """ 1) Import bulk and cell type data """
     print('1A. Importing bulk data ...')
-    bulk_df = pd.read_csv(bulk_import_path, index_col=0, header=0)
-    bulk_names = bulk_df.columns.tolist()
-    print('{} bulk samples identified: {}\n'.format(len(bulk_names),
-                                                    bulk_names))
+    try:
+        bulk_df = pd.read_csv(bulk_data_path, index_col=0, header=0)
+        bulk_names = bulk_df.columns.tolist()
+        print('{} bulk samples identified: {}\n'.format(len(bulk_names),
+                                                        bulk_names))
+    except:
+        print("""Your bulk data file could not be imported.
+        Please check the documentation for format requirements
+        and look at the example bulk data file.""")
 
     print('1B. Importing celltype reference data ...')
     # import single cell based reference
-    sc_ref_df = pd.read_csv(sc_ref_import_path, index_col=0, header=0)
-    celltypes = sc_ref_df.columns.tolist()
-    print('{} cell types identified: {}\n'.format(len(celltypes), celltypes))
+    try:
+        sc_ref_df = pd.read_csv(celltype_data_path, index_col=0, header=0)
+        celltypes = sc_ref_df.columns.tolist()
+        print('{} cell types identified: {}\n'.format(len(celltypes), celltypes))
+    except:
+        print("""Your celltype data file could not be imported.
+        Please check the documentation for format requirements
+        and look at the example celltype data file.""")
+
+    # start pipeline
+    repeatanneal_pipe(
+        celltype_data_path,
+        sc_ref_df,
+        bulk_data_path,
+        bulk_df,
+        disp_min,
+        bulk_min,
+        bulk_max,
+        maxiter,
+        N_repeat,
+        output_path)
+
+
+def repeatanneal_pipe(
+        celltype_data_path,
+        sc_ref_df,
+        bulk_data_path,
+        bulk_df,
+        disp_min,
+        bulk_min,
+        bulk_max,
+        maxiter,
+        N_repeat,
+        output_path):
 
     """ 2) Identify highly variable genes and genes that pass the thresholds
     for each bulk. """
+    # extract names
+    bulk_names = bulk_df.columns.tolist()
+    celltypes = sc_ref_df.columns.tolist()
     # produce lists of genes on which to base deconvolution
     print('2. Constructing base gene sets ...')
     gene_dict = make_gene_dictionary(
@@ -307,7 +351,7 @@ def repeat():
 
     """ 3) Run cellanneal. """
     print('\n3. Running cellanneal {} times...'.format(N_repeat))
-    master_df = repeat_annealing(
+    parent_df = repeat_annealing(
                     sc_ref_df,
                     bulk_df,
                     gene_dict,
@@ -316,29 +360,43 @@ def repeat():
                     maxiter=maxiter)
 
     """ 4) Write results to file."""
-    print('\n4. Writing results to file in folder "results" ...')
-    # all results
-    bulk_file_name = Path(bulk_import_path).name
+    print('\n4. Writing results to file ...')
+
+    # make top level folder for all results from this run
+    # get timestamp for labelling
+    timestamp = time.asctime().replace(' ', '_').replace(':', '-')
+    bulk_file_name = bulk_data_path.name
     bulk_file_ID = bulk_file_name.split(".")[0]
+    top_folder_name = 'repeatanneal_N={}_'.format(N_repeat) + bulk_file_ID + '_' + timestamp
+    top_folder_path = output_path / top_folder_name
+    top_folder_path.mkdir(parents=True, exist_ok=True)
 
-    output_name = 'repeat_individual_N={}_'.format(
-        N_repeat) + bulk_file_name
-    result_path = Path('results/') / output_name
-    master_df.sort_index(axis=0, inplace=True)
-    master_df.to_csv(result_path, header=True, index=True, sep=',')
+    # make subfolders for deconv, gen expr and figures
+    deconv_folder_path = top_folder_path / 'deconvolution_results'
+    deconv_folder_path.mkdir(parents=True, exist_ok=True)
+    figure_folder_path = top_folder_path / 'figures'
+    figure_folder_path.mkdir(parents=True, exist_ok=True)
+    genexpr_folder_path = top_folder_path / 'genewise_comparison'
+    genexpr_folder_path.mkdir(parents=True, exist_ok=True)
 
-    # mean result
-    mean_name = 'repeat_mean_N={}_'.format(
-        N_repeat) + bulk_file_name
-    result_path = Path('results/') / mean_name
-    mean_df_long = master_df.groupby(['bulk', 'celltype']).mean()
+    # first, write individual deconvolution results to file
+    deconv_name = 'deconvolution_individual_' + bulk_file_ID + '.csv'
+    result_path = deconv_folder_path / deconv_name
+    parent_df.sort_index(axis=0, inplace=True)
+    parent_df.to_csv(result_path, header=True, index=True, sep=',')
+
+    # next, calculate a mean deconvolution result and store
+    mean_name = 'deconvolution_mean_' + bulk_file_ID + '.csv'
+    mean_path = deconv_folder_path / mean_name
+    # make mean df
+    mean_df_long = parent_df.groupby(['bulk', 'celltype']).mean()
     mean_df_long = mean_df_long.drop(['run'], axis=1)
     # the mean df is in long form currently, we want wide form
     mean_df = pd.pivot_table(mean_df_long, index='bulk', columns='celltype')
     mean_df.columns = mean_df.columns.droplevel(0)
     mean_df.index.name = None
     mean_df.sort_index(axis=0, inplace=True)
-    mean_df.to_csv(result_path, header=True, index=True, sep=',')
+    mean_df.to_csv(mean_path, header=True, index=True, sep=',')
 
     # next, write the actual and estimated gene expression to file for the
     # mean result, this has to be done per sample as the genes are sample-
@@ -352,34 +410,27 @@ def repeat():
                             sc_ref_df=sc_ref_df,
                             gene_list=gene_dict[sample_name])
         # construct export path for this sample
-        sample_gene_name = """repeat_mean_expression_N={}_{}_{}.csv""".format(N_repeat,
+        sample_gene_name = """expression_{}_{}.csv""".format(
                                 bulk_file_ID,
                                 sample_name)
-        sample_gene_path = Path('results/') / sample_gene_name
+        sample_gene_path = genexpr_folder_path / sample_gene_name
         gene_comp_df.sort_index(axis=0, inplace=True)
         gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
 
     """ 5) Produce plot and save to folder"""
-    print('\n5. Storing figure in folder "figures" ...')
+    print('\nProducing figures ...')
     # plot results, first spread of repeated annealing
-    figure_path = Path('figures/')
-    repeat_path = figure_path / """repeat_spread_boxplot_N={}_{}.pdf""".format(
-        N_repeat, bulk_file_ID)
-    plot_repeats(master_df, save_path=repeat_path)
+    box_path = figure_folder_path / 'boxplot_{}.pdf'.format(bulk_file_ID)
+    plot_repeats(parent_df, save_path=box_path)
 
     # next, same plots as above, for mean expression of all repeats
-    pie_path = figure_path / """repeat_mean_pies_N={}_{}.pdf""".format(
-        N_repeat, bulk_file_ID)
+    pie_path = figure_folder_path / 'pies_{}.pdf'.format(bulk_file_ID)
     plot_pies_from_df(mean_df, save_path=pie_path)
 
-    heat_path = figure_path / """repeat_mean_heatmap_boxplot_N={}_{}.pdf""".format(N_repeat, bulk_file_ID)
+    heat_path = figure_folder_path / 'heat_{}.pdf'.format(bulk_file_ID)
     plot_mix_heatmap(mean_df, rownorm=False, save_path=heat_path)
 
-    line_path = figure_path / """repeat_mean_lines_N={}_{}.pdf""".format(N_repeat, bulk_file_ID)
-    plot_1D_lines(mean_df, line_path)
-
-    scatter_path = figure_path / """repeat_mean_scatter_N={}_{}.pdf""".format(
-        N_repeat, bulk_file_ID)
+    scatter_path = figure_folder_path / 'scatter_{}.pdf'.format(bulk_file_ID)
     plot_scatter(mean_df, bulk_df, sc_ref_df, gene_dict,
                  save_path=scatter_path)
 
