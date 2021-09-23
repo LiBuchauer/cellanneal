@@ -6,7 +6,6 @@ from tkinter import messagebox
 from pathlib import Path
 from cellanneal import cellanneal_pipe, repeatanneal_pipe
 
-
 class cellgui:
 
     def __init__(self, root):
@@ -43,32 +42,38 @@ class cellgui:
 
         # basic layout considerations
         self.canvas = tk.Canvas(root, width=800, height=600)
-        self.canvas.grid(columnspan=7, rowspan=12)
+        self.canvas.grid(columnspan=7, rowspan=14)
         # for easier grid layout changes
         i_i = 1  # start of import section
         p_i = 5  # start of parameter section
         d_i = 11  # start of deconv section
+        t_i = 13  # start of text display section
 
-        """ logo """
-        logo = Image.open('logo_orange.png')
+        """ self.logo """
+        self.logo = Image.open('logo_orange.png')
         # convert pillow image to tkinter image
-        logo = ImageTk.PhotoImage(logo)
+        self.logo = ImageTk.PhotoImage(self.logo)
         # place image inside label widget (both lines below are needed)
-        logo_label = tk.Label(image=logo)
-        logo_label.image = logo
-        # place the logo label inside the box using grid method
-        logo_label.grid(column=3, row=0)
+        self.logo_label = tk.Label(image=self.logo)
+        self.logo_label.image = self.logo
+        # place the self.logo label inside the box using grid method
+        self.logo_label.grid(column=3, row=0)
 
         # for buttons belows
-        ca_button = Image.open('cellanneal_button.png')
-        ca_button = ImageTk.PhotoImage(ca_button)
-        ca_label = tk.Label(image=ca_button)  # is needed for display below, unclear why
-        ca_label.image = ca_button
+        self.ca_button = Image.open('cellanneal_button.png')
+        self.ca_button = ImageTk.PhotoImage(self.ca_button)
+        self.ca_label = tk.Label(image=self.ca_button)
+        self.ca_label.image = self.ca_button
 
-        ra_button = Image.open('repeatanneal_button.png')
-        ra_button = ImageTk.PhotoImage(ra_button)
-        ra_label = tk.Label(image=ra_button)  # is needed for display below, unclear why
-        ra_label.image = ra_button
+        self.ra_button = Image.open('repeatanneal_button.png')
+        self.ra_button = ImageTk.PhotoImage(self.ra_button)
+        self.ra_label = tk.Label(image=self.ra_button)
+        self.ra_label.image = self.ra_button
+
+        self.running_img = Image.open('running.png')
+        self.running_img = ImageTk.PhotoImage(self.running_img)
+        self.running_label = tk.Label(image=self.running_img)
+        self.running_label.image = self.running_img
 
         """ main section labels, structure """
         self.sec1_label = tk.Label(root, text="1) Select source data \nand output folder.", font=('Helvetica', 14, 'bold'))
@@ -239,13 +244,13 @@ class cellgui:
                                         root,
                                         text='cellanneal',
                                         font="-weight bold ",
-                                        image=ca_button,
+                                        image=self.ca_button,
                                         highlightbackground='#f47a60',
                                         command=lambda: self.cellanneal())
         self.cellanneal_button.grid(
                                 row=d_i,
                                 column=1,
-                                columnspan=2,
+                                columnspan=3,
                                 sticky=tk.W+tk.E,
                                 padx=10, pady=10)
 
@@ -254,15 +259,30 @@ class cellgui:
                                         root,
                                         text='repeatanneal',
                                         font="-weight bold ",
-                                        image=ra_button,
+                                        image=self.ra_button,
                                         command=lambda: self.repeatanneal(),
                                         highlightbackground='#f47a60')
         self.repeatanneal_button.grid(
                                     row=d_i,
-                                    column=3,
-                                    columnspan=2,
+                                    column=4,
+                                    columnspan=3,
                                     sticky=tk.W+tk.E,
                                     padx=10, pady=10)
+
+        """ progress display section """
+        self.progress_label = tk.Label(root, text="Progress updates", font="-weight bold")
+        self.progress_label.grid(
+                            row=t_i,
+                            column=1,
+                            columnspan=6,
+                            sticky=tk.W+tk.E)
+        self.progress_text = tk.Text(root, height=10, width=50)
+        self.progress_text.grid(
+                                row=t_i+1,
+                                column=1,
+                                columnspan=6,
+                                sticky=tk.W+tk.E)
+        self.progress_text.insert(tk.END, 'would be great to see progress updates here')
 
     # methods
     def import_bulk_data(self):
@@ -408,7 +428,7 @@ class cellgui:
         if self.output_path_is_set == 0:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
             return 0
-        # run cellanneal!
+
         cellanneal_pipe(
             celltype_data_path=Path(self.celltype_folder_path.get()),
             celltype_df=self.celltype_df,
@@ -419,6 +439,7 @@ class cellgui:
             bulk_max=self.bulk_max,
             maxiter=self.maxiter,
             output_path=Path(self.output_path.get()))
+        self.cellanneal_button['image'] = self.ca_button
 
     def repeatanneal(self):
         # check if input and output is set
@@ -431,6 +452,9 @@ class cellgui:
         if self.output_path_is_set == 0:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
             return 0
+
+            self.cellanneal_button['image'] = self.running_img
+
         # run cellanneal!
         repeatanneal_pipe(
             celltype_data_path=Path(self.celltype_folder_path.get()),
