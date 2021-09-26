@@ -81,6 +81,11 @@ class cellgui:
         self.running_label = tk.Label(image=self.running_img)
         self.running_label.image = self.running_img
 
+        self.abort_img = Image.open('abort_button.png')
+        self.abort_img = ImageTk.PhotoImage(self.abort_img)
+        self.abort_label = tk.Label(image=self.abort_img)
+        self.abort_label.image = self.abort_img
+
         """ main section labels, structure """
         self.sec1_label = tk.Label(root, text="1) Select source data \nand output folder.", font=('Helvetica', 14, 'bold'))
         self.sec2_label = tk.Label(root, text="2) Set parameters. \n[optional]", font=('Helvetica', 14, 'bold'))
@@ -256,7 +261,7 @@ class cellgui:
         self.cellanneal_button.grid(
                                 row=d_i,
                                 column=1,
-                                columnspan=3,
+                                columnspan=2,
                                 sticky=tk.W+tk.E,
                                 padx=10, pady=10)
 
@@ -270,8 +275,23 @@ class cellgui:
                                         highlightbackground='#f47a60')
         self.repeatanneal_button.grid(
                                     row=d_i,
-                                    column=4,
-                                    columnspan=3,
+                                    column=3,
+                                    columnspan=2,
+                                    sticky=tk.W+tk.E,
+                                    padx=10, pady=10)
+
+        # make button for cellanneal
+        self.abort_button = tk.Button(
+                                        root,
+                                        text='abort',
+                                        font="-weight bold ",
+                                        image=self.abort_img,
+                                        command=lambda: self.stop(),
+                                        highlightbackground='#f47a60')
+        self.abort_button.grid(
+                                    row=d_i,
+                                    column=5,
+                                    columnspan=2,
                                     sticky=tk.W+tk.E,
                                     padx=10, pady=10)
 
@@ -437,27 +457,36 @@ class cellgui:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
             return 0
 
-        # the progress text box should be emptied when a new round is started
-        self.progress_text.config(state=tk.NORMAL)
-        self.progress_text.delete('1.0', tk.END)
+        # check if subprocess is still running, if so don't open another one
+        try:
+            poll = self.subprocess.poll()
+            if poll == None: # a subprocess is alive, don't do anything
+                pass
+            else:
+                raise AttributeError
+        except AttributeError:  # doesn' exist yet or is dead
+            # the progress text box should be emptied when a new round is started
+            self.progress_text.config(state=tk.NORMAL)
+            self.progress_text.delete('1.0', tk.END)
 
-        # start subprocess
-        self.subprocess = Popen([sys.executable, "-u",
-                                 'cellanneal_pipeline_script.py',
-                                 self.celltype_folder_path.get(),
-                                 self.bulk_folder_path.get(),
-                                 str(self.disp_min),
-                                 str(self.bulk_min),
-                                 str(self.bulk_max),
-                                 str(self.maxiter),
-                                 str(self.output_path.get())], stdout=PIPE)
+            # start subprocess
+            print('start')
+            self.subprocess = Popen([sys.executable, "-u",
+                                     'cellanneal_pipeline_script.py',
+                                     self.celltype_folder_path.get(),
+                                     self.bulk_folder_path.get(),
+                                     str(self.disp_min),
+                                     str(self.bulk_min),
+                                     str(self.bulk_max),
+                                     str(self.maxiter),
+                                     str(self.output_path.get())], stdout=PIPE)
 
-        # Create a new thread that will read stdout and write the data to
-        # `self.stdout_buffer`
-        thread = Thread(
-                    target=self.read_output,
-                    args=(self.subprocess.stdout, ))
-        thread.start()
+            # Create a new thread that will read stdout and write the data to
+            # `self.stdout_buffer`
+            thread = Thread(
+                        target=self.read_output,
+                        args=(self.subprocess.stdout, ))
+            thread.start()
 
     def read_output(self, pipe):
         """Read subprocess' output and store it in `self.stdout_data`."""
@@ -477,33 +506,21 @@ class cellgui:
         # after having grabbed it, empty the string
         self.stdout_data = ""
         self.progress_text.insert(tk.END, data)
-        self.progress_text.see(tk.END)
+        # if new data was written, moce to end
+        if len(data) > 0:
+            self.progress_text.see(tk.END)
         self.root.after(100, self.show_stdout)
 
     def stop(self, stopping=[]):
         """Stop subprocess"""
-        if stopping:
-            return # avoid killing subprocess more than once
-        stopping.append(True)
+        try:  # see if the process is there in the first place
+            self.subprocess.kill()  # tell the subprocess to exit
 
-        self.subprocess.terminate() # tell the subprocess to exit
-
-        # kill subprocess if it hasn't exited after a countdown
-        def kill_after(countdown):
-            if self.subprocess.poll() is None: # subprocess hasn't exited yet
-                countdown -= 1
-                if countdown < 0: # do kill
-                    self.subprocess.kill() # more likely to kill on *nix
-                else:
-                    self.root.after(1000, kill_after, countdown)
-                    return # continue countdown in a second
-
-            self.subprocess.stdout.close()  # close fd
-            self.subprocess.wait()          # wait for the subprocess' exit
-
-        kill_after(countdown=5)
-
-
+            # clean also the text windows
+            self.progress_text.config(state=tk.NORMAL)
+            self.progress_text.delete('1.0', tk.END)
+        except AttributeError:
+            pass
 
     def repeatanneal(self):
         # check if input and output is set
@@ -517,31 +534,43 @@ class cellgui:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
             return 0
 
-        # the progress text box should be emptied when a new round is started
-        self.progress_text.config(state=tk.NORMAL)
-        self.progress_text.delete('1.0', tk.END)
+        # check if subprocess is still running, if so don't open another one
+        try:
+            poll = self.subprocess.poll()
+            if poll == None: # a subprocess is alive, don't do anything
+                pass
+            else:
+                raise AttributeError
+        except AttributeError:  # doesn' exist yet or is dead
+            # the progress text box should be emptied when a new round is started
+            self.progress_text.config(state=tk.NORMAL)
+            self.progress_text.delete('1.0', tk.END)
 
-        # start subprocess
-        self.subprocess = Popen([sys.executable, "-u",
-                                 'repeatanneal_pipeline_script.py',
-                                 self.celltype_folder_path.get(),
-                                 self.bulk_folder_path.get(),
-                                 str(self.disp_min),
-                                 str(self.bulk_min),
-                                 str(self.bulk_max),
-                                 str(self.maxiter),
-                                 str(self.N_repeat),
-                                 str(self.output_path.get())], stdout=PIPE)
+            # start subprocess
+            print('repeat')
+            self.subprocess = Popen([sys.executable, "-u",
+                                     'repeatanneal_pipeline_script.py',
+                                     self.celltype_folder_path.get(),
+                                     self.bulk_folder_path.get(),
+                                     str(self.disp_min),
+                                     str(self.bulk_min),
+                                     str(self.bulk_max),
+                                     str(self.maxiter),
+                                     str(self.N_repeat),
+                                     str(self.output_path.get())], stdout=PIPE)
 
-        # Create a new thread that will read stdout and write the data to
-        # `self.stdout_buffer`
-        thread = Thread(
-                    target=self.read_output,
-                    args=(self.subprocess.stdout, ))
-        thread.start()
+            # Create a new thread that will read stdout and write the data to
+            # `self.stdout_buffer`
+            thread = Thread(
+                        target=self.read_output,
+                        args=(self.subprocess.stdout, ))
+            thread.start()
 
     def quit(self):
-        self.subprocess.kill() # exit subprocess if GUI is closed (zombie!)
+        try:
+            self.subprocess.kill() # exit subprocess if GUI is closed (zombie!)
+        except AttributeError:
+            pass
         self.root.destroy()
 
 root = tk.Tk()
