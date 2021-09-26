@@ -2,9 +2,15 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import pandas as pd
 from tkinter.filedialog import askopenfile, askdirectory
+import tkinter.scrolledtext as scrolledtext
 from tkinter import messagebox
 from pathlib import Path
 from cellanneal import cellanneal_pipe, repeatanneal_pipe
+
+import sys
+import os
+from subprocess import Popen, PIPE
+from threading import Thread
 
 class cellgui:
 
@@ -276,13 +282,17 @@ class cellgui:
                             column=1,
                             columnspan=6,
                             sticky=tk.W+tk.E)
-        self.progress_text = tk.Text(root, height=10, width=50)
+        self.progress_text = scrolledtext.ScrolledText(root, height=10, width=50)
         self.progress_text.grid(
                                 row=t_i+1,
                                 column=1,
                                 columnspan=6,
                                 sticky=tk.W+tk.E)
         self.progress_text.insert(tk.END, 'would be great to see progress updates here')
+        # Create a buffer for the stdout
+        self.stdout_data = ""
+        # A tkinter loop that will show `self.stdout_data` on the screen
+        self.show_stdout()
 
     # methods
     def import_bulk_data(self):
@@ -320,8 +330,6 @@ class cellgui:
         if folder:
             self.output_path.set(folder)
             self.output_path_is_set = 1
-
-
 
     def set_bulk_min(self):
         # get input and check validity
@@ -429,17 +437,81 @@ class cellgui:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
             return 0
 
-        cellanneal_pipe(
-            celltype_data_path=Path(self.celltype_folder_path.get()),
-            celltype_df=self.celltype_df,
-            bulk_data_path=Path(self.bulk_folder_path.get()),  # path object!
-            bulk_df=self.bulk_df,
-            disp_min=self.disp_min,
-            bulk_min=self.bulk_min,
-            bulk_max=self.bulk_max,
-            maxiter=self.maxiter,
-            output_path=Path(self.output_path.get()))
-        self.cellanneal_button['image'] = self.ca_button
+        # the progress text box should be emptied when a new round is started
+        self.progress_text.config(state=tk.NORMAL)
+        self.progress_text.delete('1.0', tk.END)
+
+        # start subprocess
+        print(self.celltype_folder_path.get(),
+              self.bulk_folder_path.get(),
+              str(self.disp_min),
+              str(self.bulk_min),
+              str(self.bulk_max),
+              str(self.maxiter),
+              str(self.output_path.get()))
+        self.subprocess = Popen([sys.executable, "-u",
+                                 'cellanneal_pipeline_script.py',
+                                 self.celltype_folder_path.get(),
+                                 self.bulk_folder_path.get(),
+                                 str(self.disp_min),
+                                 str(self.bulk_min),
+                                 str(self.bulk_max),
+                                 str(self.maxiter),
+                                 str(self.output_path.get())], stdout=PIPE)
+
+        # Create a new thread that will read stdout and write the data to
+        # `self.stdout_buffer`
+        thread = Thread(
+                    target=self.read_output,
+                    args=(self.subprocess.stdout, ))
+        thread.start()
+
+    def read_output(self, pipe):
+        """Read subprocess' output and store it in `self.stdout_data`."""
+        while True:
+            data = os.read(pipe.fileno(), 1 << 20)
+            print(data)
+            # Windows uses: "\r\n" instead of "\n" for new lines.
+            data = data.replace(b"\r\n", b"\n")
+            if data:
+                self.stdout_data += data.decode()
+            else:  # clean up
+                self.root.after(5000, self.stop)  # stop in 5 seconds
+                return None
+
+    def show_stdout(self):
+        """Read `self.stdout_data` and put the data in the GUI."""
+        data = self.stdout_data
+        # after having grabbed it, empty the string
+        self.stdout_data = ""
+        self.progress_text.insert(tk.END, data)
+        self.progress_text.see(tk.END)
+        self.root.after(100, self.show_stdout)
+
+    def stop(self, stopping=[]):
+        """Stop subprocess"""
+        if stopping:
+            return # avoid killing subprocess more than once
+        stopping.append(True)
+
+        self.subprocess.terminate() # tell the subprocess to exit
+
+        # kill subprocess if it hasn't exited after a countdown
+        def kill_after(countdown):
+            if self.subprocess.poll() is None: # subprocess hasn't exited yet
+                countdown -= 1
+                if countdown < 0: # do kill
+                    self.subprocess.kill() # more likely to kill on *nix
+                else:
+                    self.root.after(1000, kill_after, countdown)
+                    return # continue countdown in a second
+
+            self.subprocess.stdout.close()  # close fd
+            self.subprocess.wait()          # wait for the subprocess' exit
+
+        kill_after(countdown=5)
+
+
 
     def repeatanneal(self):
         # check if input and output is set
@@ -468,7 +540,12 @@ class cellgui:
             N_repeat=self.N_repeat,
             output_path=Path(self.output_path.get()))
 
+    def quit(self):
+        self.subprocess.kill() # exit subprocess if GUI is closed (zombie!)
+        self.root.destroy()
 
 root = tk.Tk()
-my_gui = cellgui(root)
+ca_gui = cellgui(root)
+# make sure all processes are closed when user clicks X
+root.protocol("WM_DELETE_WINDOW", ca_gui.quit)
 root.mainloop()
