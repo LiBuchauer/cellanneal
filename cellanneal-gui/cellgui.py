@@ -55,7 +55,7 @@ class cellgui:
         d_i = 11  # start of deconv section
         t_i = 13  # start of text display section
 
-        """ self.logo """
+        """ logo and welcome section """
         self.logo = Image.open('logo_orange.png')
         # convert pillow image to tkinter image
         self.logo = ImageTk.PhotoImage(self.logo)
@@ -63,8 +63,12 @@ class cellgui:
         self.logo_label = tk.Label(image=self.logo)
         self.logo_label.image = self.logo
         # place the self.logo label inside the box using grid method
-        self.logo_label.grid(column=3, row=0)
+        self.logo_label.grid(column=0, columnspan=2, sticky=tk.W+tk.E, row=0)
 
+        self.welcome_label = tk.Label(
+            text='Welcome to cellanneal, the user-friendly bulk deconvolution software.\nPlease visit the doumentation at https://github.com/LiBuchauer/cellanneal for instructions.',
+            wraplength=450)
+        self.welcome_label.grid(column=2, columnspan=4, sticky=tk.W+tk.E, row=0)
         # for buttons belows
         self.ca_button = Image.open('cellanneal_button.png')
         self.ca_button = ImageTk.PhotoImage(self.ca_button)
@@ -308,7 +312,7 @@ class cellgui:
                                 column=1,
                                 columnspan=6,
                                 sticky=tk.W+tk.E)
-        self.progress_text.insert(tk.END, 'would be great to see progress updates here')
+    #    self.progress_text.insert(tk.END, 'would be great to see progress updates here')
         # Create a buffer for the stdout
         self.stdout_data = ""
         # A tkinter loop that will show `self.stdout_data` on the screen
