@@ -442,13 +442,6 @@ class cellgui:
         self.progress_text.delete('1.0', tk.END)
 
         # start subprocess
-        print(self.celltype_folder_path.get(),
-              self.bulk_folder_path.get(),
-              str(self.disp_min),
-              str(self.bulk_min),
-              str(self.bulk_max),
-              str(self.maxiter),
-              str(self.output_path.get()))
         self.subprocess = Popen([sys.executable, "-u",
                                  'cellanneal_pipeline_script.py',
                                  self.celltype_folder_path.get(),
@@ -470,7 +463,6 @@ class cellgui:
         """Read subprocess' output and store it in `self.stdout_data`."""
         while True:
             data = os.read(pipe.fileno(), 1 << 20)
-            print(data)
             # Windows uses: "\r\n" instead of "\n" for new lines.
             data = data.replace(b"\r\n", b"\n")
             if data:
@@ -525,20 +517,28 @@ class cellgui:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
             return 0
 
-            self.cellanneal_button['image'] = self.running_img
+        # the progress text box should be emptied when a new round is started
+        self.progress_text.config(state=tk.NORMAL)
+        self.progress_text.delete('1.0', tk.END)
 
-        # run cellanneal!
-        repeatanneal_pipe(
-            celltype_data_path=Path(self.celltype_folder_path.get()),
-            celltype_df=self.celltype_df,
-            bulk_data_path=Path(self.bulk_folder_path.get()),  # path object!
-            bulk_df=self.bulk_df,
-            disp_min=self.disp_min,
-            bulk_min=self.bulk_min,
-            bulk_max=self.bulk_max,
-            maxiter=self.maxiter,
-            N_repeat=self.N_repeat,
-            output_path=Path(self.output_path.get()))
+        # start subprocess
+        self.subprocess = Popen([sys.executable, "-u",
+                                 'repeatanneal_pipeline_script.py',
+                                 self.celltype_folder_path.get(),
+                                 self.bulk_folder_path.get(),
+                                 str(self.disp_min),
+                                 str(self.bulk_min),
+                                 str(self.bulk_max),
+                                 str(self.maxiter),
+                                 str(self.N_repeat),
+                                 str(self.output_path.get())], stdout=PIPE)
+
+        # Create a new thread that will read stdout and write the data to
+        # `self.stdout_buffer`
+        thread = Thread(
+                    target=self.read_output,
+                    args=(self.subprocess.stdout, ))
+        thread.start()
 
     def quit(self):
         self.subprocess.kill() # exit subprocess if GUI is closed (zombie!)
