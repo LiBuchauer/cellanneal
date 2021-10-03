@@ -24,7 +24,7 @@ def repeat_annealing(
 
     # repeat deconvolution n times and collect results
     for i in range(N_repeat):
-        print("\nRepeat number {}".format(i+1))
+        print("\nRunning repeat number {} of {}".format(i+1, N_repeat))
         # now, bootstrap a new gene dictionary (same length as original one)
         gene_dict_new = {}
         for key in list(gene_dict.keys()):

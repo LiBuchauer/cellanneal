@@ -2,15 +2,12 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import pandas as pd
 from tkinter.filedialog import askopenfile, askdirectory
-import tkinter.scrolledtext as scrolledtext
 from tkinter import messagebox
 from pathlib import Path
 from cellanneal import cellanneal_pipe, repeatanneal_pipe
 
 import sys
 import os
-from subprocess import Popen, PIPE
-from threading import Thread
 
 
 def resource_path(relative_path):
@@ -30,10 +27,10 @@ class cellgui:
 
         # place holders for required data
         self.bulk_df = pd.DataFrame()
-        self.bulk_folder_path = tk.StringVar()
+        self.bulk_data_path = tk.StringVar()
         self.bulk_df_is_set = 0  # check later whether data has been selected
         self.celltype_df = pd.DataFrame()
-        self.celltype_folder_path = tk.StringVar()
+        self.celltype_data_path = tk.StringVar()
         self.celltype_df_is_set = 0
 
         # output path
@@ -63,7 +60,6 @@ class cellgui:
         i_i = 1  # start of import section
         p_i = 5  # start of parameter section
         d_i = 11  # start of deconv section
-        t_i = 13  # start of text display section
 
         """ logo and welcome section """
         self.logo = Image.open(resource_path('logo_orange.png'))
@@ -90,16 +86,6 @@ class cellgui:
         self.ra_label = tk.Label(image=self.ra_button)
         self.ra_label.image = self.ra_button
 
-        self.running_img = Image.open(resource_path('running.png'))
-        self.running_img = ImageTk.PhotoImage(self.running_img)
-        self.running_label = tk.Label(image=self.running_img)
-        self.running_label.image = self.running_img
-
-        self.abort_img = Image.open(resource_path('abort_button.png'))
-        self.abort_img = ImageTk.PhotoImage(self.abort_img)
-        self.abort_label = tk.Label(image=self.abort_img)
-        self.abort_label.image = self.abort_img
-
         """ main section labels, structure """
         self.sec1_label = tk.Label(root, text="1) Select source data \nand output folder.", font="-weight bold")
         self.sec2_label = tk.Label(root, text="2) Set parameters. \n[optional]", font="-weight bold")
@@ -118,7 +104,7 @@ class cellgui:
         # path entry field
         self.bulk_data_entry = tk.Entry(
                                     root,
-                                    textvariable=self.bulk_folder_path)
+                                    textvariable=self.bulk_data_path)
         self.bulk_data_entry.grid(row=i_i, column=3, columnspan=2, sticky=tk.W+tk.E)
         # file system browse button
         self.bulk_browse_button = tk.Button(
@@ -132,7 +118,7 @@ class cellgui:
         self.celltype_data_label = tk.Label(root, text="Select celltype data (*.csv).")
         self.celltype_data_label.grid(row=i_i+1, column=1, columnspan=2, sticky=tk.W)
         # path entry field
-        self.celltype_data_entry = tk.Entry(root, textvariable=self.celltype_folder_path)
+        self.celltype_data_entry = tk.Entry(root, textvariable=self.celltype_data_path)
         self.celltype_data_entry.grid(row=i_i+1, column=3, columnspan=2, sticky=tk.W+tk.E)
         # file system browse button
         self.celltype_browse_button = tk.Button(
@@ -158,7 +144,7 @@ class cellgui:
         """ parameter section """
         # for parameter bulk_min
         # title label and current value
-        self.bulk_min_label = tk.Label(root, text="bulk_min", font="-weight bold")
+        self.bulk_min_label = tk.Label(root, text="minimum expression in bulk", font="-weight bold")
         self.bulk_min_label.grid(row=p_i, column=1, columnspan=2, sticky=tk.W+tk.E)
         self.bulk_min_current_label = tk.Label(root, text="current value: {}".format(self.bulk_min), font="-slant italic")
         self.bulk_min_current_label.grid(row=p_i+1, column=1, columnspan=2, sticky=tk.W+tk.E)
@@ -168,7 +154,7 @@ class cellgui:
                                     root,
                                     width=8)
         self.bulk_min_entry.grid(row=p_i+2, column=1, sticky=tk.E)
-
+        self.bulk_min_entry.insert(tk.END, '1e-5')
         # set button
         self.bulk_min_set_button = tk.Button(
                                         root,
@@ -179,7 +165,7 @@ class cellgui:
 
         # for parameter bulk_max
         # title label and current value
-        self.bulk_max_label = tk.Label(root, text="bulk_max", font="-weight bold")
+        self.bulk_max_label = tk.Label(root, text="maximum expression in bulk", font="-weight bold")
         self.bulk_max_label.grid(row=p_i, column=3, columnspan=2, sticky=tk.W+tk.E)
         self.bulk_max_current_label = tk.Label(root, text="current value: {}".format(self.bulk_max), font="-slant italic")
         self.bulk_max_current_label.grid(row=p_i+1, column=3, columnspan=2, sticky=tk.W+tk.E)
@@ -189,6 +175,7 @@ class cellgui:
                                     root,
                                     width=8)
         self.bulk_max_entry.grid(row=p_i+2, column=3, sticky=tk.E)
+        self.bulk_max_entry.insert(tk.END, '0.01')
 
         # set button
         self.bulk_max_set_button = tk.Button(
@@ -201,7 +188,7 @@ class cellgui:
 
         # for parameter disp_min
         # title label and current value
-        self.disp_min_label = tk.Label(root, text="disp_min", font="-weight bold")
+        self.disp_min_label = tk.Label(root, text="minimum dispersion", font="-weight bold")
         self.disp_min_label.grid(row=p_i, column=5, columnspan=2, sticky=tk.W+tk.E)
         self.disp_min_current_label = tk.Label(root, text="current value: {}".format(self.disp_min), font="-slant italic")
         self.disp_min_current_label.grid(row=p_i+1, column=5, columnspan=2, sticky=tk.W+tk.E)
@@ -211,6 +198,7 @@ class cellgui:
                                     root,
                                     width=8)
         self.disp_min_entry.grid(row=p_i+2, column=5, sticky=tk.E)
+        self.disp_min_entry.insert(tk.END, '0.5')
 
         # set button
         self.disp_min_set_button = tk.Button(
@@ -222,7 +210,7 @@ class cellgui:
 
         # for parameter maxiter
         # title label and current value
-        self.maxiter_label = tk.Label(root, text="maxiter", font="-weight bold")
+        self.maxiter_label = tk.Label(root, text="maximum number of\nannealing iterations", font="-weight bold")
         self.maxiter_label.grid(row=p_i+3, column=1, columnspan=2, sticky=tk.W+tk.E)
         self.maxiter_current_label = tk.Label(root, text="current value: {}".format(self.maxiter), font="-slant italic")
         self.maxiter_current_label.grid(row=p_i+4, column=1, columnspan=2, sticky=tk.W+tk.E)
@@ -232,6 +220,7 @@ class cellgui:
                                     root,
                                     width=8)
         self.maxiter_entry.grid(row=p_i+5, column=1, sticky=tk.E)
+        self.maxiter_entry.insert(tk.END, '1000')
 
         # set button
         self.maxiter_set_button = tk.Button(
@@ -243,7 +232,7 @@ class cellgui:
 
         # for parameter N_repeat
         # title label and current value
-        self.N_repeat_label = tk.Label(root, text="N_repeat", font="-weight bold")
+        self.N_repeat_label = tk.Label(root, text="number of repeats\n(relevant for repeatanneal)", font="-weight bold")
         self.N_repeat_label.grid(row=p_i+3, column=3, columnspan=2, sticky=tk.W+tk.E)
         self.N_repeat_current_label = tk.Label(root, text="current value: {}".format(self.N_repeat), font="-slant italic")
         self.N_repeat_current_label.grid(row=p_i+4, column=3, columnspan=2, sticky=tk.W+tk.E)
@@ -253,7 +242,7 @@ class cellgui:
                                     root,
                                     width=8)
         self.N_repeat_entry.grid(row=p_i+5, column=3, sticky=tk.E)
-
+        self.N_repeat_entry.insert(tk.END, '10')
         # set button
         self.N_repeat_set_button = tk.Button(
                                         root,
@@ -294,39 +283,6 @@ class cellgui:
                                     sticky=tk.W+tk.E,
                                     padx=10, pady=10)
 
-        # make button for cellanneal
-        self.abort_button = tk.Button(
-                                        root,
-                                        text='abort',
-                                        font="-weight bold ",
-                                        image=self.abort_img,
-                                        command=lambda: self.stop(),
-                                        highlightbackground='#f47a60')
-        self.abort_button.grid(
-                                    row=d_i,
-                                    column=5,
-                                    columnspan=2,
-                                    sticky=tk.W+tk.E,
-                                    padx=10, pady=10)
-
-        """ progress display section """
-        self.progress_label = tk.Label(root, text="Progress updates", font="-weight bold")
-        self.progress_label.grid(
-                            row=t_i,
-                            column=1,
-                            columnspan=6,
-                            sticky=tk.W+tk.E)
-        self.progress_text = scrolledtext.ScrolledText(root, height=10, width=50)
-        self.progress_text.grid(
-                                row=t_i+1,
-                                column=1,
-                                columnspan=6,
-                                sticky=tk.W+tk.E)
-    #    self.progress_text.insert(tk.END, 'would be great to see progress updates here')
-        # Create a buffer for the stdout
-        self.stdout_data = ""
-        # A tkinter loop that will show `self.stdout_data` on the screen
-        self.show_stdout()
 
     # methods
     def import_bulk_data(self):
@@ -338,7 +294,7 @@ class cellgui:
         if file:
             try:
                 self.bulk_df = pd.read_csv(file, index_col=0)
-                self.bulk_folder_path.set(file.name)
+                self.bulk_data_path.set(file.name)
                 self.bulk_df_is_set = 1
             except:
                 messagebox.showerror("Import error", """Your bulk data file could not be imported. Please check the documentation for format requirements and look at the example bulk data file.""")
@@ -352,7 +308,7 @@ class cellgui:
         if file:
             try:
                 self.celltype_df = pd.read_csv(file, index_col=0)
-                self.celltype_folder_path.set(file.name)
+                self.celltype_data_path.set(file.name)
                 self.celltype_df_is_set = 1
             except:
                 messagebox.showerror("Import error", """Your celltype data file could not be imported. Please check the documentation for format requirements and look at the example celltype data file.""")
@@ -471,70 +427,18 @@ class cellgui:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
             return 0
 
+        print("\n\n+++ Welcome to cellanneal! +++ \n\n")
         # check if subprocess is still running, if so don't open another one
-        try:
-            poll = self.subprocess.poll()
-            if poll == None: # a subprocess is alive, don't do anything
-                pass
-            else:
-                raise AttributeError
-        except AttributeError:  # doesn' exist yet or is dead
-            # the progress text box should be emptied when a new round is started
-            self.progress_text.config(state=tk.NORMAL)
-            self.progress_text.delete('1.0', tk.END)
-
-            # start subprocess
-            print('start')
-            self.subprocess = Popen([sys.executable, "-u",
-                                     resource_path('cellanneal_pipeline_script.py'),
-                                     self.celltype_folder_path.get(),
-                                     self.bulk_folder_path.get(),
-                                     str(self.disp_min),
-                                     str(self.bulk_min),
-                                     str(self.bulk_max),
-                                     str(self.maxiter),
-                                     str(self.output_path.get())], stdout=PIPE)
-
-            # Create a new thread that will read stdout and write the data to
-            # `self.stdout_buffer`
-            thread = Thread(
-                        target=self.read_output,
-                        args=(self.subprocess.stdout, ))
-            thread.start()
-
-    def read_output(self, pipe):
-        """Read subprocess' output and store it in `self.stdout_data`."""
-        while True:
-            data = os.read(pipe.fileno(), 1 << 20)
-            # Windows uses: "\r\n" instead of "\n" for new lines.
-            data = data.replace(b"\r\n", b"\n")
-            if data:
-                self.stdout_data += data.decode()
-            else:  # clean up
-                self.root.after(5000, self.stop)  # stop in 5 seconds
-                return None
-
-    def show_stdout(self):
-        """Read `self.stdout_data` and put the data in the GUI."""
-        data = self.stdout_data
-        # after having grabbed it, empty the string
-        self.stdout_data = ""
-        self.progress_text.insert(tk.END, data)
-        # if new data was written, moce to end
-        if len(data) > 0:
-            self.progress_text.see(tk.END)
-        self.root.after(100, self.show_stdout)
-
-    def stop(self, stopping=[]):
-        """Stop subprocess"""
-        try:  # see if the process is there in the first place
-            self.subprocess.kill()  # tell the subprocess to exit
-
-            # clean also the text windows
-            self.progress_text.config(state=tk.NORMAL)
-            self.progress_text.delete('1.0', tk.END)
-        except AttributeError:
-            pass
+        cellanneal_pipe(
+            Path(self.celltype_data_path.get()),  # path object!
+            self.celltype_df,
+            Path(self.bulk_data_path.get()),  # path object!
+            self.bulk_df,
+            self.disp_min,
+            self.bulk_min,
+            self.bulk_max,
+            self.maxiter,
+            Path(self.output_path.get()))  # path object!
 
     def repeatanneal(self):
         # check if input and output is set
@@ -547,48 +451,21 @@ class cellgui:
         if self.output_path_is_set == 0:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
             return 0
-
+        print("\n\n+++ Welcome to cellanneal! +++ \n\n")
         # check if subprocess is still running, if so don't open another one
-        try:
-            poll = self.subprocess.poll()
-            if poll == None: # a subprocess is alive, don't do anything
-                pass
-            else:
-                raise AttributeError
-        except AttributeError:  # doesn' exist yet or is dead
-            # the progress text box should be emptied when a new round is started
-            self.progress_text.config(state=tk.NORMAL)
-            self.progress_text.delete('1.0', tk.END)
+        repeatanneal_pipe(
+            Path(self.celltype_data_path.get()),  # path object!
+            self.celltype_df,
+            Path(self.bulk_data_path.get()),  # path object!
+            self.bulk_df,
+            self.disp_min,
+            self.bulk_min,
+            self.bulk_max,
+            self.maxiter,
+            self.N_repeat,
+            Path(self.output_path.get()))  # path object!
 
-            # start subprocess
-            print('repeat')
-            self.subprocess = Popen([sys.executable, "-u",
-                                     resource_path('repeatanneal_pipeline_script.py'),
-                                     self.celltype_folder_path.get(),
-                                     self.bulk_folder_path.get(),
-                                     str(self.disp_min),
-                                     str(self.bulk_min),
-                                     str(self.bulk_max),
-                                     str(self.maxiter),
-                                     str(self.N_repeat),
-                                     str(self.output_path.get())], stdout=PIPE)
-
-            # Create a new thread that will read stdout and write the data to
-            # `self.stdout_buffer`
-            thread = Thread(
-                        target=self.read_output,
-                        args=(self.subprocess.stdout, ))
-            thread.start()
-
-    def quit(self):
-        try:
-            self.subprocess.kill() # exit subprocess if GUI is closed (zombie!)
-        except AttributeError:
-            pass
-        self.root.destroy()
 
 root = tk.Tk()
 ca_gui = cellgui(root)
-# make sure all processes are closed when user clicks X
-root.protocol("WM_DELETE_WINDOW", ca_gui.quit)
 root.mainloop()

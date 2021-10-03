@@ -25,7 +25,7 @@ def cellanneal_pipe(
     bulk_names = bulk_df.columns.tolist()
     celltypes = celltype_df.columns.tolist()
     # produce lists of genes on which to base deconvolution
-    print('2. Constructing gene sets ...')
+    print('\n+++ Constructing gene sets ... +++')
     gene_dict = make_gene_dictionary(
                     celltype_df,
                     bulk_df,
@@ -34,7 +34,7 @@ def cellanneal_pipe(
                     bulk_max=bulk_max)
 
     """ 3) Run cellanneal. """
-    print('\n3. Running cellanneal ...')
+    print('\n+++ Running cellanneal ... +++')
     all_mix_df = deconvolve(
                     celltype_df=celltype_df,
                     bulk_df=bulk_df,
@@ -43,7 +43,7 @@ def cellanneal_pipe(
                     no_local_search=False)
 
     """ 4) Write results to file."""
-    print('\n4. Writing results to file ...')
+    print('\n+++ Writing results to file ... +++')
 
     # make top level folder for all results from this run
     # get timestamp for labelling
@@ -86,7 +86,7 @@ def cellanneal_pipe(
         gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
 
     """ 5) Produce plots and save to folder"""
-    print('\n5. Storing figures in folder "figures" ...')
+    print('\n+++ Storing figures in folder "figures" ... +++')
     # plot results
 
     pie_path = figure_folder_path / 'pies_{}.pdf'.format(bulk_file_ID)
@@ -99,7 +99,7 @@ def cellanneal_pipe(
     plot_scatter(all_mix_df, bulk_df, celltype_df, gene_dict,
                  save_path=scatter_path)
 
-    print('\nAll done! :-)\n')
+    print('\n+++ Finished. +++\n')
 
 
 def repeatanneal_pipe(
@@ -120,7 +120,7 @@ def repeatanneal_pipe(
     bulk_names = bulk_df.columns.tolist()
     celltypes = celltype_df.columns.tolist()
     # produce lists of genes on which to base deconvolution
-    print('2. Constructing base gene sets ...')
+    print('\n+++ Constructing base gene sets ... +++')
     gene_dict = make_gene_dictionary(
                     celltype_df,
                     bulk_df,
@@ -129,7 +129,7 @@ def repeatanneal_pipe(
                     bulk_max=bulk_max)
 
     """ 3) Run cellanneal. """
-    print('\n3. Running cellanneal {} times...'.format(N_repeat))
+    print('\n+++ Running cellanneal {} times... +++'.format(N_repeat))
     parent_df = repeat_annealing(
                     celltype_df,
                     bulk_df,
@@ -139,7 +139,7 @@ def repeatanneal_pipe(
                     maxiter=maxiter)
 
     """ 4) Write results to file."""
-    print('\n4. Writing results to file ...')
+    print('\n+++ Writing results to file ... +++')
 
     # make top level folder for all results from this run
     # get timestamp for labelling
@@ -197,7 +197,7 @@ def repeatanneal_pipe(
         gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
 
     """ 5) Produce plot and save to folder"""
-    print('\nProducing figures ...')
+    print('\n+++ Producing figures ... +++')
     # plot results, first spread of repeated annealing
     box_path = figure_folder_path / 'boxplot_{}.pdf'.format(bulk_file_ID)
     plot_repeats(parent_df, save_path=box_path)
@@ -213,4 +213,4 @@ def repeatanneal_pipe(
     plot_scatter(mean_df, bulk_df, celltype_df, gene_dict,
                  save_path=scatter_path)
 
-    print('\nAll done! :-)\n')
+    print('\n+++ Finished. +++\n')
