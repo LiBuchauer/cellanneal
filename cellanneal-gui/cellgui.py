@@ -57,9 +57,9 @@ class cellgui:
         self.canvas = tk.Canvas(root, width=800, height=600)
         self.canvas.grid(columnspan=7, rowspan=14)
         # for easier grid layout changes
-        i_i = 1  # start of import section
-        p_i = 5  # start of parameter section
-        d_i = 11  # start of deconv section
+        i_i = 3  # start of import section
+        p_i = 8  # start of parameter section
+        d_i = 14  # start of deconv section
 
         """ logo and welcome section """
         self.logo = Image.open(resource_path('logo_orange.png'))
@@ -69,11 +69,11 @@ class cellgui:
         self.logo_label = tk.Label(image=self.logo)
         self.logo_label.image = self.logo
         # place the self.logo label inside the box using grid method
-        self.logo_label.grid(column=0, columnspan=2, sticky=tk.W+tk.E, row=0)
+        self.logo_label.grid(column=1, columnspan=1, sticky=tk.W, row=0)
 
         self.welcome_label = tk.Label(
             text='Welcome to cellanneal, the user-friendly bulk deconvolution software.\nPlease visit the doumentation at https://github.com/LiBuchauer/cellanneal for instructions.',
-            wraplength=450)
+            wraplength=300)
         self.welcome_label.grid(column=2, columnspan=4, sticky=tk.W+tk.E, row=0)
         # for buttons belows
         self.ca_button = Image.open(resource_path('cellanneal_button.png'))
@@ -86,32 +86,35 @@ class cellgui:
         self.ra_label = tk.Label(image=self.ra_button)
         self.ra_label.image = self.ra_button
 
-        """ main section labels, structure """
-        self.sec1_label = tk.Label(root, text="1) Select source data \nand output folder.", font="-weight bold")
-        self.sec2_label = tk.Label(root, text="2) Set parameters. \n[optional]", font="-weight bold")
-        self.sec3_label = tk.Label(root, text="3) Run deconvolution.", font="-weight bold")
-        self.sec1_label.grid(row=i_i, column=0, sticky='w')
-        self.sec2_label.grid(row=p_i, column=0, sticky='w')
-        self.sec3_label.grid(row=d_i, column=0, sticky='w')
+        # spacers for tidier look
+        spacer1 = tk.Label(root, text="")
+        spacer1.grid(row=i_i-2, column=0, padx=5, pady=10)
+
+        spacer2 = tk.Label(root, text="")
+        spacer2.grid(row=p_i-2, column=0, padx=5, pady=10)
+
 
         """ data import section """
         # import bulk data
+        # title
+        self.param_label = tk.Label(root, text="deconvolution data", font="-weight bold")
+        self.param_label.grid(row=i_i-1, column=1, columnspan=3, sticky=tk.W)
         # label to indicate that we want bulk data here
         self.bulk_data_label = tk.Label(
                                     root,
                                     text="Select bulk data (*.csv).")
-        self.bulk_data_label.grid(row=i_i, column=1, columnspan=2, sticky=tk.W)
+        self.bulk_data_label.grid(row=i_i, column=1, columnspan=1, sticky=tk.W)
         # path entry field
         self.bulk_data_entry = tk.Entry(
                                     root,
                                     textvariable=self.bulk_data_path)
-        self.bulk_data_entry.grid(row=i_i, column=3, columnspan=2, sticky=tk.W+tk.E)
+        self.bulk_data_entry.grid(row=i_i, column=2, columnspan=2, sticky=tk.W+tk.E)
         # file system browse button
         self.bulk_browse_button = tk.Button(
                                         root,
                                         text="Browse file system",
                                         command=lambda: self.import_bulk_data())
-        self.bulk_browse_button.grid(row=i_i, column=5, columnspan=2, sticky=tk.W+tk.E)
+        self.bulk_browse_button.grid(row=i_i, column=4, columnspan=2, sticky=tk.W+tk.E)
 
         # import celltype data
         # label to indicate that we want celltype data here
@@ -119,13 +122,13 @@ class cellgui:
         self.celltype_data_label.grid(row=i_i+1, column=1, columnspan=2, sticky=tk.W)
         # path entry field
         self.celltype_data_entry = tk.Entry(root, textvariable=self.celltype_data_path)
-        self.celltype_data_entry.grid(row=i_i+1, column=3, columnspan=2, sticky=tk.W+tk.E)
+        self.celltype_data_entry.grid(row=i_i+1, column=2, columnspan=2, sticky=tk.W+tk.E)
         # file system browse button
         self.celltype_browse_button = tk.Button(
                                         root,
                                         text="Browse file system",
                                         command=lambda: self.import_celltype_data())
-        self.celltype_browse_button.grid(row=i_i+1, column=5, columnspan=2, sticky=tk.W+tk.E)
+        self.celltype_browse_button.grid(row=i_i+1, column=4, columnspan=2, sticky=tk.W+tk.E)
 
         # select output folder
         # label to indicate that we want celltype data here
@@ -133,123 +136,81 @@ class cellgui:
         self.output_folder_label.grid(row=i_i+2, column=1, columnspan=2, sticky=tk.W)
         # path entry field
         self.output_folder_entry = tk.Entry(root, textvariable=self.output_path)
-        self.output_folder_entry.grid(row=i_i+2, column=3, columnspan=2, sticky=tk.W+tk.E)
+        self.output_folder_entry.grid(row=i_i+2, column=2, columnspan=2, sticky=tk.W+tk.E)
         # file system browse button
         self.celltype_browse_button = tk.Button(
                                         root,
                                         text="Browse file system",
                                         command=lambda: self.select_output_folder())
-        self.celltype_browse_button.grid(row=i_i+2, column=5, columnspan=2, sticky=tk.W+tk.E)
+        self.celltype_browse_button.grid(row=i_i+2, column=4, columnspan=2, sticky=tk.W+tk.E)
 
         """ parameter section """
-        # for parameter bulk_min
-        # title label and current value
-        self.bulk_min_label = tk.Label(root, text="minimum expression in bulk", font="-weight bold")
-        self.bulk_min_label.grid(row=p_i, column=1, columnspan=2, sticky=tk.W+tk.E)
-        self.bulk_min_current_label = tk.Label(root, text="current value: {}".format(self.bulk_min), font="-slant italic")
-        self.bulk_min_current_label.grid(row=p_i+1, column=1, columnspan=2, sticky=tk.W+tk.E)
+        # title
+        self.param_label = tk.Label(root, text="deconvolution parameters", font="-weight bold")
+        self.param_label.grid(row=p_i-1, column=1, columnspan=3, sticky=tk.W)
+        # list parameter settings with set of labels
+        self.bulk_min_param_label = tk.Label(
+            root,
+            text="minimum expression in bulk")
+        self.bulk_min_param_label.grid(row=p_i, column=1, sticky=tk.W)
 
-        # entry field
-        self.bulk_min_entry = tk.Entry(
-                                    root,
-                                    width=8)
-        self.bulk_min_entry.grid(row=p_i+2, column=1, sticky=tk.E)
-        self.bulk_min_entry.insert(tk.END, '1e-5')
-        # set button
-        self.bulk_min_set_button = tk.Button(
-                                        root,
-                                        text='set',
-                                        command=lambda: self.set_bulk_min(),
-                                        width=8)
-        self.bulk_min_set_button.grid(row=p_i+2, column=2, sticky=tk.W)
+        self.bulk_max_param_label = tk.Label(
+            root,
+            text="maximum expression in bulk")
+        self.bulk_max_param_label.grid(row=p_i+1, column=1, sticky=tk.W)
 
-        # for parameter bulk_max
-        # title label and current value
-        self.bulk_max_label = tk.Label(root, text="maximum expression in bulk", font="-weight bold")
-        self.bulk_max_label.grid(row=p_i, column=3, columnspan=2, sticky=tk.W+tk.E)
-        self.bulk_max_current_label = tk.Label(root, text="current value: {}".format(self.bulk_max), font="-slant italic")
-        self.bulk_max_current_label.grid(row=p_i+1, column=3, columnspan=2, sticky=tk.W+tk.E)
+        self.disp_min_param_label = tk.Label(
+            root,
+            text="minimum dispersion")
+        self.disp_min_param_label.grid(row=p_i+2, column=1, sticky=tk.W)
 
-        # entry field
-        self.bulk_max_entry = tk.Entry(
-                                    root,
-                                    width=8)
-        self.bulk_max_entry.grid(row=p_i+2, column=3, sticky=tk.E)
-        self.bulk_max_entry.insert(tk.END, '0.01')
+        self.maxiter_param_label = tk.Label(
+            root,
+            text="maximum number iterations")
+        self.maxiter_param_label.grid(row=p_i+3, column=1, sticky=tk.W)
 
-        # set button
-        self.bulk_max_set_button = tk.Button(
-                                        root,
-                                        text='set',
-                                        command=lambda: self.set_bulk_max(),
-                                        width=8)
-        self.bulk_max_set_button.grid(row=p_i+2, column=4, sticky=tk.W)
+        self.N_repeat_param_label = tk.Label(
+            root,
+            text="no. of repeats (for repeatanneal)")
+        self.N_repeat_param_label.grid(row=p_i+4, column=1, sticky=tk.W)
+
+        # corresponding set of values
+        self.bulk_min_value_label = tk.Label(
+            root,
+            text="{}".format(self.bulk_min))
+        self.bulk_min_value_label.grid(row=p_i, column=2, sticky=tk.W)
+
+        self.bulk_max_value_label = tk.Label(
+            root,
+            text="{}".format(self.bulk_max))
+        self.bulk_max_value_label.grid(row=p_i+1, column=2, sticky=tk.W)
+
+        self.disp_min_value_label = tk.Label(
+            root,
+            text="{}".format(self.disp_min))
+        self.disp_min_value_label.grid(row=p_i+2, column=2, sticky=tk.W)
+
+        self.maxiter_value_label = tk.Label(
+            root,
+            text="{}".format(self.maxiter))
+        self.maxiter_value_label.grid(row=p_i+3, column=2, sticky=tk.W)
+
+        self.N_repeat_value_label = tk.Label(
+            root,
+            text="{}".format(self.N_repeat))
+        self.N_repeat_value_label.grid(row=p_i+4, column=2, sticky=tk.W)
 
 
-        # for parameter disp_min
-        # title label and current value
-        self.disp_min_label = tk.Label(root, text="minimum dispersion", font="-weight bold")
-        self.disp_min_label.grid(row=p_i, column=5, columnspan=2, sticky=tk.W+tk.E)
-        self.disp_min_current_label = tk.Label(root, text="current value: {}".format(self.disp_min), font="-slant italic")
-        self.disp_min_current_label.grid(row=p_i+1, column=5, columnspan=2, sticky=tk.W+tk.E)
+        # button for editing parameters which spawns new window
+        self.parameter_change_button = tk.Button(root,
+                                                 text='Change parameters \n(optional)',
+                                                 command=lambda: self.open_param_window())
+        self.parameter_change_button.grid(row=p_i,
+                                          rowspan=5,
+                                          column=3,
+                                          columnspan=2)
 
-        # entry field
-        self.disp_min_entry = tk.Entry(
-                                    root,
-                                    width=8)
-        self.disp_min_entry.grid(row=p_i+2, column=5, sticky=tk.E)
-        self.disp_min_entry.insert(tk.END, '0.5')
 
-        # set button
-        self.disp_min_set_button = tk.Button(
-                                        root,
-                                        text='set',
-                                        command=lambda: self.set_disp_min(),
-                                        width=8)
-        self.disp_min_set_button.grid(row=p_i+2, column=6, sticky=tk.W)
-
-        # for parameter maxiter
-        # title label and current value
-        self.maxiter_label = tk.Label(root, text="maximum number of\nannealing iterations", font="-weight bold")
-        self.maxiter_label.grid(row=p_i+3, column=1, columnspan=2, sticky=tk.W+tk.E)
-        self.maxiter_current_label = tk.Label(root, text="current value: {}".format(self.maxiter), font="-slant italic")
-        self.maxiter_current_label.grid(row=p_i+4, column=1, columnspan=2, sticky=tk.W+tk.E)
-
-        # entry field
-        self.maxiter_entry = tk.Entry(
-                                    root,
-                                    width=8)
-        self.maxiter_entry.grid(row=p_i+5, column=1, sticky=tk.E)
-        self.maxiter_entry.insert(tk.END, '1000')
-
-        # set button
-        self.maxiter_set_button = tk.Button(
-                                        root,
-                                        text='set',
-                                        command=lambda: self.set_maxiter(),
-                                        width=8)
-        self.maxiter_set_button.grid(row=p_i+5, column=2, sticky=tk.W)
-
-        # for parameter N_repeat
-        # title label and current value
-        self.N_repeat_label = tk.Label(root, text="number of repeats\n(relevant for repeatanneal)", font="-weight bold")
-        self.N_repeat_label.grid(row=p_i+3, column=3, columnspan=2, sticky=tk.W+tk.E)
-        self.N_repeat_current_label = tk.Label(root, text="current value: {}".format(self.N_repeat), font="-slant italic")
-        self.N_repeat_current_label.grid(row=p_i+4, column=3, columnspan=2, sticky=tk.W+tk.E)
-
-        # entry field
-        self.N_repeat_entry = tk.Entry(
-                                    root,
-                                    width=8)
-        self.N_repeat_entry.grid(row=p_i+5, column=3, sticky=tk.E)
-        self.N_repeat_entry.insert(tk.END, '10')
-        # set button
-        self.N_repeat_set_button = tk.Button(
-                                        root,
-                                        text='set',
-                                        command=lambda: self.set_N_repeat(),
-                                        width=8)
-        self.N_repeat_set_button.grid(row=p_i+5, column=4, sticky=tk.W)
 
 
         """ run deconvolution section """
@@ -260,13 +221,14 @@ class cellgui:
                                         font="-weight bold ",
                                         image=self.ca_button,
                                         highlightbackground='#f47a60',
-                                        command=lambda: self.cellanneal())
+                                        command=lambda: self.cellanneal(),
+                                        width=20)
         self.cellanneal_button.grid(
                                 row=d_i,
                                 column=1,
-                                columnspan=2,
+                                columnspan=1,
                                 sticky=tk.W+tk.E,
-                                padx=10, pady=10)
+                                padx=10, pady=20)
 
         # make button for cellanneal
         self.repeatanneal_button = tk.Button(
@@ -275,13 +237,14 @@ class cellgui:
                                         font="-weight bold ",
                                         image=self.ra_button,
                                         command=lambda: self.repeatanneal(),
-                                        highlightbackground='#f47a60')
+                                        highlightbackground='#f47a60',
+                                        width=20)
         self.repeatanneal_button.grid(
                                     row=d_i,
                                     column=3,
-                                    columnspan=2,
+                                    columnspan=3,
                                     sticky=tk.W+tk.E,
-                                    padx=10, pady=10)
+                                    padx=10, pady=20)
 
 
     # methods
@@ -321,6 +284,130 @@ class cellgui:
             self.output_path.set(folder)
             self.output_path_is_set = 1
 
+    def open_param_window(self):
+        par_window = tk.Toplevel(root)
+        par_window.title("Set parameters")
+        par_window.canvas = tk.Canvas(root, width=150, height=400)
+        # grab attention for this window until it is closed
+        par_window.grab_set()
+
+        # empty first column
+        spacer1 = tk.Label(par_window, text="")
+        spacer1.grid(row=0, column=0, padx=5, pady=5)
+
+        spacer2 = tk.Label(par_window, text="")
+        spacer2.grid(row=16, column=3, padx=15, pady=5)
+
+        # for parameter bulk_min
+        # title label and current value
+        self.bulk_min_label = tk.Label(par_window, text="minimum expression in bulk", font="-weight bold")
+        self.bulk_min_label.grid(row=1, column=1, columnspan=2, sticky=tk.W+tk.E)
+        self.bulk_min_current_label = tk.Label(par_window, text="current value: {}".format(self.bulk_min), font="-slant italic")
+        self.bulk_min_current_label.grid(row=2, column=1, columnspan=2, sticky=tk.W+tk.E, padx=5, pady=5)
+
+        # entry field
+        self.bulk_min_entry = tk.Entry(
+                                    par_window,
+                                    width=8)
+        self.bulk_min_entry.grid(row=3, column=1, sticky=tk.E)
+        self.bulk_min_entry.insert(tk.END, '1e-5')
+        # set button
+        self.bulk_min_set_button = tk.Button(
+                                        par_window,
+                                        text='set',
+                                        command=lambda: self.set_bulk_min(),
+                                        width=8)
+        self.bulk_min_set_button.grid(row=3, column=2, sticky=tk.W)
+
+        # for parameter bulk_max
+        # title label and current value
+        self.bulk_max_label = tk.Label(par_window, text="maximum expression in bulk", font="-weight bold")
+        self.bulk_max_label.grid(row=4, column=1, columnspan=2, sticky=tk.W+tk.E)
+        self.bulk_max_current_label = tk.Label(par_window, text="current value: {}".format(self.bulk_max), font="-slant italic")
+        self.bulk_max_current_label.grid(row=5, column=1, columnspan=2, sticky=tk.W+tk.E)
+
+        # entry field
+        self.bulk_max_entry = tk.Entry(
+                                    par_window,
+                                    width=8)
+        self.bulk_max_entry.grid(row=6, column=1, sticky=tk.E)
+        self.bulk_max_entry.insert(tk.END, '0.01')
+
+        # set button
+        self.bulk_max_set_button = tk.Button(
+                                        par_window,
+                                        text='set',
+                                        command=lambda: self.set_bulk_max(),
+                                        width=8)
+        self.bulk_max_set_button.grid(row=6, column=2, sticky=tk.W)
+
+
+        # for parameter disp_min
+        # title label and current value
+        self.disp_min_label = tk.Label(par_window, text="minimum dispersion", font="-weight bold")
+        self.disp_min_label.grid(row=7, column=1, columnspan=2, sticky=tk.W+tk.E)
+        self.disp_min_current_label = tk.Label(par_window, text="current value: {}".format(self.disp_min), font="-slant italic")
+        self.disp_min_current_label.grid(row=8, column=1, columnspan=2, sticky=tk.W+tk.E)
+
+        # entry field
+        self.disp_min_entry = tk.Entry(
+                                    par_window,
+                                    width=8)
+        self.disp_min_entry.grid(row=9, column=1, sticky=tk.E)
+        self.disp_min_entry.insert(tk.END, '0.5')
+
+        # set button
+        self.disp_min_set_button = tk.Button(
+                                        par_window,
+                                        text='set',
+                                        command=lambda: self.set_disp_min(),
+                                        width=8)
+        self.disp_min_set_button.grid(row=9, column=2, sticky=tk.W)
+
+        # for parameter maxiter
+        # title label and current value
+        self.maxiter_label = tk.Label(par_window, text="maximum no. of iterations", font="-weight bold")
+        self.maxiter_label.grid(row=10, column=1, columnspan=2, sticky=tk.W+tk.E)
+        self.maxiter_current_label = tk.Label(par_window, text="current value: {}".format(self.maxiter), font="-slant italic")
+        self.maxiter_current_label.grid(row=11, column=1, columnspan=2, sticky=tk.W+tk.E)
+
+        # entry field
+        self.maxiter_entry = tk.Entry(
+                                    par_window,
+                                    width=8)
+        self.maxiter_entry.grid(row=12, column=1, sticky=tk.E)
+        self.maxiter_entry.insert(tk.END, '1000')
+
+        # set button
+        self.maxiter_set_button = tk.Button(
+                                        par_window,
+                                        text='set',
+                                        command=lambda: self.set_maxiter(),
+                                        width=8)
+        self.maxiter_set_button.grid(row=12, column=2, sticky=tk.W)
+
+        # for parameter N_repeat
+        # title label and current value
+        self.N_repeat_label = tk.Label(par_window, text="no. of repeats\n(relevant for repeatanneal)", font="-weight bold")
+        self.N_repeat_label.grid(row=13, column=1, columnspan=2, sticky=tk.W+tk.E)
+        self.N_repeat_current_label = tk.Label(par_window, text="current value: {}".format(self.N_repeat), font="-slant italic")
+        self.N_repeat_current_label.grid(row=14, column=1, columnspan=2, sticky=tk.W+tk.E)
+
+        # entry field
+        self.N_repeat_entry = tk.Entry(
+                                    par_window,
+                                    width=8)
+        self.N_repeat_entry.grid(row=15, column=1, sticky=tk.E)
+        self.N_repeat_entry.insert(tk.END, '10')
+        # set button
+        self.N_repeat_set_button = tk.Button(
+                                        par_window,
+                                        text='set',
+                                        command=lambda: self.set_N_repeat(),
+                                        width=8)
+        self.N_repeat_set_button.grid(row=15, column=2, sticky=tk.W)
+
+
     def set_bulk_min(self):
         # get input and check validity
         input = self.bulk_min_entry.get()
@@ -334,8 +421,9 @@ class cellgui:
         if (0 <= new_val < 1) and (new_val < self.bulk_max):
             # update bulk_min
             self.bulk_min = new_val
-            # update displa of current bulk_min
+            # update display of current bulk_min
             self.bulk_min_current_label['text'] = "current value: {}".format(self.bulk_min)
+            self.bulk_min_value_label['text'] = "{}".format(self.bulk_min)
         elif not (0 <= new_val < 1):
             messagebox.showerror("Input error", """Please provdide a numerical value between 0 (inclusive) and 1 (exclusive). Examples: "0", "0.01", "2e-5".""")
         elif not (new_val < self.bulk_max):
@@ -356,6 +444,7 @@ class cellgui:
             self.bulk_max = new_val
             # update display of current bulk_min
             self.bulk_max_current_label['text'] = "current value: {}".format(self.bulk_max)
+            self.bulk_max_value_label['text'] = "{}".format(self.bulk_max)
         elif not (0 < new_val <= 1):
             messagebox.showerror("Input error", """Please provdide a numerical value between 0 (exclusive) and 1 (inclusive). Examples: "0.01", "2e-5", "1".""")
         elif not (new_val > self.bulk_min):
@@ -376,6 +465,7 @@ class cellgui:
             self.disp_min = new_val
             # update display of current bulk_min
             self.disp_min_current_label['text'] = "current value: {}".format(self.disp_min)
+            self.disp_min_value_label['text'] = "{}".format(self.disp_min)
         else:
             messagebox.showerror("Input error", """Please provdide a positive numerical value. Examples: "0.5", "5e-1", "1".""")
 
@@ -394,6 +484,7 @@ class cellgui:
             self.maxiter = new_val
             # update display of current bulk_min
             self.maxiter_current_label['text'] = "current value: {}".format(self.maxiter)
+            self.maxiter_value_label['text'] = "{}".format(self.maxiter)
         else:
             messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "50", "587", "1000".""")
 
@@ -412,6 +503,7 @@ class cellgui:
             self.N_repeat = new_val
             # update display of current bulk_min
             self.N_repeat_current_label['text'] = "current value: {}".format(self.N_repeat)
+            self.N_repeat_value_label['text'] = "{}".format(self.N_repeat)
         else:
             messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "5", "10", "21".""")
 
