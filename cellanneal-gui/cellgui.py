@@ -12,6 +12,16 @@ import os
 from subprocess import Popen, PIPE
 from threading import Thread
 
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 class cellgui:
 
     def __init__(self, root):
@@ -56,7 +66,7 @@ class cellgui:
         t_i = 13  # start of text display section
 
         """ logo and welcome section """
-        self.logo = Image.open('logo_orange.png')
+        self.logo = Image.open(resource_path('logo_orange.png'))
         # convert pillow image to tkinter image
         self.logo = ImageTk.PhotoImage(self.logo)
         # place image inside label widget (both lines below are needed)
@@ -70,30 +80,30 @@ class cellgui:
             wraplength=450)
         self.welcome_label.grid(column=2, columnspan=4, sticky=tk.W+tk.E, row=0)
         # for buttons belows
-        self.ca_button = Image.open('cellanneal_button.png')
+        self.ca_button = Image.open(resource_path('cellanneal_button.png'))
         self.ca_button = ImageTk.PhotoImage(self.ca_button)
         self.ca_label = tk.Label(image=self.ca_button)
         self.ca_label.image = self.ca_button
 
-        self.ra_button = Image.open('repeatanneal_button.png')
+        self.ra_button = Image.open(resource_path('repeatanneal_button.png'))
         self.ra_button = ImageTk.PhotoImage(self.ra_button)
         self.ra_label = tk.Label(image=self.ra_button)
         self.ra_label.image = self.ra_button
 
-        self.running_img = Image.open('running.png')
+        self.running_img = Image.open(resource_path('running.png'))
         self.running_img = ImageTk.PhotoImage(self.running_img)
         self.running_label = tk.Label(image=self.running_img)
         self.running_label.image = self.running_img
 
-        self.abort_img = Image.open('abort_button.png')
+        self.abort_img = Image.open(resource_path('abort_button.png'))
         self.abort_img = ImageTk.PhotoImage(self.abort_img)
         self.abort_label = tk.Label(image=self.abort_img)
         self.abort_label.image = self.abort_img
 
         """ main section labels, structure """
-        self.sec1_label = tk.Label(root, text="1) Select source data \nand output folder.", font=('Helvetica', 14, 'bold'))
-        self.sec2_label = tk.Label(root, text="2) Set parameters. \n[optional]", font=('Helvetica', 14, 'bold'))
-        self.sec3_label = tk.Label(root, text="3) Run deconvolution.", font=('Helvetica', 14, 'bold'))
+        self.sec1_label = tk.Label(root, text="1) Select source data \nand output folder.", font="-weight bold")
+        self.sec2_label = tk.Label(root, text="2) Set parameters. \n[optional]", font="-weight bold")
+        self.sec3_label = tk.Label(root, text="3) Run deconvolution.", font="-weight bold")
         self.sec1_label.grid(row=i_i, column=0, sticky='w')
         self.sec2_label.grid(row=p_i, column=0, sticky='w')
         self.sec3_label.grid(row=d_i, column=0, sticky='w')
@@ -476,7 +486,7 @@ class cellgui:
             # start subprocess
             print('start')
             self.subprocess = Popen([sys.executable, "-u",
-                                     'cellanneal_pipeline_script.py',
+                                     resource_path('cellanneal_pipeline_script.py'),
                                      self.celltype_folder_path.get(),
                                      self.bulk_folder_path.get(),
                                      str(self.disp_min),
@@ -553,7 +563,7 @@ class cellgui:
             # start subprocess
             print('repeat')
             self.subprocess = Popen([sys.executable, "-u",
-                                     'repeatanneal_pipeline_script.py',
+                                     resource_path('repeatanneal_pipeline_script.py'),
                                      self.celltype_folder_path.get(),
                                      self.bulk_folder_path.get(),
                                      str(self.disp_min),
