@@ -1,6 +1,7 @@
 
 # User
 *.DS_Store
+.smbdelete*
 examples/example_data/results/
 examples/example_data/figures/
 results/
@@ -42,7 +43,6 @@ __pycache__
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
-*.spec
 
 # Installer logs
 pip-log.txt
@@ -101,20 +101,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
 
 # mkdocs documentation
 /site
-
-# mypy
-.mypy_cache/
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
