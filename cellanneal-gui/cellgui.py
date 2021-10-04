@@ -1,6 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-import pandas as pd
+from pandas import DataFrame, read_excel, read_csv
 from tkinter.filedialog import askopenfile, askdirectory
 from tkinter import messagebox
 from pathlib import Path
@@ -26,10 +26,10 @@ class cellgui:
         root.title("cellanneal")
 
         # place holders for required data
-        self.bulk_df = pd.DataFrame()
+        self.bulk_df = DataFrame()
         self.bulk_data_path = tk.StringVar()
         self.bulk_df_is_set = 0  # check later whether data has been selected
-        self.celltype_df = pd.DataFrame()
+        self.celltype_df = DataFrame()
         self.celltype_data_path = tk.StringVar()
         self.celltype_df_is_set = 0
 
@@ -296,9 +296,9 @@ class cellgui:
             try:
                 # depending on extension, use different import function
                 if file.name.split(".")[-1] in ["csv", 'txt']:
-                    self.bulk_df = pd.read_csv(file, index_col=0)
+                    self.bulk_df = read_csv(file, index_col=0)
                 elif file.name.split(".")[-1] == "xlsx":
-                    self.bulk_df = pd.read_excel(file, index_col=0, engine='openpyxl')
+                    self.bulk_df = read_excel(file, index_col=0, engine='openpyxl')
                 else:
                     raise ImportError
                 # here, in order to make further course case insensitive,
@@ -321,9 +321,9 @@ class cellgui:
             try:
                 # depending on extension, use different import function
                 if file.name.split(".")[-1] in ["csv", 'txt']:
-                    self.celltype_df = pd.read_csv(file, index_col=0)
+                    self.celltype_df = read_csv(file, index_col=0)
                 elif file.name.split(".")[-1] == "xlsx":
-                    self.celltype_df = pd.read_excel(file, index_col=0, engine='openpyxl')
+                    self.celltype_df = read_excel(file, index_col=0, engine='openpyxl')
                 else:
                     raise ImportError
                 # here, in order to make further course case insensitive,
@@ -360,7 +360,7 @@ class cellgui:
 
         # for parameter bulk_min
         # title label and current value
-        self.bulk_min_label = tk.Label(par_window, text="minimum expression in bulk", font="-weight bold")
+        self.bulk_min_label = tk.Label(par_window, text="minimum expression in bulk", font="-weight bold -size 13")
         self.bulk_min_label.grid(row=1, column=1, columnspan=2, sticky=tk.W+tk.E)
         self.bulk_min_current_label = tk.Label(par_window, text="current value: {}".format(self.bulk_min), font="-slant italic")
         self.bulk_min_current_label.grid(row=2, column=1, columnspan=2, sticky=tk.W+tk.E, padx=5, pady=5)

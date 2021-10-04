@@ -7,7 +7,7 @@ block_cipher = None
 a = Analysis(['cellgui.py'],
              pathex=['/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui'],
              binaries=[],
-             datas=[('logo_orange.png', 'img'), ('cellanneal_button.png', 'img'), ('repeatanneal_button.png', 'img'), ('abort_button.png', 'img'), ('running.png', 'img')],
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              hooksconfig={},
@@ -17,6 +17,13 @@ a = Analysis(['cellgui.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
+
+a.datas += [('logo_orange.png', '/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/logo_orange.png', 'img'),
+            ('cellanneal_button.png', '/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/cellanneal_button.png', 'img'),
+            ('repeatanneal_button.png', '/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/repeatanneal_button.png', 'img'),
+            ('logo.icns', '/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/logo.icns', 'img')]
+
+
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 
@@ -24,7 +31,7 @@ exe = EXE(pyz,
           a.scripts,
           a.binaries,
           a.zipfiles,
-          a.datas,  
+          a.datas,
           [],
           name='cellgui',
           debug=False,
@@ -37,4 +44,5 @@ exe = EXE(pyz,
           disable_windowed_traceback=False,
           target_arch=None,
           codesign_identity=None,
-          entitlements_file=None )
+          entitlements_file=None,
+          icon='/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/logo.icns')
