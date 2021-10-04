@@ -45,4 +45,4 @@ exe = EXE(pyz,
           target_arch=None,
           codesign_identity=None,
           entitlements_file=None,
-          icon='/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/logo.icns')
+          icon='logo.icns')
