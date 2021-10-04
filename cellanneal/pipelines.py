@@ -1,4 +1,4 @@
-import pandas as pd
+from pandas import DataFrame, pivot_table
 import time
 
 from .general import make_gene_dictionary, deconvolve, calc_gene_expression
@@ -171,7 +171,7 @@ def repeatanneal_pipe(
     mean_df_long = parent_df.groupby(['bulk', 'celltype']).mean()
     mean_df_long = mean_df_long.drop(['run'], axis=1)
     # the mean df is in long form currently, we want wide form
-    mean_df = pd.pivot_table(mean_df_long, index='bulk', columns='celltype')
+    mean_df = pivot_table(mean_df_long, index='bulk', columns='celltype')
     mean_df.columns = mean_df.columns.droplevel(0)
     mean_df.index.name = None
     mean_df.sort_index(axis=0, inplace=True)

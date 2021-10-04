@@ -5,18 +5,18 @@ from tkinter.filedialog import askopenfile, askdirectory
 from tkinter import messagebox
 from pathlib import Path
 from cellanneal import cellanneal_pipe, repeatanneal_pipe
-
+import openpyxl  # for excel import
 import sys
-import os
+from os import path
 
 
 def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        base_path = path.abspath(".")
 
-    return os.path.join(base_path, relative_path)
+    return path.join(base_path, relative_path)
 
 
 class cellgui:
@@ -54,12 +54,12 @@ class cellgui:
         self.N_repeat_default = 10
 
         # basic layout considerations
-        self.canvas = tk.Canvas(root, width=800, height=600)
-        self.canvas.grid(columnspan=7, rowspan=14)
+        self.canvas = tk.Canvas(root, width=700, height=500)
+        self.canvas.grid(columnspan=6, rowspan=15)
         # for easier grid layout changes
-        i_i = 3  # start of import section
-        p_i = 8  # start of parameter section
-        d_i = 14  # start of deconv section
+        i_i = 4  # start of import section
+        p_i = 9  # start of parameter section
+        d_i = 15  # start of deconv section
 
         """ logo and welcome section """
         self.logo = Image.open(resource_path('logo_orange.png'))
@@ -69,12 +69,24 @@ class cellgui:
         self.logo_label = tk.Label(image=self.logo)
         self.logo_label.image = self.logo
         # place the self.logo label inside the box using grid method
-        self.logo_label.grid(column=1, columnspan=1, sticky=tk.W, row=0)
+        self.logo_label.grid(column=1, columnspan=1, sticky=tk.W, row=0,
+                             padx=5, pady=5, rowspan=2)
 
         self.welcome_label = tk.Label(
-            text='Welcome to cellanneal, the user-friendly bulk deconvolution software.\nPlease visit the doumentation at https://github.com/LiBuchauer/cellanneal for instructions.',
-            wraplength=300)
-        self.welcome_label.grid(column=2, columnspan=4, sticky=tk.W+tk.E, row=0)
+            text='Welcome to cellanneal, the user-friendly bulk deconvolution software.',
+            wraplength=300, font="-weight bold")
+        self.welcome_label.grid(column=2, columnspan=4, sticky=tk.W+tk.E, row=0,
+                                pady=10)
+
+        # a button that allows to show a small documentation
+        self.instruct_button = tk.Button(root,
+                                         text="Instructions",
+                                         command=lambda: self.show_instructions(),
+                                         highlightbackground='#f47a60')
+        self.instruct_button.grid(row=1, column=3,
+                                  columnspan=2, sticky=tk.W+tk.E,
+                                  padx=5, pady=1,
+                                  ipadx=10, ipady=10)
         # for buttons belows
         self.ca_button = Image.open(resource_path('cellanneal_button.png'))
         self.ca_button = ImageTk.PhotoImage(self.ca_button)
@@ -88,10 +100,10 @@ class cellgui:
 
         # spacers for tidier look
         spacer1 = tk.Label(root, text="")
-        spacer1.grid(row=i_i-2, column=0, padx=5, pady=10)
+        spacer1.grid(row=i_i-2, column=0, padx=10, pady=2)
 
         spacer2 = tk.Label(root, text="")
-        spacer2.grid(row=p_i-2, column=0, padx=5, pady=10)
+        spacer2.grid(row=p_i-2, column=6, padx=10, pady=2)
 
 
         """ data import section """
@@ -102,7 +114,7 @@ class cellgui:
         # label to indicate that we want bulk data here
         self.bulk_data_label = tk.Label(
                                     root,
-                                    text="Select bulk data (*.csv).")
+                                    text="Select bulk data (*.csv or *.xlsx).")
         self.bulk_data_label.grid(row=i_i, column=1, columnspan=1, sticky=tk.W)
         # path entry field
         self.bulk_data_entry = tk.Entry(
@@ -118,7 +130,7 @@ class cellgui:
 
         # import celltype data
         # label to indicate that we want celltype data here
-        self.celltype_data_label = tk.Label(root, text="Select celltype data (*.csv).")
+        self.celltype_data_label = tk.Label(root, text="Select celltype data (*.csv or *.xlsx).")
         self.celltype_data_label.grid(row=i_i+1, column=1, columnspan=2, sticky=tk.W)
         # path entry field
         self.celltype_data_entry = tk.Entry(root, textvariable=self.celltype_data_path)
@@ -204,11 +216,13 @@ class cellgui:
         # button for editing parameters which spawns new window
         self.parameter_change_button = tk.Button(root,
                                                  text='Change parameters \n(optional)',
-                                                 command=lambda: self.open_param_window())
+                                                 command=lambda: self.open_param_window(),
+                                                 highlightbackground='#f47a60',)
         self.parameter_change_button.grid(row=p_i,
                                           rowspan=5,
                                           column=3,
-                                          columnspan=2)
+                                          columnspan=2,
+                                          ipadx=10, ipady=10)
 
 
 
@@ -241,22 +255,57 @@ class cellgui:
                                         width=20)
         self.repeatanneal_button.grid(
                                     row=d_i,
-                                    column=3,
-                                    columnspan=3,
+                                    column=2,
+                                    columnspan=4,
                                     sticky=tk.W+tk.E,
-                                    padx=10, pady=20)
+                                    padx=20, pady=20)
 
 
     # methods
+    def show_instructions(self):
+        readme_window = tk.Toplevel(root)
+        readme_window.title("Instructions")
+        readme_window.canvas = tk.Canvas(root, width=400, height=600)
+        # write text into this window
+        self.readme_text1 = tk.Label(readme_window, wraplength=350, text="Welcome to cellanneal.", font="-weight bold")
+        self.readme_text1.grid(row=1, column=0, padx=10)
+
+        self.readme_text2 = tk.Label(readme_window, wraplength=350, text="For the full documentation and example file please see https://github.com/LiBuchauer/cellanneal.")
+        self.readme_text2.grid(row=2, column=0, padx=10)
+
+        self.readme_text3 = tk.Label(readme_window, wraplength=350, text="\n\n1) Deconvolution data.\n", font="-weight bold")
+        self.readme_text3.grid(row=3, column=0, padx=10)
+
+        self.readme_text4 = tk.Label(readme_window, wraplength=350, justify=tk.LEFT, text="cellanneal accepts comma-separated text files (*.csv and *.txt) as well as excel files (*.xlsx) as inputs for both bulk data and celltype provided that they are formatted as specified in the examples. \n\nSpecifically, gene names need to appear in the first column for both bulk and celltype data files, and sample names (for bulk data file) or cell type names (for celltype data file) need to appear in th first row.")
+        self.readme_text4.grid(row=4, column=0, padx=10)
+
+        self.readme_text5 = tk.Label(readme_window, wraplength=350, text="\n\n2) Deconvolution parameters.\n", font="-weight bold")
+        self.readme_text5.grid(row=5, column=0, padx=10)
+
+        self.readme_text6 = tk.Label(readme_window, wraplength=350, text="\n\n3) Running deconvolution with cellanneal or repeatanneal.\n", font="-weight bold")
+        self.readme_text6.grid(row=6, column=0, padx=10)
+
+
     def import_bulk_data(self):
         file = askopenfile(
                 parent=root,
                 mode='rb',
-                title="Choose a csv file.",
-                filetypes=[("csv file", "*.csv")])
+                title="Choose a bulk data file.",
+                filetypes=[("tabular data files", ".csv .txt .xlsx")])
         if file:
             try:
-                self.bulk_df = pd.read_csv(file, index_col=0)
+                # depending on extension, use different import function
+                if file.name.split(".")[-1] in ["csv", 'txt']:
+                    self.bulk_df = pd.read_csv(file, index_col=0)
+                elif file.name.split(".")[-1] == "xlsx":
+                    self.bulk_df = pd.read_excel(file, index_col=0, engine='openpyxl')
+                else:
+                    raise ImportError
+                # here, in order to make further course case insensitive,
+                # change all gene names to uppercase only
+                self.bulk_df.index = self.bulk_df.index.str.upper()
+                # also, if there are duplicate genes, the are summed here
+                self.bulk_df = self.bulk_df.groupby(self.bulk_df.index).sum()
                 self.bulk_data_path.set(file.name)
                 self.bulk_df_is_set = 1
             except:
@@ -266,11 +315,22 @@ class cellgui:
         file = askopenfile(
                 parent=root,
                 mode='rb',
-                title="Choose a csv file.",
-                filetypes=[("csv file", "*.csv")])
+                title="Choose a celltype data file.",
+                filetypes=[("tabular data files", ".csv .txt .xlsx")])
         if file:
             try:
-                self.celltype_df = pd.read_csv(file, index_col=0)
+                # depending on extension, use different import function
+                if file.name.split(".")[-1] in ["csv", 'txt']:
+                    self.celltype_df = pd.read_csv(file, index_col=0)
+                elif file.name.split(".")[-1] == "xlsx":
+                    self.celltype_df = pd.read_excel(file, index_col=0, engine='openpyxl')
+                else:
+                    raise ImportError
+                # here, in order to make further course case insensitive,
+                # change all gene names to uppercase only
+                self.celltype_df.index = self.celltype_df.index.str.upper()
+                # also, if there are duplicate genes, the are summed here
+                self.celltype_df = self.celltype_df.groupby(self.celltype_df.index).sum()
                 self.celltype_data_path.set(file.name)
                 self.celltype_df_is_set = 1
             except:
@@ -293,10 +353,10 @@ class cellgui:
 
         # empty first column
         spacer1 = tk.Label(par_window, text="")
-        spacer1.grid(row=0, column=0, padx=5, pady=5)
+        spacer1.grid(row=0, column=0, padx=5, pady=0)
 
         spacer2 = tk.Label(par_window, text="")
-        spacer2.grid(row=16, column=3, padx=15, pady=5)
+        spacer2.grid(row=17, column=3, padx=5, pady=0)
 
         # for parameter bulk_min
         # title label and current value
@@ -406,6 +466,15 @@ class cellgui:
                                         command=lambda: self.set_N_repeat(),
                                         width=8)
         self.N_repeat_set_button.grid(row=15, column=2, sticky=tk.W)
+
+        # buton for wuitting and return to main window
+        self.return_button = tk.Button(par_window,
+                                       text='Return to main window',
+                                       command=par_window.destroy,
+                                       highlightbackground='#f47a60')
+        self.return_button.grid(row=16, column=1,
+                                columnspan=2, sticky=tk.W+tk.E, padx=5, pady=10,
+                                ipadx=5, ipady=5)
 
 
     def set_bulk_min(self):

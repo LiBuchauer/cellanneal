@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd
+from pandas import DataFrame, cut, Series
 
 # functional requirements
 from scipy.spatial.distance import correlation
@@ -7,6 +7,10 @@ from scipy.spatial.distance import correlation
 # personalized dual_annealing function
 from .dual_annealing import dual_annealing
 
+# we choose to ignore warnings at this stage because console output is
+# part of the user experience - make sure to enable when developing
+import warnings
+warnings.filterwarnings("ignore")
 
 def make_gene_dictionary(
         celltype_df,
@@ -77,7 +81,7 @@ def calc_gene_expression(
                       mixed_expression_comp,
                       exp_over_mixed,
                       log_exp_over_mixed)).T
-    gene_comp_df = pd.DataFrame(data=data,
+    gene_comp_df = DataFrame(data=data,
                                 columns=['experimental bulk',
                                          'cellanneal mixed bulk',
                                          'fold change, exp/mixed',
@@ -113,12 +117,12 @@ def find_high_var_genes(
     mean = np.log1p(mean)
 
     # collect in a dataframe
-    df = pd.DataFrame(index=sc_ref_norm.index)
+    df = DataFrame(index=sc_ref_norm.index)
     df['means'] = mean
     df['dispersions'] = dispersion
 
     # group into 20 bins
-    df['mean_bin'] = pd.cut(df['means'], bins=20)
+    df['mean_bin'] = cut(df['means'], bins=20)
     disp_grouped = df.groupby('mean_bin')['dispersions']
     # mean and std of dispersion in each group
     disp_mean_bin = disp_grouped.mean()
@@ -170,7 +174,7 @@ def find_thr_genes(
     "mt-").
     """
     # check if input is a series
-    if type(series) is not pd.Series:
+    if type(series) is not Series:
         raise TypeError("""The object you have passed to 'find_genes()' is not
                 a pandas Series.""")
 
@@ -331,7 +335,7 @@ def deconvolve(
     data_out = np.hstack((np.array(mixture_list), np.array([spears, pears]).T))
     cols_out = celltype_df.columns.tolist() + ['rho_Spearman', 'rho_Pearson']
 
-    all_mix_df = pd.DataFrame(data=data_out, columns=cols_out,
+    all_mix_df = DataFrame(data=data_out, columns=cols_out,
                               index=bulk_df.columns)
 
     return all_mix_df

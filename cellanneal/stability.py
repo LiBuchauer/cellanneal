@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd
+from pandas import melt, concat, DataFrame
 
 # functional requirements
 from .general import deconvolve
@@ -44,11 +44,11 @@ def repeat_annealing(
         except KeyError:
             b_mix_df = all_mix_df
         b_mix_df['bulk'] = b_mix_df.index
-        long_df = pd.melt(b_mix_df, id_vars=['bulk'], var_name='celltype', value_name='fraction')
+        long_df = melt(b_mix_df, id_vars=['bulk'], var_name='celltype', value_name='fraction')
         long_df['run'] = i
         df_list.append(long_df)
 
     # finally, merge the dfs in the list, write to file and return
-    master_df = pd.concat(df_list, axis=0)
+    master_df = concat(df_list, axis=0)
 
     return master_df

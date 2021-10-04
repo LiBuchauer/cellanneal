@@ -1,12 +1,12 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import seaborn as sns
+from matplotlib.pyplot import savefig, subplots, subplots_adjust
+from matplotlib import rcParams, cycler
+from seaborn import heatmap, catplot
 from scipy.stats import spearmanr
 from scipy.spatial.distance import correlation
 
 
-mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=[
+rcParams['axes.prop_cycle'] = cycler(color=[
             '#e6194b', '#3cb44b', '#ffe119', '#4363d8',
             '#f58231', '#911eb4', '#46f0f0', '#f032e6',
             '#bcf60c', '#fabebe', '#008080', '#e6beff',
@@ -19,7 +19,7 @@ def plot_pies_from_df(mix_df,
 
     # for each mixture, plot a pie chart
     plot_num = np.shape(mix_df)[0] + 1
-    fig, axes = plt.subplots(
+    fig, axes = subplots(
             int(np.ceil(plot_num/4)),
             4,
             figsize=(12, 3*np.ceil(plot_num/4)))
@@ -59,11 +59,11 @@ def plot_pies_from_df(mix_df,
         lax.set_visible(True)
         lax.axis("off")
         lax.legend(pie[0], plot_df.columns, loc='best', ncol=2)
-    plt.savefig(save_path, bbox_inches='tight')
+    savefig(save_path, bbox_inches='tight')
 
 
 def plot_mix_heatmap(mix_df, rownorm=False, save_path='figures/heatmap.pdf'):
-    fig, ax = plt.subplots(
+    fig, ax = subplots(
         figsize=(10/np.shape(mix_df)[1]*np.shape(mix_df)[0],
                  0.5*np.shape(mix_df)[1]))
     # if correlation values are included in the mix_df,
@@ -86,12 +86,12 @@ def plot_mix_heatmap(mix_df, rownorm=False, save_path='figures/heatmap.pdf'):
 
     if rownorm:
         tdf = plot_df.T.sort_index(0)
-        ax = sns.heatmap(tdf.div(tdf.max(axis=1), axis=0),
+        ax = heatmap(tdf.div(tdf.max(axis=1), axis=0),
                          linewidths=.5, square=True, cmap='viridis',
                          cbar_kws={'shrink': 0.7})
         ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
     else:
-        ax = sns.heatmap(plot_df.T.sort_index(0),
+        ax = heatmap(plot_df.T.sort_index(0),
                          linewidths=.5, square=True, cmap='viridis',
                          cbar_kws={'shrink': 0.7})
         ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
@@ -101,7 +101,7 @@ def plot_mix_heatmap(mix_df, rownorm=False, save_path='figures/heatmap.pdf'):
     ax.set_ylim(bottom + 0.5, top - 0.5)
     ax.invert_yaxis()
 
-    plt.savefig(save_path, bbox_inches='tight')
+    savefig(save_path, bbox_inches='tight')
 
 
 def plot_1D_lines(
@@ -145,9 +145,9 @@ def plot_1D_lines(
         plot.set_ylim(bottom=0)
 
     # adjust spacing
-    plt.subplots_adjust(hspace=0.2, wspace=0.4)
+    subplots_adjust(hspace=0.2, wspace=0.4)
     # save
-    plt.savefig(save_path, bbox_inches='tight')
+    savefig(save_path, bbox_inches='tight')
 
 
 # function for pie plots from one lcm position set of results
@@ -190,7 +190,7 @@ def plot_scatter(mix_df,
     # for each mixture, plot a scatterplot of mixed vs real bulk
     plot_num = len(bulk_df.columns) + 1
 
-    fig, axes = plt.subplots(int(np.ceil(plot_num/4)), 4,
+    fig, axes = subplots(int(np.ceil(plot_num/4)), 4,
                              figsize=(12, 3*np.ceil(plot_num/4)),
                              sharex=False, sharey=True)
 
@@ -226,7 +226,7 @@ def plot_scatter(mix_df,
             ax.set_visible(False)
 
     fig.tight_layout()
-    plt.savefig(save_path, bbox_inches='tight')
+    savefig(save_path, bbox_inches='tight')
 
 
 """
@@ -245,7 +245,7 @@ def plot_repeats(
 
     # plot catplot of required kind via seaborn
     if kind == 'swarm':
-        g = sns.catplot(
+        g = catplot(
             x='bulk',
             y='fraction',
             col='celltype',
@@ -256,7 +256,7 @@ def plot_repeats(
             sharey=False)
 
     else:
-        g = sns.catplot(
+        g = catplot(
             x='bulk',
             y='fraction',
             col='celltype',
@@ -271,4 +271,4 @@ def plot_repeats(
         ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
 
     # store
-    plt.savefig(save_path, bbox_inches='tight')
+    savefig(save_path, bbox_inches='tight')

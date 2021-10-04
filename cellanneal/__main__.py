@@ -99,24 +99,34 @@ def main():
     print('1A. Importing bulk data ...')
     try:
         bulk_df = pd.read_csv(bulk_data_path, index_col=0, header=0)
+        # here, in order to make further course case insensitive,
+        # change all gene names to uppercase only
+        bulk_df.index = bulk_df.index.str.upper()
+        # also, if there are duplicate genes, the are summed here
+        bulk_df = bulk_df.groupby(bulk_df.index).sum()
         bulk_names = bulk_df.columns.tolist()
         print('{} bulk samples identified: {}\n'.format(len(bulk_names),
                                                         bulk_names))
     except:
         print("""Your bulk data file could not be imported.
         Please check the documentation for format requirements
-        and look at the example bulk data file.""")
+        and look at the example bulk data files.""")
 
     print('1B. Importing celltype reference data ...')
     # import single cell based reference
     try:
         celltype_df = pd.read_csv(celltype_data_path, index_col=0, header=0)
+        # here, in order to make further course case insensitive,
+        # change all gene names to uppercase only
+        celltype_df.index = celltype_df.index.str.upper()
+        # also, if there are duplicate genes, the are summed here
+        celltype_df = celltype_df.groupby(celltype_df.index).sum()
         celltypes = celltype_df.columns.tolist()
         print('{} cell types identified: {}\n'.format(len(celltypes), celltypes))
     except:
         print("""Your celltype data file could not be imported.
         Please check the documentation for format requirements
-        and look at the example celltype data file.""")
+        and look at the example celltype data files.""")
 
     # start pipeline
     cellanneal_pipe(
