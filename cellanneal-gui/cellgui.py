@@ -5,7 +5,8 @@ from tkinter.filedialog import askopenfile, askdirectory
 from tkinter import messagebox
 from pathlib import Path
 from cellanneal import cellanneal_pipe, repeatanneal_pipe
-import openpyxl  # for excel import
+import openpyxl  # for xlsx import
+import xlrd  # for xls import
 import sys
 from os import path
 
@@ -114,7 +115,7 @@ class cellgui:
         # label to indicate that we want bulk data here
         self.bulk_data_label = tk.Label(
                                     root,
-                                    text="Select bulk data (*.csv or *.xlsx).")
+                                    text="Select bulk data (*.csv, *.txt or *.xlsx).")
         self.bulk_data_label.grid(row=i_i, column=1, columnspan=1, sticky=tk.W)
         # path entry field
         self.bulk_data_entry = tk.Entry(
@@ -130,7 +131,7 @@ class cellgui:
 
         # import celltype data
         # label to indicate that we want celltype data here
-        self.celltype_data_label = tk.Label(root, text="Select celltype data (*.csv or *.xlsx).")
+        self.celltype_data_label = tk.Label(root, text="Select celltype data (*.csv, *.txt or *.xlsx).")
         self.celltype_data_label.grid(row=i_i+1, column=1, columnspan=2, sticky=tk.W)
         # path entry field
         self.celltype_data_entry = tk.Entry(root, textvariable=self.celltype_data_path)
@@ -276,7 +277,7 @@ class cellgui:
         self.readme_text3 = tk.Label(readme_window, wraplength=350, text="\n\n1) Deconvolution data.\n", font="-weight bold")
         self.readme_text3.grid(row=3, column=0, padx=10)
 
-        self.readme_text4 = tk.Label(readme_window, wraplength=350, justify=tk.LEFT, text="cellanneal accepts comma-separated text files (*.csv and *.txt) as well as excel files (*.xlsx) as inputs for both bulk data and celltype provided that they are formatted as specified in the examples. \n\nSpecifically, gene names need to appear in the first column for both bulk and celltype data files, and sample names (for bulk data file) or cell type names (for celltype data file) need to appear in th first row.")
+        self.readme_text4 = tk.Label(readme_window, wraplength=350, justify=tk.LEFT, text="cellanneal accepts comma-separated text files (*.csv and *.txt) as well as excel files (*.xlsx, *.xls) as inputs for both bulk data and celltype provided that they are formatted as specified in the examples. \n\nSpecifically, gene names need to appear in the first column for both bulk and celltype data files, and sample names (for bulk data file) or cell type names (for celltype data file) need to appear in th first row.")
         self.readme_text4.grid(row=4, column=0, padx=10)
 
         self.readme_text5 = tk.Label(readme_window, wraplength=350, text="\n\n2) Deconvolution parameters.\n", font="-weight bold")
@@ -291,14 +292,16 @@ class cellgui:
                 parent=root,
                 mode='rb',
                 title="Choose a bulk data file.",
-                filetypes=[("tabular data files", ".csv .txt .xlsx")])
+                filetypes=[("tabular data files", ".csv .txt .xlsx .xls")])
         if file:
             try:
                 # depending on extension, use different import function
                 if file.name.split(".")[-1] in ["csv", 'txt']:
                     self.bulk_df = read_csv(file, index_col=0)
-                elif file.name.split(".")[-1] == "xlsx":
+                elif file.name.split(".")[-1] in ["xlsx"]:
                     self.bulk_df = read_excel(file, index_col=0, engine='openpyxl')
+                elif file.name.split(".")[-1] in ["xls"]:
+                    self.bulk_df = read_excel(file, index_col=0, engine='xlrd')
                 else:
                     raise ImportError
                 # here, in order to make further course case insensitive,
@@ -322,8 +325,10 @@ class cellgui:
                 # depending on extension, use different import function
                 if file.name.split(".")[-1] in ["csv", 'txt']:
                     self.celltype_df = read_csv(file, index_col=0)
-                elif file.name.split(".")[-1] == "xlsx":
+                elif file.name.split(".")[-1] in ["xlsx"]:
                     self.celltype_df = read_excel(file, index_col=0, engine='openpyxl')
+                elif file.name.split(".")[-1] in ["xls"]:
+                    self.celltype_df = read_excel(file, index_col=0, engine='xlrd')
                 else:
                     raise ImportError
                 # here, in order to make further course case insensitive,
