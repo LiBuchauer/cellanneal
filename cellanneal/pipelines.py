@@ -1,8 +1,9 @@
-from pandas import DataFrame, pivot_table
+from pandas import pivot_table
 import time
 
 from .general import make_gene_dictionary, deconvolve, calc_gene_expression
 from .plots import (plot_pies_from_df, plot_mix_heatmap, plot_scatter)
+
 
 def cellanneal_pipe(
         celltype_data_path,  # path object!
@@ -82,6 +83,17 @@ def cellanneal_pipe(
         sample_gene_path = genexpr_folder_path / sample_gene_name
         gene_comp_df.sort_index(axis=0, inplace=True)
         gene_comp_df.to_csv(sample_gene_path, header=True, index=True, sep=',')
+
+    # write a text file with all parameters
+    param_file_path = top_folder_path / 'parameters_{}.txt'.format(timestamp)
+    with open(param_file_path, 'a') as file:
+        file.write('parameters and data used for this cellanneal run ({})\n\n'.format(timestamp))
+        file.write('mixture data: {}\n'.format(bulk_data_path))
+        file.write('signature data: {}\n'.format(celltype_data_path))
+        file.write('minimum expression in mixture: {}\n'.format(bulk_min))
+        file.write('maximum expression in mixture: {}\n'.format(bulk_max))
+        file.write('minimum dispersion: {}\n'.format(disp_min))
+        file.write('maximum number of iterations: {}\n'.format(maxiter))
 
     """ 5) Produce plots and save to folder"""
     print('\n+++ Storing figures in folder "figures" ... +++')

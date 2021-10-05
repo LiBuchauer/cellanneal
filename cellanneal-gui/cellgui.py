@@ -502,11 +502,11 @@ class cellgui:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
             return 0
 
-        print("\n\n+++ Welcome to cellanneal! +++ \n\n")
+        print("\n+++ Welcome to cellanneal! +++ \n")
 
         # import bulk and celltype data
         # bulk data
-        print("\n\n+++ Importing mixture data ... +++ \n\n")
+        print("\n+++ Importing mixture data ... +++ \n")
         try:
             bfile = self.bulk_data_path.get()
             # depending on extension, use different import function
@@ -534,7 +534,7 @@ class cellgui:
             return 0
 
         # celltype data
-        print("\n\n+++ Importing signature data ... +++ \n\n")
+        print("\n+++ Importing signature data ... +++ \n")
         try:
             # depending on extension, use different import function
             cfile = self.celltype_data_path.get()
