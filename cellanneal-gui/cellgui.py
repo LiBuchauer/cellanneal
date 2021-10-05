@@ -112,7 +112,8 @@ class cellgui:
         # path entry field
         self.bulk_data_entry = tk.Entry(
                                     root,
-                                    textvariable=self.bulk_data_path)
+                                    textvariable=self.bulk_data_path,
+                                    state='readonly')
         self.bulk_data_entry.grid(row=i_i, column=2, columnspan=2, sticky=tk.W+tk.E)
         # file system browse button
         self.bulk_browse_button = tk.Button(
@@ -126,7 +127,10 @@ class cellgui:
         self.celltype_data_label = tk.Label(root, text="Select signature data (*.csv, *.txt or *.xlsx).")
         self.celltype_data_label.grid(row=i_i+1, column=1, columnspan=2, sticky=tk.W)
         # path entry field
-        self.celltype_data_entry = tk.Entry(root, textvariable=self.celltype_data_path)
+        self.celltype_data_entry = tk.Entry(
+                                        root,
+                                        textvariable=self.celltype_data_path,
+                                        state='readonly')
         self.celltype_data_entry.grid(row=i_i+1, column=2, columnspan=2, sticky=tk.W+tk.E)
         # file system browse button
         self.celltype_browse_button = tk.Button(
@@ -140,7 +144,9 @@ class cellgui:
         self.output_folder_label = tk.Label(root, text="Select folder to store results.")
         self.output_folder_label.grid(row=i_i+2, column=1, columnspan=2, sticky=tk.W)
         # path entry field
-        self.output_folder_entry = tk.Entry(root, textvariable=self.output_path)
+        self.output_folder_entry = tk.Entry(root,
+                                            textvariable=self.output_path,
+                                            state='readonly')
         self.output_folder_entry.grid(row=i_i+2, column=2, columnspan=2, sticky=tk.W+tk.E)
         # file system browse button
         self.celltype_browse_button = tk.Button(
