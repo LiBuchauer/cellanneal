@@ -308,8 +308,10 @@ def deconvolve(
 
     # go through all mixtures and deconvolve them separately
     mixt_results_list = []
+    # total number of samples for print message
+    N_samples = len(bulk_df.columns)
     for i, mixt in enumerate(bulk_df.columns):
-        print('Deconvolving sample {} ...'.format(mixt))
+        print('Deconvolving sample {} of {} ({}) ...'.format(i+1, N_samples, mixt))
         res = dual_annealing(
                 calculate_distance,
                 bounds=[[0, 1] for x in range(len(celltype_df.columns))],

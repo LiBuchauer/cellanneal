@@ -179,7 +179,7 @@ class cellgui:
 
         self.maxiter_param_label = tk.Label(
             root,
-            text="maximum number iterations")
+            text="maximum number of iterations")
         self.maxiter_param_label.grid(row=p_i+3, column=1, sticky=tk.W)
 
         self.N_repeat_param_label = tk.Label(
