@@ -271,29 +271,8 @@ class cellgui:
                 title="Choose a mixture data file.",
                 filetypes=[("tabular data files", ".csv .txt .xlsx .xls")])
         if file:
-            try:
-                # depending on extension, use different import function
-                if file.name.split(".")[-1] in ["csv", 'txt']:
-                    self.bulk_df = read_csv(file, index_col=0,
-                                            sep=None)
-                elif file.name.split(".")[-1] in ["xlsx"]:
-                    self.bulk_df = read_excel(file, index_col=0, engine='openpyxl')
-                elif file.name.split(".")[-1] in ["xls"]:
-                    self.bulk_df = read_excel(file, index_col=0, engine='xlrd')
-                else:
-                    raise ImportError
-                # here, in order to make further course case insensitive,
-                # change all gene names to uppercase only
-                self.bulk_df.index = self.bulk_df.index.str.upper()
-                # also, if there are duplicate genes, the are summed here
-                self.bulk_df = self.bulk_df.groupby(self.bulk_df.index).sum()
-                # finally, if there are nan's after import, set them to 0 to
-                # avoid further issues
-                self.bulk_df = self.bulk_df.fillna(0)
-                self.bulk_data_path.set(file.name)
-                self.bulk_df_is_set = 1
-            except:
-                messagebox.showerror("Import error", """Your mixture data file could not be imported. Please check the documentation for format requirements and look at the example mixture data files.""")
+            self.bulk_data_path.set(file.name)
+            self.bulk_df_is_set = 1
 
     def import_celltype_data(self):
         file = askopenfile(
@@ -302,29 +281,8 @@ class cellgui:
                 title="Choose a signature data file.",
                 filetypes=[("tabular data files", ".csv .txt .xlsx")])
         if file:
-            try:
-                # depending on extension, use different import function
-                if file.name.split(".")[-1] in ["csv", 'txt']:
-                    self.celltype_df = read_csv(file, index_col=0,
-                                                sep=None)
-                elif file.name.split(".")[-1] in ["xlsx"]:
-                    self.celltype_df = read_excel(file, index_col=0, engine='openpyxl')
-                elif file.name.split(".")[-1] in ["xls"]:
-                    self.celltype_df = read_excel(file, index_col=0, engine='xlrd')
-                else:
-                    raise ImportError
-                # here, in order to make further course case insensitive,
-                # change all gene names to uppercase only
-                self.celltype_df.index = self.celltype_df.index.str.upper()
-                # also, if there are duplicate genes, the are summed here
-                self.celltype_df = self.celltype_df.groupby(self.celltype_df.index).sum()
-                # finally, if there are nan's after import, set them to 0 to
-                # avoid further issues
-                self.celltype_df = self.celltype_df.fillna(0)
-                self.celltype_data_path.set(file.name)
-                self.celltype_df_is_set = 1
-            except:
-                messagebox.showerror("Import error", """Your signature data file could not be imported. Please check the documentation for format requirements and look at the example signature data files.""")
+            self.celltype_data_path.set(file.name)
+            self.celltype_df_is_set = 1
 
     def select_output_folder(self):
         folder = askdirectory(
@@ -539,7 +497,64 @@ class cellgui:
             return 0
 
         print("\n\n+++ Welcome to cellanneal! +++ \n\n")
-        # check if subprocess is still running, if so don't open another one
+
+        # import bulk and celltype data
+        # bulk data
+        print("\n\n+++ Importing mixture data ... +++ \n\n")
+        try:
+            bfile = self.bulk_data_path.get()
+            # depending on extension, use different import function
+            if bfile.split(".")[-1] in ["csv", 'txt']:
+                self.bulk_df = read_csv(bfile, index_col=0,
+                                        sep=None)
+            elif bfile.split(".")[-1] in ["xlsx"]:
+                self.bulk_df = read_excel(bfile, index_col=0, engine='openpyxl')
+            elif bfile.name.split(".")[-1] in ["xls"]:
+                self.bulk_df = read_excel(bfile, index_col=0, engine='xlrd')
+            else:
+                raise ImportError
+            # here, in order to make further course case insensitive,
+            # change all gene names to uppercase only
+            self.bulk_df.index = self.bulk_df.index.str.upper()
+            # also, if there are duplicate genes, the are summed here
+            self.bulk_df = self.bulk_df.groupby(self.bulk_df.index).sum()
+            # finally, if there are nan's after import, set them to 0 to
+            # avoid further issues
+            self.bulk_df = self.bulk_df.fillna(0)
+
+        except:
+            messagebox.showerror("Import error", """Your mixture data file could not be imported. Please check the documentation for format requirements and look at the example mixture data files.""")
+            print("+++ Aborted. +++")
+            return 0
+
+        # celltype data
+        print("\n\n+++ Importing signature data ... +++ \n\n")
+        try:
+            # depending on extension, use different import function
+            cfile = self.celltype_data_path.get()
+            if cfile.split(".")[-1] in ["csv", 'txt']:
+                self.celltype_df = read_csv(cfile, index_col=0,
+                                            sep=None)
+            elif cfile.split(".")[-1] in ["xlsx"]:
+                self.celltype_df = read_excel(cfile, index_col=0, engine='openpyxl')
+            elif cfile.split(".")[-1] in ["xls"]:
+                self.celltype_df = read_excel(cfile, index_col=0, engine='xlrd')
+            else:
+                raise ImportError
+            # here, in order to make further course case insensitive,
+            # change all gene names to uppercase only
+            self.celltype_df.index = self.celltype_df.index.str.upper()
+            # also, if there are duplicate genes, the are summed here
+            self.celltype_df = self.celltype_df.groupby(self.celltype_df.index).sum()
+            # finally, if there are nan's after import, set them to 0 to
+            # avoid further issues
+            self.celltype_df = self.celltype_df.fillna(0)
+
+        except:
+            messagebox.showerror("Import error", """Your signature data file could not be imported. Please check the documentation for format requirements and look at the example signature data files.""")
+            print("+++ Aborted. +++")
+            return 0
+
         cellanneal_pipe(
             Path(self.celltype_data_path.get()),  # path object!
             self.celltype_df,
