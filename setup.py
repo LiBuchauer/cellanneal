@@ -37,8 +37,7 @@ setup(
 
     entry_points = {
         'console_scripts': [
-            'cellanneal = cellanneal.__main__:main',
-            'repeatanneal = cellanneal.__main__:repeat'
+            'cellanneal = cellanneal.__main__:main'
             ]
         }
 )

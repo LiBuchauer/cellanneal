@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib.pyplot import savefig, subplots, subplots_adjust
 from matplotlib import rcParams, cycler
-from seaborn import heatmap, catplot
+from seaborn import heatmap
 from scipy.stats import spearmanr
 from scipy.spatial.distance import correlation
 
@@ -226,49 +226,4 @@ def plot_scatter(mix_df,
             ax.set_visible(False)
 
     fig.tight_layout()
-    savefig(save_path, bbox_inches='tight')
-
-
-"""
-2)
-plots that display results of multiple annealing runs in order to show
-variability between them, the input is typically a long form dataframe
-produced by one of the functions in D_fun_stability.
-"""
-
-
-def plot_repeats(
-        master_df,
-        kind='box',
-        save_path='figures/repeat_plot.pdf',
-        ):
-
-    # plot catplot of required kind via seaborn
-    if kind == 'swarm':
-        g = catplot(
-            x='bulk',
-            y='fraction',
-            col='celltype',
-            hue='run',
-            data=master_df,
-            kind=kind,
-            col_wrap=4,
-            sharey=False)
-
-    else:
-        g = catplot(
-            x='bulk',
-            y='fraction',
-            col='celltype',
-            data=master_df,
-            kind=kind,
-            col_wrap=4,
-            sharey=False)
-
-    # all y_axes should start at 0
-    for ax in g.axes:
-        ax.set_ylim(bottom=0)
-        ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
-
-    # store
     savefig(save_path, bbox_inches='tight')

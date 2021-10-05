@@ -4,6 +4,5 @@
 pyinstaller --onefile \
 --add-data="/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/logo_orange.png:img" \
 --add-data="/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/cellanneal_button.png:img" \
---add-data="/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/repeatanneal_button.png:img" \
 
 cellgui.py

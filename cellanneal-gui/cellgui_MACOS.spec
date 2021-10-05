@@ -20,7 +20,6 @@ a = Analysis(['cellgui.py'],
 
 a.datas += [('logo_orange.png', '/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/logo_orange.png', 'img'),
             ('cellanneal_button.png', '/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/cellanneal_button.png', 'img'),
-            ('repeatanneal_button.png', '/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/repeatanneal_button.png', 'img'),
             ('logo.icns', '/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/logo.icns', 'img')]
 
 

@@ -20,7 +20,6 @@ a = Analysis(['cellgui.py'],
 
 a.datas += [('logo_orange.png', 'C:\\Users\\yotam\\Desktop\\cellanneal-master\\cellanneal-gui\\logo_orange.png', 'img'),
    ('cellanneal_button.png', 'C:\\Users\\yotam\\Desktop\\cellanneal-master\\cellanneal-gui\\cellanneal_button.png', 'img'),
-   ('repeatanneal_button.png', 'C:\\Users\\yotam\\Desktop\\cellanneal-master\\cellanneal-gui\\repeatanneal_button.png', 'img'),
    ('logo.ico', 'C:\\Users\\yotam\\Desktop\\cellanneal-master\\cellanneal-gui\\logo.ico', 'img')]
 
 pyz = PYZ(a.pure, a.zipped_data,

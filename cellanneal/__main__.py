@@ -7,7 +7,7 @@ import argparse
 from pathlib import Path
 import pandas as pd
 
-from .pipelines import cellanneal_pipe, repeatanneal_pipe
+from .pipelines import cellanneal_pipe
 
 
 def init_parser(parser):
@@ -138,94 +138,4 @@ def main():
         bulk_min,
         bulk_max,
         maxiter,
-        output_path)
-
-
-def repeat():
-    """ repeatanneal. Runs cellanneal a given number of times and averages
-    the results (takes the mean of cell fractions produced in each of the
-    runs). Plots and gene expression predictions as known from cellanneal
-    are produced for the mean result. Additional plots showing the spread
-    of the repeats are also produced.
-
-    Input:
-            bulk_data_path
-            celltype_data_path
-            output_path
-            bulk_min
-            bulk_max
-            disp_min
-            maxiter
-            N_repeat
-
-    Output:
-
-    Example:
-
-
-    """
-    # get a parser object, initialise the inputs and read them into args
-    # in a first step, the same arguments as in the main function are
-    # required/allowed
-    my_parser = argparse.ArgumentParser(
-        description=('cellanneal deconvolves bulk RNA-Seq data.'))
-    my_parser = init_parser(my_parser)
-
-    # however, we also need additional arguments for the subsampling which
-    # are unique unique to the repeat function and will be added below
-    my_parser.add_argument(
-        '--N_repeat', type=int, default=10,
-        help=("""Number of times a subset of genes is drawn and deconvolution
-            is performed on that set of genes.""")
-    )
-
-    args = my_parser.parse_args()
-
-    # grab the individual inputs for further use
-    bulk_data_path = Path(args.bulk_data_path)
-    celltype_data_path = Path(args.celltype_data_path)
-    output_path = Path(args.output_path)
-    bulk_min = args.bulk_min
-    bulk_max = args.bulk_max
-    disp_min = args.disp_min
-    maxiter = args.maxiter
-    N_repeat = args.N_repeat
-
-    print("""\nWelcome to cellanneal!\n\n
-    You have chosen to repeatedly anneal on subsets of the full gene list.""")
-
-    """ 1) Import bulk and cell type data """
-    print('1A. Importing bulk data ...')
-    try:
-        bulk_df = pd.read_csv(bulk_data_path, index_col=0, header=0)
-        bulk_names = bulk_df.columns.tolist()
-        print('{} bulk samples identified: {}\n'.format(len(bulk_names),
-                                                        bulk_names))
-    except:
-        print("""Your bulk data file could not be imported.
-        Please check the documentation for format requirements
-        and look at the example bulk data file.""")
-
-    print('1B. Importing celltype reference data ...')
-    # import single cell based reference
-    try:
-        celltype_df = pd.read_csv(celltype_data_path, index_col=0, header=0)
-        celltypes = celltype_df.columns.tolist()
-        print('{} cell types identified: {}\n'.format(len(celltypes), celltypes))
-    except:
-        print("""Your celltype data file could not be imported.
-        Please check the documentation for format requirements
-        and look at the example celltype data file.""")
-
-    # start pipeline
-    repeatanneal_pipe(
-        celltype_data_path,
-        celltype_df,
-        bulk_data_path,
-        bulk_df,
-        disp_min,
-        bulk_min,
-        bulk_max,
-        maxiter,
-        N_repeat,
         output_path)

@@ -6,6 +6,5 @@ __author__ = 'Lisa Buchauer <lisa.buchauer@posteo.de>'
 # functions which become available for import
 from .general import make_gene_dictionary, return_mixture, deconvolve
 from .plots import (plot_pies_from_df, plot_mix_heatmap,
-                          plot_1D_lines, plot_repeats, plot_scatter)
-from .stability import repeat_annealing
-from .pipelines import cellanneal_pipe, repeatanneal_pipe
+                          plot_1D_lines, plot_scatter)
+from .pipelines import cellanneal_pipe
