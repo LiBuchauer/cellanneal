@@ -115,7 +115,7 @@ class cellgui:
         # label to indicate that we want bulk data here
         self.bulk_data_label = tk.Label(
                                     root,
-                                    text="Select bulk data (*.csv, *.txt or *.xlsx).")
+                                    text="Select mixture data (*.csv, *.txt or *.xlsx).")
         self.bulk_data_label.grid(row=i_i, column=1, columnspan=1, sticky=tk.W)
         # path entry field
         self.bulk_data_entry = tk.Entry(
@@ -131,7 +131,7 @@ class cellgui:
 
         # import celltype data
         # label to indicate that we want celltype data here
-        self.celltype_data_label = tk.Label(root, text="Select celltype data (*.csv, *.txt or *.xlsx).")
+        self.celltype_data_label = tk.Label(root, text="Select signature data (*.csv, *.txt or *.xlsx).")
         self.celltype_data_label.grid(row=i_i+1, column=1, columnspan=2, sticky=tk.W)
         # path entry field
         self.celltype_data_entry = tk.Entry(root, textvariable=self.celltype_data_path)
@@ -164,12 +164,12 @@ class cellgui:
         # list parameter settings with set of labels
         self.bulk_min_param_label = tk.Label(
             root,
-            text="minimum expression in bulk")
+            text="minimum expression in mixture")
         self.bulk_min_param_label.grid(row=p_i, column=1, sticky=tk.W)
 
         self.bulk_max_param_label = tk.Label(
             root,
-            text="maximum expression in bulk")
+            text="maximum expression in mixture")
         self.bulk_max_param_label.grid(row=p_i+1, column=1, sticky=tk.W)
 
         self.disp_min_param_label = tk.Label(
@@ -277,7 +277,7 @@ class cellgui:
         self.readme_text3 = tk.Label(readme_window, wraplength=350, text="\n\n1) Deconvolution data.\n", font="-weight bold")
         self.readme_text3.grid(row=3, column=0, padx=10)
 
-        self.readme_text4 = tk.Label(readme_window, wraplength=350, justify=tk.LEFT, text="cellanneal accepts comma-separated text files (*.csv and *.txt) as well as excel files (*.xlsx, *.xls) as inputs for both bulk data and celltype provided that they are formatted as specified in the examples. \n\nSpecifically, gene names need to appear in the first column for both bulk and celltype data files, and sample names (for bulk data file) or cell type names (for celltype data file) need to appear in th first row.")
+        self.readme_text4 = tk.Label(readme_window, wraplength=350, justify=tk.LEFT, text="cellanneal accepts comma-separated text files (*.csv and *.txt) as well as excel files (*.xlsx, *.xls) as inputs for both mixture data and signature data provided that they are formatted as specified in the examples. \n\nSpecifically, gene names need to appear in the first column for both mixture and signature data files, and sample names (for mixture data file) or cell type names (for signature data file) need to appear in th first row.")
         self.readme_text4.grid(row=4, column=0, padx=10)
 
         self.readme_text5 = tk.Label(readme_window, wraplength=350, text="\n\n2) Deconvolution parameters.\n", font="-weight bold")
@@ -291,7 +291,7 @@ class cellgui:
         file = askopenfile(
                 parent=root,
                 mode='rb',
-                title="Choose a bulk data file.",
+                title="Choose a mixture data file.",
                 filetypes=[("tabular data files", ".csv .txt .xlsx .xls")])
         if file:
             try:
@@ -312,13 +312,13 @@ class cellgui:
                 self.bulk_data_path.set(file.name)
                 self.bulk_df_is_set = 1
             except:
-                messagebox.showerror("Import error", """Your bulk data file could not be imported. Please check the documentation for format requirements and look at the example bulk data file.""")
+                messagebox.showerror("Import error", """Your mixture data file could not be imported. Please check the documentation for format requirements and look at the example mixture data files.""")
 
     def import_celltype_data(self):
         file = askopenfile(
                 parent=root,
                 mode='rb',
-                title="Choose a celltype data file.",
+                title="Choose a signature data file.",
                 filetypes=[("tabular data files", ".csv .txt .xlsx")])
         if file:
             try:
@@ -339,7 +339,7 @@ class cellgui:
                 self.celltype_data_path.set(file.name)
                 self.celltype_df_is_set = 1
             except:
-                messagebox.showerror("Import error", """Your celltype data file could not be imported. Please check the documentation for format requirements and look at the example celltype data file.""")
+                messagebox.showerror("Import error", """Your signature data file could not be imported. Please check the documentation for format requirements and look at the example signature data files.""")
 
     def select_output_folder(self):
         folder = askdirectory(
@@ -365,7 +365,7 @@ class cellgui:
 
         # for parameter bulk_min
         # title label and current value
-        self.bulk_min_label = tk.Label(par_window, text="minimum expression in bulk", font="-weight bold -size 13")
+        self.bulk_min_label = tk.Label(par_window, text="minimum expression in mixture", font="-weight bold -size 13")
         self.bulk_min_label.grid(row=1, column=1, columnspan=2, sticky=tk.W+tk.E)
         self.bulk_min_current_label = tk.Label(par_window, text="current value: {}".format(self.bulk_min), font="-slant italic")
         self.bulk_min_current_label.grid(row=2, column=1, columnspan=2, sticky=tk.W+tk.E, padx=5, pady=5)
@@ -386,7 +386,7 @@ class cellgui:
 
         # for parameter bulk_max
         # title label and current value
-        self.bulk_max_label = tk.Label(par_window, text="maximum expression in bulk", font="-weight bold")
+        self.bulk_max_label = tk.Label(par_window, text="maximum expression in mixture", font="-weight bold")
         self.bulk_max_label.grid(row=4, column=1, columnspan=2, sticky=tk.W+tk.E)
         self.bulk_max_current_label = tk.Label(par_window, text="current value: {}".format(self.bulk_max), font="-slant italic")
         self.bulk_max_current_label.grid(row=5, column=1, columnspan=2, sticky=tk.W+tk.E)
@@ -584,10 +584,10 @@ class cellgui:
     def cellanneal(self):
         # check if input and output is set
         if self.bulk_df_is_set == 0:
-            messagebox.showerror("Data error", """Please select a bulk data file in section 1).""")
+            messagebox.showerror("Data error", """Please select a mixture data file in section 1).""")
             return 0
         if self.celltype_df_is_set == 0:
-            messagebox.showerror("Data error", """Please select a celltype data file in section 1).""")
+            messagebox.showerror("Data error", """Please select a signature data file in section 1).""")
             return 0
         if self.output_path_is_set == 0:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
@@ -609,10 +609,10 @@ class cellgui:
     def repeatanneal(self):
         # check if input and output is set
         if self.bulk_df_is_set == 0:
-            messagebox.showerror("Data error", """Please select a bulk data file in section 1).""")
+            messagebox.showerror("Data error", """Please select a mixture data file in section 1).""")
             return 0
         if self.celltype_df_is_set == 0:
-            messagebox.showerror("Data error", """Please select a celltype data file in section 1).""")
+            messagebox.showerror("Data error", """Please select a signature data file in section 1).""")
             return 0
         if self.output_path_is_set == 0:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
