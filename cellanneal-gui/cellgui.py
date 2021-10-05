@@ -274,7 +274,8 @@ class cellgui:
             try:
                 # depending on extension, use different import function
                 if file.name.split(".")[-1] in ["csv", 'txt']:
-                    self.bulk_df = read_csv(file, index_col=0)
+                    self.bulk_df = read_csv(file, index_col=0,
+                                            sep=None)
                 elif file.name.split(".")[-1] in ["xlsx"]:
                     self.bulk_df = read_excel(file, index_col=0, engine='openpyxl')
                 elif file.name.split(".")[-1] in ["xls"]:
@@ -304,7 +305,8 @@ class cellgui:
             try:
                 # depending on extension, use different import function
                 if file.name.split(".")[-1] in ["csv", 'txt']:
-                    self.celltype_df = read_csv(file, index_col=0)
+                    self.celltype_df = read_csv(file, index_col=0,
+                                                sep=None)
                 elif file.name.split(".")[-1] in ["xlsx"]:
                     self.celltype_df = read_excel(file, index_col=0, engine='openpyxl')
                 elif file.name.split(".")[-1] in ["xls"]:
