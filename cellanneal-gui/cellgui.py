@@ -40,16 +40,16 @@ class cellgui:
 
         # parameters for the deconvolution procedure, set to default values
         self.bulk_min = 1e-5  # minimum expression in bulk
-        self.bulk_min_default = 1e-5
+        self._bulk_min_default = 1e-5
 
         self.bulk_max = 0.01  # maximum expression in bulk
-        self.bulk_max_default = 0.01
+        self._bulk_max_default = 0.01
 
         self.disp_min = 0.5  # minimum dispersion for highly variable genes
-        self.disp_min_default = 0.5
+        self._disp_min_default = 0.5
 
         self.maxiter = 1000  # maximum annealing iterations
-        self.maxiter_default = 1000
+        self._maxiter_default = 1000
 
         # basic layout considerations
         self.canvas = tk.Canvas(root, width=700, height=500)
@@ -197,14 +197,27 @@ class cellgui:
 
         # button for editing parameters which spawns new window
         self.parameter_change_button = tk.Button(root,
-                                                 text='Change parameters \n(optional)',
+                                                 text='Change\nparameters',
                                                  command=lambda: self.open_param_window(),
                                                  highlightbackground='#f47a60',)
         self.parameter_change_button.grid(row=p_i,
-                                          rowspan=5,
+                                          rowspan=2,
                                           column=3,
                                           columnspan=2,
-                                          ipadx=10, ipady=10)
+                                          padx=0, pady=5,
+                                          ipadx=17, ipady=5)
+
+        # button for resetting all parameters to default
+        self.default_button = tk.Button(root,
+                                        text='Reset to\ndefault values',
+                                        command=lambda: self.reset_default_params(),
+                                        highlightbackground='#f47a60')
+        self.default_button.grid(row=p_i+2,
+                                 rowspan=2,
+                                 column=3,
+                                 columnspan=2,
+                                 padx=0, pady=5,
+                                 ipadx=8, ipady=5)
 
 
 
@@ -497,6 +510,19 @@ class cellgui:
             self.maxiter_value_label['text'] = "{}".format(self.maxiter)
         else:
             messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "50", "587", "1000".""")
+
+    def reset_default_params(self):
+        self.bulk_min = self._bulk_min_default
+        self.bulk_min_value_label['text'] = "{}".format(self.bulk_min)
+
+        self.bulk_max = self._bulk_max_default
+        self.bulk_max_value_label['text'] = "{}".format(self.bulk_max)
+
+        self.disp_min = self._disp_min_default
+        self.disp_min_value_label['text'] = "{}".format(self.disp_min)
+
+        self.maxiter = self._maxiter_default
+        self.maxiter_value_label['text'] = "{}".format(self.maxiter)
 
     def cellanneal(self):
         # check if input and output is set
