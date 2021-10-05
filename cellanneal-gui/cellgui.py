@@ -4,7 +4,7 @@ from pandas import DataFrame, read_excel, read_csv
 from tkinter.filedialog import askopenfile, askdirectory
 from tkinter import messagebox
 from pathlib import Path
-from cellanneal import cellanneal_pipe, repeatanneal_pipe
+from cellanneal import cellanneal_pipe
 import openpyxl  # for xlsx import
 import xlrd  # for xls import
 import sys
@@ -51,16 +51,13 @@ class cellgui:
         self.maxiter = 1000  # maximum annealing iterations
         self.maxiter_default = 1000
 
-        self.N_repeat = 10  # deconvolution repeats in case of repeatanneal
-        self.N_repeat_default = 10
-
         # basic layout considerations
         self.canvas = tk.Canvas(root, width=700, height=500)
         self.canvas.grid(columnspan=6, rowspan=15)
         # for easier grid layout changes
         i_i = 4  # start of import section
         p_i = 9  # start of parameter section
-        d_i = 15  # start of deconv section
+        d_i = 14  # start of deconv section
 
         """ logo and welcome section """
         self.logo = Image.open(resource_path('logo_orange.png'))
@@ -93,11 +90,6 @@ class cellgui:
         self.ca_button = ImageTk.PhotoImage(self.ca_button)
         self.ca_label = tk.Label(image=self.ca_button)
         self.ca_label.image = self.ca_button
-
-        self.ra_button = Image.open(resource_path('repeatanneal_button.png'))
-        self.ra_button = ImageTk.PhotoImage(self.ra_button)
-        self.ra_label = tk.Label(image=self.ra_button)
-        self.ra_label.image = self.ra_button
 
         # spacers for tidier look
         spacer1 = tk.Label(root, text="")
@@ -182,11 +174,6 @@ class cellgui:
             text="maximum number of iterations")
         self.maxiter_param_label.grid(row=p_i+3, column=1, sticky=tk.W)
 
-        self.N_repeat_param_label = tk.Label(
-            root,
-            text="no. of repeats (for repeatanneal)")
-        self.N_repeat_param_label.grid(row=p_i+4, column=1, sticky=tk.W)
-
         # corresponding set of values
         self.bulk_min_value_label = tk.Label(
             root,
@@ -207,12 +194,6 @@ class cellgui:
             root,
             text="{}".format(self.maxiter))
         self.maxiter_value_label.grid(row=p_i+3, column=2, sticky=tk.W)
-
-        self.N_repeat_value_label = tk.Label(
-            root,
-            text="{}".format(self.N_repeat))
-        self.N_repeat_value_label.grid(row=p_i+4, column=2, sticky=tk.W)
-
 
         # button for editing parameters which spawns new window
         self.parameter_change_button = tk.Button(root,
@@ -241,26 +222,9 @@ class cellgui:
         self.cellanneal_button.grid(
                                 row=d_i,
                                 column=1,
-                                columnspan=1,
+                                columnspan=5,
                                 sticky=tk.W+tk.E,
-                                padx=10, pady=20)
-
-        # make button for cellanneal
-        self.repeatanneal_button = tk.Button(
-                                        root,
-                                        text='repeatanneal',
-                                        font="-weight bold ",
-                                        image=self.ra_button,
-                                        command=lambda: self.repeatanneal(),
-                                        highlightbackground='#f47a60',
-                                        width=20)
-        self.repeatanneal_button.grid(
-                                    row=d_i,
-                                    column=2,
-                                    columnspan=4,
-                                    sticky=tk.W+tk.E,
-                                    padx=20, pady=20)
-
+                                padx=10, pady=50)
 
     # methods
     def show_instructions(self):
@@ -283,7 +247,7 @@ class cellgui:
         self.readme_text5 = tk.Label(readme_window, wraplength=350, text="\n\n2) Deconvolution parameters.\n", font="-weight bold")
         self.readme_text5.grid(row=5, column=0, padx=10)
 
-        self.readme_text6 = tk.Label(readme_window, wraplength=350, text="\n\n3) Running deconvolution with cellanneal or repeatanneal.\n", font="-weight bold")
+        self.readme_text6 = tk.Label(readme_window, wraplength=350, text="\n\n3) Running deconvolution with cellanneal.\n", font="-weight bold")
         self.readme_text6.grid(row=6, column=0, padx=10)
 
 
@@ -451,27 +415,6 @@ class cellgui:
                                         width=8)
         self.maxiter_set_button.grid(row=12, column=2, sticky=tk.W)
 
-        # for parameter N_repeat
-        # title label and current value
-        self.N_repeat_label = tk.Label(par_window, text="no. of repeats\n(relevant for repeatanneal)", font="-weight bold")
-        self.N_repeat_label.grid(row=13, column=1, columnspan=2, sticky=tk.W+tk.E)
-        self.N_repeat_current_label = tk.Label(par_window, text="current value: {}".format(self.N_repeat), font="-slant italic")
-        self.N_repeat_current_label.grid(row=14, column=1, columnspan=2, sticky=tk.W+tk.E)
-
-        # entry field
-        self.N_repeat_entry = tk.Entry(
-                                    par_window,
-                                    width=8)
-        self.N_repeat_entry.grid(row=15, column=1, sticky=tk.E)
-        self.N_repeat_entry.insert(tk.END, '10')
-        # set button
-        self.N_repeat_set_button = tk.Button(
-                                        par_window,
-                                        text='set',
-                                        command=lambda: self.set_N_repeat(),
-                                        width=8)
-        self.N_repeat_set_button.grid(row=15, column=2, sticky=tk.W)
-
         # buton for wuitting and return to main window
         self.return_button = tk.Button(par_window,
                                        text='Return to main window',
@@ -562,25 +505,6 @@ class cellgui:
         else:
             messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "50", "587", "1000".""")
 
-    def set_N_repeat(self):
-        # get input and check validity
-        input = self.N_repeat_entry.get()
-        # can it be interpreted as float?
-        try:
-            new_val = int(input)
-        except ValueError:
-            messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "5", "10", "21".""")
-            return 0
-        # check if value is >0
-        if new_val >= 1:
-            # update disp_min
-            self.N_repeat = new_val
-            # update display of current bulk_min
-            self.N_repeat_current_label['text'] = "current value: {}".format(self.N_repeat)
-            self.N_repeat_value_label['text'] = "{}".format(self.N_repeat)
-        else:
-            messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "5", "10", "21".""")
-
     def cellanneal(self):
         # check if input and output is set
         if self.bulk_df_is_set == 0:
@@ -605,32 +529,6 @@ class cellgui:
             self.bulk_max,
             self.maxiter,
             Path(self.output_path.get()))  # path object!
-
-    def repeatanneal(self):
-        # check if input and output is set
-        if self.bulk_df_is_set == 0:
-            messagebox.showerror("Data error", """Please select a mixture data file in section 1).""")
-            return 0
-        if self.celltype_df_is_set == 0:
-            messagebox.showerror("Data error", """Please select a signature data file in section 1).""")
-            return 0
-        if self.output_path_is_set == 0:
-            messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
-            return 0
-        print("\n\n+++ Welcome to cellanneal! +++ \n\n")
-        # check if subprocess is still running, if so don't open another one
-        repeatanneal_pipe(
-            Path(self.celltype_data_path.get()),  # path object!
-            self.celltype_df,
-            Path(self.bulk_data_path.get()),  # path object!
-            self.bulk_df,
-            self.disp_min,
-            self.bulk_min,
-            self.bulk_max,
-            self.maxiter,
-            self.N_repeat,
-            Path(self.output_path.get()))  # path object!
-
 
 root = tk.Tk()
 ca_gui = cellgui(root)
