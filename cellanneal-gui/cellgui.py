@@ -273,6 +273,9 @@ class cellgui:
                 self.bulk_df.index = self.bulk_df.index.str.upper()
                 # also, if there are duplicate genes, the are summed here
                 self.bulk_df = self.bulk_df.groupby(self.bulk_df.index).sum()
+                # finally, if there are nan's after import, set them to 0 to
+                # avoid further issues
+                self.bulk_df = self.bulk_df.fillna(0)
                 self.bulk_data_path.set(file.name)
                 self.bulk_df_is_set = 1
             except:
@@ -300,6 +303,9 @@ class cellgui:
                 self.celltype_df.index = self.celltype_df.index.str.upper()
                 # also, if there are duplicate genes, the are summed here
                 self.celltype_df = self.celltype_df.groupby(self.celltype_df.index).sum()
+                # finally, if there are nan's after import, set them to 0 to
+                # avoid further issues
+                self.celltype_df = self.celltype_df.fillna(0)
                 self.celltype_data_path.set(file.name)
                 self.celltype_df_is_set = 1
             except:
@@ -331,15 +337,13 @@ class cellgui:
         # title label and current value
         self.bulk_min_label = tk.Label(par_window, text="minimum expression in mixture", font="-weight bold -size 13")
         self.bulk_min_label.grid(row=1, column=1, columnspan=2, sticky=tk.W+tk.E)
-        self.bulk_min_current_label = tk.Label(par_window, text="current value: {}".format(self.bulk_min), font="-slant italic")
-        self.bulk_min_current_label.grid(row=2, column=1, columnspan=2, sticky=tk.W+tk.E, padx=5, pady=5)
 
         # entry field
         self.bulk_min_entry = tk.Entry(
                                     par_window,
                                     width=8)
         self.bulk_min_entry.grid(row=3, column=1, sticky=tk.E)
-        self.bulk_min_entry.insert(tk.END, '1e-5')
+        self.bulk_min_entry.insert(tk.END, self.bulk_min)
         # set button
         self.bulk_min_set_button = tk.Button(
                                         par_window,
@@ -352,15 +356,13 @@ class cellgui:
         # title label and current value
         self.bulk_max_label = tk.Label(par_window, text="maximum expression in mixture", font="-weight bold")
         self.bulk_max_label.grid(row=4, column=1, columnspan=2, sticky=tk.W+tk.E)
-        self.bulk_max_current_label = tk.Label(par_window, text="current value: {}".format(self.bulk_max), font="-slant italic")
-        self.bulk_max_current_label.grid(row=5, column=1, columnspan=2, sticky=tk.W+tk.E)
 
         # entry field
         self.bulk_max_entry = tk.Entry(
                                     par_window,
                                     width=8)
         self.bulk_max_entry.grid(row=6, column=1, sticky=tk.E)
-        self.bulk_max_entry.insert(tk.END, '0.01')
+        self.bulk_max_entry.insert(tk.END, self.bulk_max)
 
         # set button
         self.bulk_max_set_button = tk.Button(
@@ -375,15 +377,13 @@ class cellgui:
         # title label and current value
         self.disp_min_label = tk.Label(par_window, text="minimum dispersion", font="-weight bold")
         self.disp_min_label.grid(row=7, column=1, columnspan=2, sticky=tk.W+tk.E)
-        self.disp_min_current_label = tk.Label(par_window, text="current value: {}".format(self.disp_min), font="-slant italic")
-        self.disp_min_current_label.grid(row=8, column=1, columnspan=2, sticky=tk.W+tk.E)
 
         # entry field
         self.disp_min_entry = tk.Entry(
                                     par_window,
                                     width=8)
         self.disp_min_entry.grid(row=9, column=1, sticky=tk.E)
-        self.disp_min_entry.insert(tk.END, '0.5')
+        self.disp_min_entry.insert(tk.END, self.disp_min)
 
         # set button
         self.disp_min_set_button = tk.Button(
@@ -395,17 +395,15 @@ class cellgui:
 
         # for parameter maxiter
         # title label and current value
-        self.maxiter_label = tk.Label(par_window, text="maximum no. of iterations", font="-weight bold")
+        self.maxiter_label = tk.Label(par_window, text="maximum number of iterations", font="-weight bold")
         self.maxiter_label.grid(row=10, column=1, columnspan=2, sticky=tk.W+tk.E)
-        self.maxiter_current_label = tk.Label(par_window, text="current value: {}".format(self.maxiter), font="-slant italic")
-        self.maxiter_current_label.grid(row=11, column=1, columnspan=2, sticky=tk.W+tk.E)
 
         # entry field
         self.maxiter_entry = tk.Entry(
                                     par_window,
                                     width=8)
         self.maxiter_entry.grid(row=12, column=1, sticky=tk.E)
-        self.maxiter_entry.insert(tk.END, '1000')
+        self.maxiter_entry.insert(tk.END, self.maxiter)
 
         # set button
         self.maxiter_set_button = tk.Button(
@@ -424,7 +422,6 @@ class cellgui:
                                 columnspan=2, sticky=tk.W+tk.E, padx=5, pady=10,
                                 ipadx=5, ipady=5)
 
-
     def set_bulk_min(self):
         # get input and check validity
         input = self.bulk_min_entry.get()
@@ -439,7 +436,6 @@ class cellgui:
             # update bulk_min
             self.bulk_min = new_val
             # update display of current bulk_min
-            self.bulk_min_current_label['text'] = "current value: {}".format(self.bulk_min)
             self.bulk_min_value_label['text'] = "{}".format(self.bulk_min)
         elif not (0 <= new_val < 1):
             messagebox.showerror("Input error", """Please provdide a numerical value between 0 (inclusive) and 1 (exclusive). Examples: "0", "0.01", "2e-5".""")
@@ -460,7 +456,6 @@ class cellgui:
             # update bulk_min
             self.bulk_max = new_val
             # update display of current bulk_min
-            self.bulk_max_current_label['text'] = "current value: {}".format(self.bulk_max)
             self.bulk_max_value_label['text'] = "{}".format(self.bulk_max)
         elif not (0 < new_val <= 1):
             messagebox.showerror("Input error", """Please provdide a numerical value between 0 (exclusive) and 1 (inclusive). Examples: "0.01", "2e-5", "1".""")
@@ -481,7 +476,6 @@ class cellgui:
             # update disp_min
             self.disp_min = new_val
             # update display of current bulk_min
-            self.disp_min_current_label['text'] = "current value: {}".format(self.disp_min)
             self.disp_min_value_label['text'] = "{}".format(self.disp_min)
         else:
             messagebox.showerror("Input error", """Please provdide a positive numerical value. Examples: "0.5", "5e-1", "1".""")
@@ -500,7 +494,6 @@ class cellgui:
             # update disp_min
             self.maxiter = new_val
             # update display of current bulk_min
-            self.maxiter_current_label['text'] = "current value: {}".format(self.maxiter)
             self.maxiter_value_label['text'] = "{}".format(self.maxiter)
         else:
             messagebox.showerror("Input error", """Please provdide a positive integer. Examples: "50", "587", "1000".""")
