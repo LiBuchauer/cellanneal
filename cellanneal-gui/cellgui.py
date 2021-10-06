@@ -80,7 +80,8 @@ class cellgui:
         self.instruct_button = tk.Button(root,
                                          text="Instructions",
                                          command=lambda: self.show_instructions(),
-                                         highlightbackground='#f47a60')
+                                         highlightbackground='#f47a60',
+                                         highlightthickness=0.1,)
         self.instruct_button.grid(row=1, column=3,
                                   columnspan=2, sticky=tk.W+tk.E,
                                   padx=5, pady=1,
@@ -103,11 +104,11 @@ class cellgui:
         # import bulk data
         # title
         self.param_label = tk.Label(root, text="deconvolution data", font="-weight bold")
-        self.param_label.grid(row=i_i-1, column=1, columnspan=3, sticky=tk.W)
+        self.param_label.grid(row=i_i-1, column=1, columnspan=1, sticky=tk.W)
         # label to indicate that we want bulk data here
         self.bulk_data_label = tk.Label(
                                     root,
-                                    text="Select mixture data (*.csv, *.txt or *.xlsx).")
+                                    text="Select mixture data (.csv, .txt, .xlsx).")
         self.bulk_data_label.grid(row=i_i, column=1, columnspan=1, sticky=tk.W)
         # path entry field
         self.bulk_data_entry = tk.Entry(
@@ -124,7 +125,7 @@ class cellgui:
 
         # import celltype data
         # label to indicate that we want celltype data here
-        self.celltype_data_label = tk.Label(root, text="Select signature data (*.csv, *.txt or *.xlsx).")
+        self.celltype_data_label = tk.Label(root, text="Select signature data (.csv, .txt, .xlsx).")
         self.celltype_data_label.grid(row=i_i+1, column=1, columnspan=2, sticky=tk.W)
         # path entry field
         self.celltype_data_entry = tk.Entry(
@@ -205,7 +206,8 @@ class cellgui:
         self.parameter_change_button = tk.Button(root,
                                                  text='Change\nparameters',
                                                  command=lambda: self.open_param_window(),
-                                                 highlightbackground='#f47a60',)
+                                                 highlightbackground='#f47a60',
+                                                 highlightthickness=0.1,)
         self.parameter_change_button.grid(row=p_i,
                                           rowspan=2,
                                           column=3,
@@ -217,7 +219,8 @@ class cellgui:
         self.default_button = tk.Button(root,
                                         text='Reset to\ndefault values',
                                         command=lambda: self.reset_default_params(),
-                                        highlightbackground='#f47a60')
+                                        highlightbackground='#f47a60',
+                                        highlightthickness=0.1,)
         self.default_button.grid(row=p_i+2,
                                  rowspan=2,
                                  column=3,
@@ -236,6 +239,7 @@ class cellgui:
                                         font="-weight bold ",
                                         image=self.ca_button,
                                         highlightbackground='#f47a60',
+                                        highlightthickness=0.1,
                                         command=lambda: self.cellanneal(),
                                         width=20)
         self.cellanneal_button.grid(
@@ -396,7 +400,8 @@ class cellgui:
         self.return_button = tk.Button(par_window,
                                        text='Return to main window',
                                        command=par_window.destroy,
-                                       highlightbackground='#f47a60')
+                                       highlightbackground='#f47a60',
+                                       highlightthickness=0.1,)
         self.return_button.grid(row=16, column=1,
                                 columnspan=2, sticky=tk.W+tk.E, padx=5, pady=10,
                                 ipadx=5, ipady=5)

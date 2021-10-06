@@ -29,36 +29,31 @@ def plot_pies_from_df(mix_df,
     corr_list = []
     if 'rho_Spearman' in mix_df.columns:
         corr_list.append('rho_Spearman')
-        spear_list = np.round(mix_df['rho_Spearman'].values, 3)
-    else:
-        spear_list = ['-' for i in mix_df.index]
     if 'rho_Pearson' in mix_df.columns:
         corr_list.append('rho_Pearson')
-        pear_list = np.round(mix_df['rho_Pearson'].values, 3)
-    else:
-        pear_list = ['-' for i in mix_df.index]
     if len(corr_list) > 0:
         plot_df = mix_df.drop(corr_list, axis=1)
     else:
         plot_df = mix_df
 
     # onto each axis, plot a mixture pie chart
-    plotted_a_pie = False
+    plotted_a_pie = 0
     for i, ax in enumerate(axes.flatten()):
         try:
             mixture = plot_df.iloc[i]
             pie = ax.pie(mixture)
             ax.set_title(
                 plot_df.index.tolist()[i])
-            plotted_a_pie = True
+            plotted_a_pie = i
         except (IndexError, ValueError):
             ax.set_visible(False)
     # onto the next empty axis after the plotting stopped, plot a legend
-    if plotted_a_pie:
-        lax = axes.flatten()[i]
-        lax.set_visible(True)
-        lax.axis("off")
-        lax.legend(pie[0], plot_df.columns, loc='best', ncol=2)
+    lax = axes.flatten()[plotted_a_pie+1]
+    lax.set_visible(True)
+    lax.axis("off")
+    lax.legend(pie[0], plot_df.columns, loc='lower center', ncol=2,
+               bbox_to_anchor=(0.7, 0))
+
     savefig(save_path, bbox_inches='tight')
 
 

@@ -307,26 +307,30 @@ def deconvolve(
         sc_list.append(sc_sub)
 
     # go through all mixtures and deconvolve them separately
-    mixt_results_list = []
+    mixture_list = []
     # total number of samples for print message
     N_samples = len(bulk_df.columns)
     for i, mixt in enumerate(bulk_df.columns):
         print('Deconvolving sample {} of {} ({}) ...'.format(i+1, N_samples, mixt))
-        res = dual_annealing(
-                calculate_distance,
-                bounds=[[0, 1] for x in range(len(celltype_df.columns))],
-                maxiter=maxiter,
-                args=[bulk_ranked_list[i], sc_list[i]],
-                no_local_search=no_local_search)
-        mixt_results_list.append(res)
+        try:
+            res = dual_annealing(
+                        calculate_distance,
+                        bounds=[[0, 1] for x in range(len(celltype_df.columns))],
+                        maxiter=maxiter,
+                        args=[bulk_ranked_list[i], sc_list[i]],
+                        no_local_search=no_local_search)
+            mixture = return_mixture(res.x)
+            mixture_list.append(mixture)
+        except ValueError:
+            print('\nERROR: Sample {} could not be deconvolved.\nPossibly the gene set for this sample is too small.\nSee online documentation for more info.\n'.format(mixt))
+            mixture = np.empty(len(celltype_df.columns))
+            mixture[:] = np.nan
+            mixture_list.append(mixture)
 
     # grab the results, write them into a dataframe and return it
-    mixture_list = []
     spears = []
     pears = []
-    for i, res in enumerate(mixt_results_list):
-        mixture = return_mixture(res.x)
-        mixture_list.append(mixture)
+    for i, mixture in enumerate(mixture_list):
         # calculate final spearson correlations
         mixed_counts = np.dot(mixture, sc_list[i].T).T
         mixed_compositional = mixed_counts / mixed_counts.sum()
