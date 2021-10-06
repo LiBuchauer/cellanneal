@@ -1,8 +1,8 @@
-from pandas import pivot_table
 import time
 
 from .general import make_gene_dictionary, deconvolve, calc_gene_expression
-from .plots import (plot_pies_from_df, plot_mix_heatmap, plot_scatter)
+from .plots import (plot_pies_from_df, plot_mix_heatmap,
+                    plot_mix_heatmap_log, plot_scatter)
 
 
 def cellanneal_pipe(
@@ -104,6 +104,9 @@ def cellanneal_pipe(
 
     heat_path = figure_folder_path / 'heat_{}.pdf'.format(bulk_file_ID)
     plot_mix_heatmap(all_mix_df, rownorm=False, save_path=heat_path)
+
+    heat_log_path = figure_folder_path / 'heat_log10_{}.pdf'.format(bulk_file_ID)
+    plot_mix_heatmap_log(all_mix_df, rownorm=False, save_path=heat_log_path)
 
     scatter_path = figure_folder_path / 'scatter_{}.pdf'.format(bulk_file_ID)
     plot_scatter(all_mix_df, bulk_df, celltype_df, gene_dict,
