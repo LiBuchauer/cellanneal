@@ -254,26 +254,38 @@ class cellgui:
     def show_instructions(self):
         readme_window = tk.Toplevel(root)
         readme_window.title("Instructions")
-        readme_window.canvas = tk.Canvas(root, width=400, height=600)
+        readme_window.canvas = tk.Canvas(root, width=500, height=600)
         # write text into this window
-        self.readme_text1 = tk.Label(readme_window, wraplength=350, text="Welcome to cellanneal.", font="-weight bold")
+        wl = 500
+        self.readme_text0 = tk.Label(readme_window, wraplength=wl,  justify=tk.LEFT, text=""" """)
+        self.readme_text0.grid(row=13, column=0, padx=10)
+
+        self.readme_text1 = tk.Label(readme_window, wraplength=wl, text="Welcome to cellanneal.", font="-weight bold")
         self.readme_text1.grid(row=1, column=0, padx=10)
 
-        self.readme_text2 = tk.Label(readme_window, wraplength=350, text="For the full documentation and example file please see https://github.com/LiBuchauer/cellanneal.")
+        self.readme_text2 = tk.Label(readme_window, wraplength=wl, text="For the full documentation and example files please see https://github.com/LiBuchauer/cellanneal.")
         self.readme_text2.grid(row=2, column=0, padx=10)
 
-        self.readme_text3 = tk.Label(readme_window, wraplength=350, text="\n\n1) Deconvolution data.\n", font="-weight bold")
+        self.readme_text3 = tk.Label(readme_window, wraplength=wl, text="\n\n1) Deconvolution data.\n", font="-weight bold")
         self.readme_text3.grid(row=3, column=0, padx=10)
 
-        self.readme_text4 = tk.Label(readme_window, wraplength=350, justify=tk.LEFT, text="cellanneal accepts comma-separated text files (*.csv and *.txt) as well as excel files (*.xlsx, *.xls) as inputs for both mixture data and signature data provided that they are formatted as specified in the examples. \n\nSpecifically, gene names need to appear in the first column for both mixture and signature data files, and sample names (for mixture data file) or cell type names (for signature data file) need to appear in th first row.")
+        self.readme_text4 = tk.Label(readme_window, wraplength=wl, justify=tk.LEFT, text="cellanneal accepts text files (*.csv and *.txt) as well as excel files (*.xlsx and *.xls) as inputs for both mixture and signature data provided that they are formatted as specified in the examples. \nSpecifically, gene names need to appear in the first column for both mixture and signature data files, and sample names (for mixture data file) or cell type names (for signature data file) need to appear in the first row.")
         self.readme_text4.grid(row=4, column=0, padx=10)
 
-        self.readme_text5 = tk.Label(readme_window, wraplength=350, text="\n\n2) Deconvolution parameters.\n", font="-weight bold")
+        self.readme_text5 = tk.Label(readme_window, wraplength=wl, text="\n\n2) Deconvolution parameters.\n", font="-weight bold")
         self.readme_text5.grid(row=5, column=0, padx=10)
 
-        self.readme_text6 = tk.Label(readme_window, wraplength=350, text="\n\n3) Running deconvolution with cellanneal.\n", font="-weight bold")
+        self.readme_text6 = tk.Label(readme_window, wraplength=wl, justify=tk.LEFT, text="The first three parameters govern the set of genes underlying the deconvolution process for each sample; the forth parameter (iteration number) specifies for how long to run the optimisation process. \nMinimum expression in mixture - minimum required expression level in the mixture sample (where total expression is normalised to 1) for a gene to be considered, default=1e-5. This parameter allows to exclude lowly expressed and potentially noisy genes. \nMaximum expression in mixture - maximum allowed expression level in the mixture sample (where total expression is normalised to 1) for a gene to be considered, default=0.01. This parameter allows to exclude very highly expressed, potential contaminant, genes. \nMinimum dispersion - minimum scaled dispersion (variance/mean) over celltypes, relative to other genes of similar expression level, for a gene to be considered, default=0.5. This parameter is used to select genes which vary across cell types in the signature file. \nMaximum number of iterations - the maximum number of initial values for the underlying optimisation algorithm, simulated annealing. Default=1000, after which typical problems have converged. Problems with a very high number of celltypes may require a higher number of iterations.")
         self.readme_text6.grid(row=6, column=0, padx=10)
 
+        self.readme_text11 = tk.Label(readme_window, wraplength=wl, text="\n\n3) Running deconvolution with cellanneal.\n", font="-weight bold")
+        self.readme_text11.grid(row=11, column=0, padx=10)
+
+        self.readme_text12 = tk.Label(readme_window, wraplength=wl,  justify=tk.LEFT, text="""Click on "run cellanneal" and watch the progress in the accompanying console. The main window freezes while deconvolution is in progress. Result tables and figures are stored to the user-specified output folder.""")
+        self.readme_text12.grid(row=12, column=0, padx=10)
+
+        self.readme_text13 = tk.Label(readme_window, wraplength=wl,  justify=tk.LEFT, text=""" """)
+        self.readme_text13.grid(row=13, column=0, padx=10)
 
     def import_bulk_data(self):
         file = askopenfile(
