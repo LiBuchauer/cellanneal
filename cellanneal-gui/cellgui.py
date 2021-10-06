@@ -9,6 +9,7 @@ import openpyxl  # for xlsx import
 import xlrd  # for xls import
 import sys
 from os import path
+import time
 
 
 def resource_path(relative_path):
@@ -507,7 +508,8 @@ class cellgui:
             messagebox.showerror("Data error", """Please select a folder for storing results in section 1).""")
             return 0
 
-        print("\n+++ Welcome to cellanneal! +++ \n")
+        print("\n+++ Welcome to cellanneal! +++")
+        print("{}\n".format(time.ctime()))
 
         # import bulk and celltype data
         # bulk data
@@ -520,7 +522,7 @@ class cellgui:
                                         sep=None)
             elif bfile.split(".")[-1] in ["xlsx"]:
                 self.bulk_df = read_excel(bfile, index_col=0, engine='openpyxl')
-            elif bfile.name.split(".")[-1] in ["xls"]:
+            elif bfile.split(".")[-1] in ["xls"]:
                 self.bulk_df = read_excel(bfile, index_col=0, engine='xlrd')
             else:
                 raise ImportError

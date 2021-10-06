@@ -66,14 +66,8 @@ def plot_mix_heatmap(mix_df, rownorm=False, save_path='figures/heatmap.pdf'):
     corr_list = []
     if 'rho_Spearman' in mix_df.columns:
         corr_list.append('rho_Spearman')
-        spear_list = np.round(mix_df['rho_Spearman'].values, 3)
-    else:
-        spear_list = ['-' for i in mix_df.index]
     if 'rho_Pearson' in mix_df.columns:
         corr_list.append('rho_Pearson')
-        pear_list = np.round(mix_df['rho_Pearson'].values, 3)
-    else:
-        pear_list = ['-' for i in mix_df.index]
     if len(corr_list) > 0:
         plot_df = mix_df.drop(corr_list, axis=1)
     else:
@@ -99,7 +93,10 @@ def plot_mix_heatmap(mix_df, rownorm=False, save_path='figures/heatmap.pdf'):
     savefig(save_path, bbox_inches='tight')
 
 
-def plot_mix_heatmap_log(mix_df, rownorm=False, save_path='figures/heatmap_log.pdf'):
+def plot_mix_heatmap_log(
+        mix_df,
+        rownorm=False,
+        save_path='figures/heatmap_log.pdf'):
     fig, ax = subplots(
         figsize=(10/np.shape(mix_df)[1]*np.shape(mix_df)[0],
                  0.5*np.shape(mix_df)[1]))
@@ -116,7 +113,7 @@ def plot_mix_heatmap_log(mix_df, rownorm=False, save_path='figures/heatmap_log.p
         plot_df = mix_df
 
     # for log version, add epsilon and take log of everything
-    plot_df = plot_df.add(1e-6)
+    plot_df = plot_df.add(1e-4)
     for col in plot_df.columns:
         plot_df[col] = np.log10(plot_df[col])
     if rownorm:
@@ -128,7 +125,7 @@ def plot_mix_heatmap_log(mix_df, rownorm=False, save_path='figures/heatmap_log.p
     else:
         ax = heatmap(plot_df.T.sort_index(0),
                      linewidths=.5, square=True, cmap='viridis',
-                     cbar_kws={'shrink': 0.7, 'label': 'log10 of fraction (truncated at 1e-6)'})
+                     cbar_kws={'shrink': 0.7, 'label': 'log10 of fraction (truncated at 1e-4)'})
         ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
 
     bottom, top = ax.get_ylim()

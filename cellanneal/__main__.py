@@ -5,7 +5,8 @@ production of a set of plots."""
 
 import argparse
 from pathlib import Path
-import pandas as pd
+from pandas import read_csv, read_excel
+import time
 
 from .pipelines import cellanneal_pipe
 
@@ -93,40 +94,64 @@ def main():
     disp_min = args.disp_min
     maxiter = args.maxiter
 
-    print("\nWelcome to cellanneal!\n")
+    print("\n+++ Welcome to cellanneal! +++")
+    print("{}\n".format(time.ctime()))
 
     """ 1) Import bulk and cell type data """
-    print('1A. Importing bulk data ...')
+    print("\n+++ Importing mixture data ... +++ \n")
     try:
-        bulk_df = pd.read_csv(bulk_data_path, index_col=0, header=0)
+        bfile = bulk_data_path
+        # depending on extension, use different import function
+        if bfile.name.split(".")[-1] in ["csv", 'txt']:
+            bulk_df = read_csv(bfile, index_col=0, sep=None)
+        elif bfile.name.split(".")[-1] in ["xlsx"]:
+            bulk_df = read_excel(bfile, index_col=0, engine='openpyxl')
+        elif bfile.name.split(".")[-1] in ["xls"]:
+            bulk_df = read_excel(bfile, index_col=0, engine='xlrd')
+        else:
+            raise ImportError
         # here, in order to make further course case insensitive,
         # change all gene names to uppercase only
         bulk_df.index = bulk_df.index.str.upper()
         # also, if there are duplicate genes, the are summed here
         bulk_df = bulk_df.groupby(bulk_df.index).sum()
-        bulk_names = bulk_df.columns.tolist()
-        print('{} bulk samples identified: {}\n'.format(len(bulk_names),
-                                                        bulk_names))
-    except:
+        # finally, if there are nan's after import, set them to 0 to
+        # avoid further issues
+        bulk_df = bulk_df.fillna(0)
+    except ValueError:
         print("""Your bulk data file could not be imported.
         Please check the documentation for format requirements
-        and look at the example bulk data files.""")
+        and look at the example bulk data files.\n""")
+        print("+++ Aborted. +++")
+        return 0
 
-    print('1B. Importing celltype reference data ...')
+    print("\n+++ Importing signature data ... +++ \n")
     # import single cell based reference
     try:
-        celltype_df = pd.read_csv(celltype_data_path, index_col=0, header=0)
+        # depending on extension, use different import function
+        cfile = celltype_data_path
+        if cfile.name.split(".")[-1] in ["csv", 'txt']:
+            celltype_df = read_csv(cfile, index_col=0, sep=None)
+        elif cfile.name.split(".")[-1] in ["xlsx"]:
+            celltype_df = read_excel(cfile, index_col=0, engine='openpyxl')
+        elif cfile.name.split(".")[-1] in ["xls"]:
+            celltype_df = read_excel(cfile, index_col=0, engine='xlrd')
+        else:
+            raise ImportError
         # here, in order to make further course case insensitive,
         # change all gene names to uppercase only
         celltype_df.index = celltype_df.index.str.upper()
         # also, if there are duplicate genes, the are summed here
         celltype_df = celltype_df.groupby(celltype_df.index).sum()
-        celltypes = celltype_df.columns.tolist()
-        print('{} cell types identified: {}\n'.format(len(celltypes), celltypes))
-    except:
+        # finally, if there are nan's after import, set them to 0 to
+        # avoid further issues
+        celltype_df = celltype_df.fillna(0)
+    except ValueError:
         print("""Your celltype data file could not be imported.
         Please check the documentation for format requirements
         and look at the example celltype data files.""")
+        print("+++ Aborted. +++")
+        return 0
 
     # start pipeline
     cellanneal_pipe(
