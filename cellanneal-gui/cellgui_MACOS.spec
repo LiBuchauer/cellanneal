@@ -4,7 +4,7 @@
 block_cipher = None
 
 
-a = Analysis(['cellanneal.py'],
+a = Analysis(['cellanneal_gui.py'],
              pathex=['/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui'],
              binaries=[],
              datas=[],
