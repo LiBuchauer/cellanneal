@@ -12,7 +12,8 @@
 5. [Using `cellanneal`](#5-using-cellanneal)  
     a. [python package](#5a-python-package)  
     b. [command line interface](#5b-command-line-interface)  
-    c. [graphical software](#5c-graphical-software)  
+    c. [graphical software](#5c-graphical-software)
+6. [`cellanneal` output](#6-cellanneal-output)
 6. [FAQs](#6-frequently-asked-questions)  
 
 

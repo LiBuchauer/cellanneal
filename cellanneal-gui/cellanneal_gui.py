@@ -254,9 +254,9 @@ class cellgui:
     def show_instructions(self):
         readme_window = tk.Toplevel(root)
         readme_window.title("Instructions")
-        readme_window.canvas = tk.Canvas(root, width=500, height=600)
+        readme_window.canvas = tk.Canvas(root, width=700, height=600)
         # write text into this window
-        wl = 500
+        wl = 700
         self.readme_text0 = tk.Label(readme_window, wraplength=wl,  justify=tk.LEFT, text=""" """)
         self.readme_text0.grid(row=13, column=0, padx=10)
 
@@ -275,7 +275,7 @@ class cellgui:
         self.readme_text5 = tk.Label(readme_window, wraplength=wl, text="\n\n2) Deconvolution parameters.\n", font="-weight bold")
         self.readme_text5.grid(row=5, column=0, padx=10)
 
-        self.readme_text6 = tk.Label(readme_window, wraplength=wl, justify=tk.LEFT, text="The first three parameters govern the set of genes underlying the deconvolution process for each sample; the forth parameter (iteration number) specifies for how long to run the optimisation process. \nMinimum expression in mixture - minimum required expression level in the mixture sample (where total expression is normalised to 1) for a gene to be considered, default=1e-5. This parameter allows to exclude lowly expressed and potentially noisy genes. \nMaximum expression in mixture - maximum allowed expression level in the mixture sample (where total expression is normalised to 1) for a gene to be considered, default=0.01. This parameter allows to exclude very highly expressed, potential contaminant, genes. \nMinimum dispersion - minimum scaled dispersion (variance/mean) over celltypes, relative to other genes of similar expression level, for a gene to be considered, default=0.5. This parameter is used to select genes which vary across cell types in the signature file. \nMaximum number of iterations - the maximum number of initial values for the underlying optimisation algorithm, simulated annealing. Default=1000, after which typical problems have converged. Problems with a very high number of celltypes may require a higher number of iterations.")
+        self.readme_text6 = tk.Label(readme_window, wraplength=wl, justify=tk.LEFT, text="The first three parameters govern the set of genes underlying the deconvolution process for each sample; the fourth parameter (iteration number) specifies for how long to run the optimisation process. \nMinimum expression in mixture - minimum required expression level in the mixture sample (where total expression is normalised to sum up to 1) for a gene to be considered, default=1e-5. Allowed values are in the range [0, 1) but must be smaller than the maximum allowed expression. This parameter allows to exclude lowly expressed and potentially noisy genes. \nMaximum expression in mixture - maximum allowed expression level in the mixture sample (where total expression is normalised to sum up to 1) for a gene to be considered, default=0.01. Allowed values are in the range (0, 1] but must be larger than the minimum allowed expression. This parameter allows to exclude very highly expressed, potential contaminant, genes. \nMinimum scaled dispersion - minimum scaled dispersion (variance/mean) over cell types for a gene to be considered, default=0.5. The value indicates the number of standard deviations which the dispersion of a specific gene lies above or below the mean when compared to genes of similar expression. All numerical values are allowed, but reasonable values for most cases lie between 0 and 3 as this parameter is used to select genes which vary strongly across cell types in the signature file. \nMaximum number of iterations - the maximum number of iterations through the logical chain of the underlying optimisation algorithm, scipy’s dual annealing (scipy.optimize.dual_annealing). Default=1000, after which typical problems have converged. Problems with a very high number of celltypes may require a higher number of iterations.")
         self.readme_text6.grid(row=6, column=0, padx=10)
 
         self.readme_text11 = tk.Label(readme_window, wraplength=wl, text="\n\n3) Running deconvolution with cellanneal.\n", font="-weight bold")
@@ -465,17 +465,13 @@ class cellgui:
         # can it be interpreted as float?
         try:
             new_val = float(input)
-        except ValueError:
-            messagebox.showerror("Input error", """Please provdide a positive numerical value. Examples: "0.5", "5e-1", "1".""")
-            return 0
-        # check if value is >0
-        if new_val >= 0:
             # update disp_min
             self.disp_min = new_val
             # update display of current bulk_min
             self.disp_min_value_label['text'] = "{}".format(self.disp_min)
-        else:
-            messagebox.showerror("Input error", """Please provdide a positive numerical value. Examples: "0.5", "5e-1", "1".""")
+        except ValueError:
+            messagebox.showerror("Input error", """Please provdide a positive value. Examples: "0", "0.5", "2.7".""")
+            return 0
 
     def set_maxiter(self):
         # get input and check validity

@@ -23,6 +23,9 @@ def cellanneal_pipe(
     # extract names
     bulk_names = bulk_df.columns.tolist()
     celltypes = celltype_df.columns.tolist()
+
+    # chech here for uniqueness
+
     # produce lists of genes on which to base deconvolution
     print('\n+++ Constructing gene sets ... +++')
     gene_dict = make_gene_dictionary(
@@ -96,20 +99,23 @@ def cellanneal_pipe(
         file.write('maximum number of iterations: {}\n'.format(maxiter))
 
     """ 5) Produce plots and save to folder"""
-    print('\n+++ Storing figures in folder "figures" ... +++')
+    # we only want figures if there are less than 100 samples
+    if len(bulk_names) > 100:
+        print("\nInfo: cellanneal does not produce figures for runs with more than 100 samples. If you would like cellanneal to produce figures, consider splitting your data into several input files with less than 100 mixtures each.")
     # plot results
+    else:
+        print('\n+++ Storing figures in folder "figures" ... +++')
+        pie_path = figure_folder_path / 'pies_{}.pdf'.format(bulk_file_ID)
+        plot_pies_from_df(all_mix_df, save_path=pie_path)
 
-    pie_path = figure_folder_path / 'pies_{}.pdf'.format(bulk_file_ID)
-    plot_pies_from_df(all_mix_df, save_path=pie_path)
+        heat_path = figure_folder_path / 'heat_{}.pdf'.format(bulk_file_ID)
+        plot_mix_heatmap(all_mix_df, rownorm=False, save_path=heat_path)
 
-    heat_path = figure_folder_path / 'heat_{}.pdf'.format(bulk_file_ID)
-    plot_mix_heatmap(all_mix_df, rownorm=False, save_path=heat_path)
+        heat_log_path = figure_folder_path / 'heat_log10_{}.pdf'.format(bulk_file_ID)
+        plot_mix_heatmap_log(all_mix_df, rownorm=False, save_path=heat_log_path)
 
-    heat_log_path = figure_folder_path / 'heat_log10_{}.pdf'.format(bulk_file_ID)
-    plot_mix_heatmap_log(all_mix_df, rownorm=False, save_path=heat_log_path)
-
-    scatter_path = figure_folder_path / 'scatter_{}.pdf'.format(bulk_file_ID)
-    plot_scatter(all_mix_df, bulk_df, celltype_df, gene_dict,
-                 save_path=scatter_path)
+        scatter_path = figure_folder_path / 'scatter_{}.pdf'.format(bulk_file_ID)
+        plot_scatter(all_mix_df, bulk_df, celltype_df, gene_dict,
+                     save_path=scatter_path)
 
     print('\n+++ Finished. +++\n')

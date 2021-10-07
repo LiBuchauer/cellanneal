@@ -111,7 +111,7 @@ def find_high_var_genes(
     # caculate dispersion from var and mean
     dispersion = var / mean
 
-    # for 'seurat' flavor, log versions of mean and dispersion are needed
+    # log versions of mean and dispersion are needed
     dispersion[dispersion == 0] = np.nan
     dispersion = np.log(dispersion)
     mean = np.log1p(mean)
@@ -143,11 +143,6 @@ def find_high_var_genes(
 
     # check which genes pass dispersion and expression thresholds
     dispersion_norm = df['dispersions_norm'].values.astype('float32')
-    dispersion_norm[np.isnan(dispersion_norm)] = 0  # similar to Seurat
-    # gene_subset = np.logical_and.reduce((
-    #                     mean > sc_min,
-    #                     mean < sc_max,
-    #                     dispersion_norm > disp_min))
     dispersion_norm[np.isnan(dispersion_norm)] = 0  # similar to Seurat
     gene_subset = (dispersion_norm > disp_min)
 
