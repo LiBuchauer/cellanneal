@@ -1,4 +1,4 @@
-## Welcome to cellanneal - A user-friendly application for deconvolving omics data sets.
+## Welcome to `cellanneal` - The user-friendly application for deconvolving omics data sets.
 
 `cellanneal` is an application for deconvolving biological mixture data into constituting cell types. It comes both as a python package which includes a command line interface (CLI) and as a graphical software (graphical user interface, GUI) with the entire application bundled into a single executable. The python package with CLI can be downloaded from this repository; the graphical version is available for Microsoft Windows and MacOS and can be downloaded from the [Itzkovitz group website](http://shalevlab.weizmann.ac.il/resources/).
 
@@ -30,12 +30,12 @@ During the deconvolution process, a computational mixture sample is constructed 
 ***
 
 ### 2. Installation
-The python package comes with a set of function which can be included in python workflows, scripts and notebooks as well as with a command-line entry point to cellanneal. The required code can be downloaded from this repository. The graphical software is available for Microsoft Windows and MacOS operating systems and can be downloaded from the [Itzkovitz group website](http://shalevlab.weizmann.ac.il/resources/).
+The python package comes with a set of functions which can be included in python workflows, scripts and notebooks as well as with a command-line entry point to `cellanneal`. The required code can be downloaded from this repository. The graphical software is available for Microsoft Windows and MacOS operating systems and can be downloaded from the [Itzkovitz group website](http://shalevlab.weizmann.ac.il/resources/).
 
 #### 2a. Installing the python package and CLI
 Clone this code repository or download the zipped version and unpack it into a location fo choice.  
 
-Installing `cellanneal` into a virtual environment, for example via conda, is recommended. `cellanneal` has been tested with `python 3.7` and `python 3.8`.
+Installing `cellanneal` into a virtual environment, for example via `anaconda`, is recommended. `cellanneal` has been tested with `python 3.7` and `python 3.8`.
 
 It is recommended to install `cellanneal`'s dependencies first; if using `conda`:
 
@@ -45,7 +45,7 @@ If using pip:
 
     pip install numpy scipy matplotlib pandas seaborn xlrd openpyxl
 
-Next, navigate into the cellanneal directory (`cellanneal-master`, the directory containing the file `setup.py`) on the command line. There, execute the command
+Next, navigate into the `cellanneal` directory (`cellanneal-master`, the directory containing the file `setup.py`) on the command line. There, execute the command
 
     pip install .
 
@@ -68,19 +68,19 @@ Installing the graphical software is as simple as downloading it from the [Itzko
 ***
 
 ### 3. Requirements for input data
-`cellanneal` accepts text files (\*.csv and \*.txt) as well as excel files (\*.xlsx and \*.xls) as inputs for both mixture and signature data provided that they are formatted correctly. \nSpecifically, gene names need to appear in the first column for both mixture and signature data files, and sample names (for mixture data file) or cell type names (for signature data file) need to appear in the first row. **ADD SCREENSHOTS OF CORRECT DATA HERE**. Example data files can be found in this repository in the directory [examples](https://github.com/LiBuchauer/cellanneal/tree/master/examples).
+`cellanneal` accepts text files (\*.csv and \*.txt) as well as excel files (\*.xlsx and \*.xls) as inputs for both mixture and signature data provided that they are formatted correctly. Specifically, gene names need to appear in the first column for both mixture and signature data files, and sample names (for mixture data file) or cell type names (for signature data file) need to appear in the first row. **ADD SCREENSHOTS OF CORRECT DATA HERE**. Example data files can be found in this repository in the directory [examples](https://github.com/LiBuchauer/cellanneal/tree/master/examples).
 ***
 
 ### 4. Parameters
 `cellanneal` allows the user to set four parameters. The first three govern the set of genes underlying the deconvolution process for each sample; the fourth parameter (iteration number) specifies for how long to run the optimisation process. Each parameter is discussed below.
 
-* **Minimum expression in mixture** (`bulk_min`) - minimum required expression level in the mixture sample (where total expression is normalised to sum up to 1) for a gene to be considered, `default=1e-5`. Allowed values are in the range [0, 1) but must be smaller than the maximum allowed expression. This parameter allows to exclude lowly expressed and potentially noisy genes.
+* **Minimum expression in mixture** (`bulk_min`) - minimum required expression level in the mixture sample (where total expression is normalised to sum up to 1) for a gene to be considered, `default=1e-5`. Allowed values are in the range `[0, 1)` but must be smaller than the maximum allowed expression. This parameter allows to exclude lowly expressed and potentially noisy genes.
 
 * **Maximum expression in mixture** (`bulk_max`) - maximum allowed expression level in the mixture sample (where total expression is normalised to sum up to 1) for a gene to be considered, `default=0.01`. Allowed values are in the range `(0, 1]` but must be larger than the minimum allowed expression. This parameter allows to exclude very highly expressed, potential contaminant, genes.
 
-* **Minimum scaled dispersion** (`min_dip`) - minimum scaled dispersion (variance/mean) over cell types for a gene to be considered, `default=0.5`. The value indicates the number of standard deviations which the dispersion of a specific gene lies above or below the mean when compared to genes of similar expression. All numerical values are allowed, but reasonable values for most cases lie between 0 and 3 as this parameter is used to select genes which vary strongly across cell types in the signature file.
+* **Minimum scaled dispersion** (`min_disp`) - minimum scaled dispersion (variance/mean) over cell types for a gene to be considered, `default=0.5`. The value indicates the number of standard deviations which the dispersion of a specific gene lies above or below the mean when compared to genes of similar expression. All numerical values are allowed, but reasonable values for most cases lie between 0 and 3 as this parameter is used to select genes which vary strongly across cell types in the signature file.
 
-* **Maximum number of iterations** (`maxiter`) - the maximum number of iterations through the logical chain of the underlying optimisation algorithm, [scipy’s dual annealing](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.dual_annealing.html). `default=1000`, after which typical problems have converged. Problems with a very high number of celltypes may require a higher number of iterations."
+* **Maximum number of iterations** (`maxiter`) - the maximum number of iterations through the logical chain of the underlying optimisation algorithm, [scipy’s dual annealing](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.dual_annealing.html). `default=1000`, after which typical problems have converged. Problems with a very high number of celltypes may require a higher number of iterations.
 
 ***
 
