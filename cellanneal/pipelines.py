@@ -24,7 +24,13 @@ def cellanneal_pipe(
     bulk_names = bulk_df.columns.tolist()
     celltypes = celltype_df.columns.tolist()
 
-    # chech here for uniqueness
+    # check here for uniqueness
+    if len(bulk_names) > len(set(bulk_names)):
+        print("Error: The names of the mixtures are not unique. Please give a unique name to each mixture.")
+        return 0
+    if len(celltypes) > len(set(celltypes)):
+        print("Error: The names of the cell types are not unique. Please give a unique name to each cell type.")
+        return 0
 
     # produce lists of genes on which to base deconvolution
     print('\n+++ Constructing gene sets ... +++')
@@ -105,17 +111,20 @@ def cellanneal_pipe(
     # plot results
     else:
         print('\n+++ Storing figures in folder "figures" ... +++')
-        pie_path = figure_folder_path / 'pies_{}.pdf'.format(bulk_file_ID)
-        plot_pies_from_df(all_mix_df, save_path=pie_path)
+        try:
+            pie_path = figure_folder_path / 'pies_{}.pdf'.format(bulk_file_ID)
+            plot_pies_from_df(all_mix_df, save_path=pie_path)
 
-        heat_path = figure_folder_path / 'heat_{}.pdf'.format(bulk_file_ID)
-        plot_mix_heatmap(all_mix_df, rownorm=False, save_path=heat_path)
+            heat_path = figure_folder_path / 'heat_{}.pdf'.format(bulk_file_ID)
+            plot_mix_heatmap(all_mix_df, rownorm=False, save_path=heat_path)
 
-        heat_log_path = figure_folder_path / 'heat_log10_{}.pdf'.format(bulk_file_ID)
-        plot_mix_heatmap_log(all_mix_df, rownorm=False, save_path=heat_log_path)
+            heat_log_path = figure_folder_path / 'heat_log10_{}.pdf'.format(bulk_file_ID)
+            plot_mix_heatmap_log(all_mix_df, rownorm=False, save_path=heat_log_path)
 
-        scatter_path = figure_folder_path / 'scatter_{}.pdf'.format(bulk_file_ID)
-        plot_scatter(all_mix_df, bulk_df, celltype_df, gene_dict,
-                     save_path=scatter_path)
+            scatter_path = figure_folder_path / 'scatter_{}.pdf'.format(bulk_file_ID)
+            plot_scatter(all_mix_df, bulk_df, celltype_df, gene_dict,
+                         save_path=scatter_path)
+        except:
+            print("\nError: Plots could not be created.")
 
     print('\n+++ Finished. +++\n')

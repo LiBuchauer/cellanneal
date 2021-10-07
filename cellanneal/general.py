@@ -317,7 +317,7 @@ def deconvolve(
             mixture = return_mixture(res.x)
             mixture_list.append(mixture)
         except ValueError:
-            print('\nERROR: Sample {} could not be deconvolved.\nPossibly the gene set for this sample is too small.\nSee online documentation for more info.\n'.format(mixt))
+            print('\nError: Sample {} could not be deconvolved.\nPossibly the gene set for this sample is too small.\nSee online documentation for more info.\n'.format(mixt))
             mixture = np.empty(len(celltype_df.columns))
             mixture[:] = np.nan
             mixture_list.append(mixture)
