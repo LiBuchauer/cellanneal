@@ -24,7 +24,9 @@ setup(
             'scipy',
             'matplotlib',
             'pandas',
-            'seaborn'],
+            'seaborn',
+            'xlrd',
+            'openpyxl'],
 
     classifiers=[
         'Development Status :: 3 - Alpha',

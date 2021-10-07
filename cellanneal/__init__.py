@@ -7,4 +7,4 @@ __author__ = 'Lisa Buchauer <lisa.buchauer@posteo.de>'
 from .general import make_gene_dictionary, return_mixture, deconvolve
 from .plots import (plot_pies_from_df, plot_mix_heatmap, plot_mix_heatmap_log,
                     plot_scatter)
-from .pipelines import cellanneal_pipe
+from .pipelines import cellanneal_pipe, run_cellanneal

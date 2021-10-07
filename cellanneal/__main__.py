@@ -7,6 +7,8 @@ import argparse
 from pathlib import Path
 from pandas import read_csv, read_excel
 import time
+import openpyxl  # for xlsx import
+import xlrd  # for xls import
 
 from .pipelines import cellanneal_pipe
 

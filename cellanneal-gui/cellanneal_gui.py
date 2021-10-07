@@ -174,7 +174,7 @@ class cellgui:
 
         self.disp_min_param_label = tk.Label(
             root,
-            text="minimum dispersion")
+            text="minimum scaled dispersion")
         self.disp_min_param_label.grid(row=p_i+2, column=1, sticky=tk.W)
 
         self.maxiter_param_label = tk.Label(
@@ -371,7 +371,7 @@ class cellgui:
 
         # for parameter disp_min
         # title label and current value
-        self.disp_min_label = tk.Label(par_window, text="minimum dispersion", font="-weight bold")
+        self.disp_min_label = tk.Label(par_window, text="minimum scaled dispersion", font="-weight bold")
         self.disp_min_label.grid(row=7, column=1, columnspan=2, sticky=tk.W+tk.E)
 
         # entry field

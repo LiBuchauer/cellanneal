@@ -128,3 +128,46 @@ def cellanneal_pipe(
             print("\nError: Plots could not be created.")
 
     print('\n+++ Finished. +++\n')
+
+
+def run_cellanneal(
+        celltype_df,
+        bulk_df,
+        disp_min,
+        bulk_min,
+        bulk_max,
+        maxiter):  # path object!
+    """ Combines gene set identification and deconvolution into a single
+    function.
+
+    Input:
+    celltype_df  -  dataframe containing signature data
+    bulk_df  -  daatframe containing mixture data
+    disp_min  -  minimum scaled dispersion
+    bulk_min   -  minimum expression in mixture data for genes
+    bulk_max  -  maximum expression in mixture data for genes
+    maxiter  -  maximum number of iterations for scipy's dual annealing
+
+    Output:
+    all_mix_df  -  a dataframe containing cell type fractions for each mixture"""
+
+
+    # produce lists of genes on which to base deconvolution
+    print('\n+++ Constructing gene sets ... +++')
+    gene_dict = make_gene_dictionary(
+                    celltype_df,
+                    bulk_df,
+                    disp_min=disp_min,
+                    bulk_min=bulk_min,
+                    bulk_max=bulk_max)
+
+    """ 3) Run cellanneal. """
+    print('\n+++ Running cellanneal ... +++')
+    all_mix_df = deconvolve(
+                    celltype_df=celltype_df,
+                    bulk_df=bulk_df,
+                    maxiter=maxiter,
+                    gene_dict=gene_dict,
+                    no_local_search=False)
+
+    return all_mix_df
