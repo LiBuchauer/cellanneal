@@ -1,7 +1,7 @@
 ## Welcome to `cellanneal` - The user-friendly application for deconvolving omics data sets.
 
 <p align="center" width="100%">
-    <img width="33%" src="https://github.com/LiBuchauer/cellanneal/blob/master/img/logo.png">
+    <img width="27%" src="https://github.com/LiBuchauer/cellanneal/blob/master/img/logo.png">
 </p>
 
 `cellanneal` is an application for deconvolving biological mixture data into constituting cell types. It comes both as a python package which includes a command line interface (CLI) and as a graphical software (graphical user interface, GUI) with the entire application bundled into a single executable. The python package with CLI can be downloaded from this repository; the graphical version is available for Microsoft Windows and MacOS and can be downloaded from the [Itzkovitz group website](http://shalevlab.weizmann.ac.il/resources/).
@@ -162,7 +162,7 @@ Further information about each parameter can be found in section [Parameters](#4
 
 #### 5c. Using the graphical software
 
-After download, the graphical user interface can be opened by double-clicking the executable. A console directly opens up; the graphical user interface follows with a delay of up to one minute as the bundled python packages have to be unpacked into a temporary directory. Please be patient and do not close the console. Once started, the interface looks like this: ![cellanneal GUI](/img/cellanneal_gui.png).  
+After download, the graphical user interface can be opened by double-clicking the executable. A console directly opens up; the graphical user interface follows with a delay of up to one minute as the bundled python packages have to be unpacked into a temporary directory. Please be patient and do not close the console. Once started, the interface looks like this: ![cellanneal GUI](/img/cellanneal_gui.png)  
 
 The user can now select mixture data, signature data and an output folder from the file system using the three `Browse file system` buttons in the upper half of the interface. Optionally, the four parameters (see also section [Parameters](#4-parameters)) can be changed via the `Change parameters` button which opens a separate window for entering parameter values. Parameter value defaults can be restored by clicking on the `Reset to default values` button.  
 
@@ -176,15 +176,25 @@ In order to shut down the application, the console window needs to be closed.
 `cellanneal` runs which were started from either the command line or the graphical user interface create a timestamped directory containing  three folders with tabular results and figures into the user-specifed output folder. Their contents are discussed below. Additionally, a text file containing the names of mixture and signature files and the parameters of the run is stored at the top level of the results folder.
 
 #### 6a. Folder "deconvolution results"
-
+This folder contains a CSV file with the main result of `cellanneal`: the fractional composition of each mixture in terms of cell types. Cell type names are shown in the first row; mixture sample names in the first column. Each numerical value in the table indicates the fraction the corresponding cell type occupies in the corresponding sample.
 
 #### 6b. Folder "figures"
+If the input mixture file contains up to 100 samples, a standard `cellanneal` run produces four figures:
+* A figure with one pie chart per sample with each part of the pie representing the size of a cell type fraction.
+* A heatmap in which mixture samples run across the horizontal axis and cell types along the vertical one, each coloured square indicating the corresponding cell type fraction.
+* A second heatmap, similar to the first one, but showing log10(cell type fractions) instead in order to display small cell populations more clearly.
+* A figure with one scatter plot per sample. In each scatter plot, each dot represents one gene and a dot's location is determined by its expression in the real mixture (x-axis) and its expression in the optimal computational mixture (i.e. the `cellanneal`result, y-axis). This figure helps judge how well `cellanneal` was able to approximate the real mixture sample by producing a computational mixture of the supplied cell types.
 
 #### 6c. Folder "genewise comparison"
+This folder contains one CSV file per mixture sample in the input data. Based on the deconvolution gene set for each sample , the file shows the normalised gene-wise expression in the experimental mixture (user input) in the first column and the corresponding expression in the optimal computational mixture in the second. The third column gives the ratio between the two (experimental/computational); the fourth the  logarithm of this fold change. The purpose of this file is to allow to search for genes with particularly high discrepancies between experimental and computational mixtures. Such genes may be of biological or medical interest: as an example, if the signature data stemmed from healthy people, but the mixture file from a pathology,  genes with high fold change between experiment and deconvolution result may have implications in the disease.
 
 ***
 
 ### 6. Frequently Asked Questions
-Notes - include antivirus issue for windows  
-mention how many genes one should aim for
-mention what lower cut-off (min expression) makes sense based on the number of counts
+* How small/large should my gene sets be?
+`cellanneal` draws its robustness and ability to identify small cell populations from its permissive gene selection strategy. Ideally, we want to include every gene which we believe to carry information (i.e. which is expressed above the noise level and has at least some meaningful variability between cell types). Very large gene sets (~5000 genes and above) may lead to long runtimes, but if the data quality allows, the user should aim to have gene set sizes upwards of 2000 or even 3000 genes.
+
+* Why can my data not be imported?
+Please make sure that your data is formatted as described in the [Input data section](#3-requirements-for-input-data). Common pitfalls include:
+    * excel files downloaded from publications contain a title row (e. g. "Supplementary Table 2")
+    *  
