@@ -1,5 +1,9 @@
 ## Welcome to `cellanneal` - The user-friendly application for deconvolving omics data sets.
 
+<p align="center" width="100%">
+    <img width="33%" src="https://github.com/LiBuchauer/cellanneal/img/logo.png">
+</p>
+
 `cellanneal` is an application for deconvolving biological mixture data into constituting cell types. It comes both as a python package which includes a command line interface (CLI) and as a graphical software (graphical user interface, GUI) with the entire application bundled into a single executable. The python package with CLI can be downloaded from this repository; the graphical version is available for Microsoft Windows and MacOS and can be downloaded from the [Itzkovitz group website](http://shalevlab.weizmann.ac.il/resources/).
 
 ### Contents
@@ -68,7 +72,15 @@ Installing the graphical software is as simple as downloading it from the [Itzko
 ***
 
 ### 3. Requirements for input data
-`cellanneal` accepts text files (\*.csv and \*.txt) as well as excel files (\*.xlsx and \*.xls) as inputs for both mixture and signature data provided that they are formatted correctly. Specifically, gene names need to appear in the first column for both mixture and signature data files, and sample names (for mixture data file) or cell type names (for signature data file) need to appear in the first row. **ADD SCREENSHOTS OF CORRECT DATA HERE**. Example data files can be found in this repository in the directory [examples](https://github.com/LiBuchauer/cellanneal/tree/master/examples).
+`cellanneal` accepts text files (\*.csv and \*.txt) as well as excel files (\*.xlsx and \*.xls) as inputs for both mixture and signature data provided that they are formatted correctly. Specifically, gene names need to appear in the first column for both mixture and signature data files, and sample names (for mixture data file) or cell type names (for signature data file) need to appear in the first row. Example data files can be found in this repository in the [example directory](https://github.com/LiBuchauer/cellanneal/tree/master/examples). The top of an exemplary mixture.csv file may look like this ![mixture csv file example](/img/data_example_csv.png) and the top of an exemplary signature.xlsx file looks like this ![signature xlsx file example](/img/data_example_excel.png)   
+
+Further important points regarding the input data:
+
+* It is not required that mixture and signature data sets contain exactly the same genes, or that these genes appear in the same order (or in alphabetical order).
+* Please do not logarithmise the input data before passing it into `cellanneal`.  
+* Normalisation of mixture data: it is not required that the individual sample columns are normalised to a specific sum value; the normalisation will not affect the outcome.
+* Normalisation of signature data: normalising the individual cell type columns to the same count sum or not will lead to different results and whether you wish to normalise or not may depend on your biological question and available data. Specifically, if you do normalise all cell types to the same count sum, the output of `cellanneal` will tell you which fraction of the overall RNA was contributed by each cell type. This will not take into account size differences between cell types. In a toy example, if you analyse a mixture of one cell of type A and one cell of type B, where cell A at the base had ten times more RNA than cell B, after normalisation you will obtain the result that 10/11=91% of the RNA stem from type A. If all your reference data stems from the same data set, and you think that the average count sum of cells of a given type is a good proxy for their size, you may instead not normalise the values (in this case, the sum of all counts for cell type A would be 10 times higher than for B). Then, `cellanneal`’s output can be interpreted as cell fractions, i.e. the above example would return 50% type A and 50% type B. Following this concept, you can also think about normalising your cell types to different sum values based on known or estimated size factors.
+
 ***
 
 ### 4. Parameters
@@ -150,12 +162,21 @@ Further information about each parameter can be found in section [Parameters](#4
 
 #### 5c. Using the graphical software
 
+After download, the graphical user interface can be opened by double-clicking the executable. A console directly opens up; the graphical user interface follows with a delay of up to one minute as the bundled python packages have to be unpacked into a temporary directory. Please be patient and do not close the console. Once started, the interface looks like this: ![cellanneal GUI](/img/cellanneal_gui.png).  
+
+The user can now select mixture data, signature data and an output folder from the file system using the three `Browse file system` buttons in the upper half of the interface. Optionally, the four parameters (see also section [Parameters](#4-parameters)) can be changed via the `Change parameters` button which opens a separate window for entering parameter values. Parameter value defaults can be restored by clicking on the `Reset to default values` button.  
+
+Finally, a deconvolution run is started by pressing the button `run cellanneal` at the bottom of the interface. Once running, the interface becomes unresponsive until the process finishes. While  `cellanneal` is running, detailed progress updates are  printed into  the accompanying console. When the run has finished, all results can be found in a directory labelled with the name of the mixture file and a timestamp inside the user-defined output folder. For further information on the output created by `cellanneal`, see section [Output](#6-cellanneal-output).
+
+In order to shut down the application, the console window needs to be closed.
+
 ***
 
 ### 6. `cellanneal` output
-Independent of whether it was started from the command line or the graphical user interface, each `cellanneal` run creates a timestamped directory containing  three folders with tabular results and figures into the user-specifed output folder. Their contents are discussed below. Additionally, a text file containing the names of mixture and signature files and the parameters of the run is stored at the top level of the results folder.
+`cellanneal` runs which were started from either the command line or the graphical user interface create a timestamped directory containing  three folders with tabular results and figures into the user-specifed output folder. Their contents are discussed below. Additionally, a text file containing the names of mixture and signature files and the parameters of the run is stored at the top level of the results folder.
 
 #### 6a. Folder "deconvolution results"
+
 
 #### 6b. Folder "figures"
 
