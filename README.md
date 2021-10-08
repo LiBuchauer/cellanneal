@@ -85,8 +85,44 @@ Installing the graphical software is as simple as downloading it from the [Itzko
 ***
 
 ### 5. Using `cellanneal`
+`cellanneal` can be used as part of a `python` workflow or individually via the command line or the graphical software. All three use cases are explained below.
 
 #### 5a. Using the python package
+The python package provides functions for the three main steps of a deconvolution anlysis with `cellanneal`: identification of a gene set for deconvolution, deconvolution using simulated annealing, and plotting the results. A [quick start workflow](https://github.com/LiBuchauer/cellanneal/blob/master/examples/cellanneal_quickstart.ipynb) is available in the examples folder.  
+
+In order to use `cellanneal` in your `python` workflow, you need to import it:
+
+```python
+import cellanneal
+```
+
+As a first step, a gene set on which to base deconvolution has to be identified for each mixture sample. This step uses the parameters `bulk_min`, `bulk_max` and `disp_min` which are explained in the section [Parameters]((#4-parameters). The function `make_gene_dictionary` takes these inputs and produces a `dictionary` holding a gene list for each mixture sample:
+
+```python
+gene_dict = cellanneal.make_gene_dictionary(
+                    signature_df,
+                    mixture_df,
+                    disp_min=0.5,
+                    bulk_min=1e-5,
+                    bulk_max=0.01)
+```
+
+Next, deconvolution is run and a `pandas.DataFrame` holding the results is returned:
+```python
+all_mix_df = cellanneal.deconvolve(
+                signature_df,
+                mixture_df,
+                maxiter=1000,
+                gene_dict=gene_dict)
+```
+Finally, four plotting options for deconvolution results are provided with `cellanneal` - pie charts, two heatmaps, and a scatter plot showing correlations between computational and real mixture samples.
+
+```python
+cellanneal.plot_pies(all_mix_df)
+cellanneal.plot_mix_heatmap(all_mix_df)
+cellanneal.plot_mix_heatmap_log(all_mix_df)
+cellanneal.plot_scatter(all_mix_df, mixture_df, signature_df, gene_dict)
+```
 
 #### 5b. Using the command line interface
 After installing the python package, a single command line command, `cellanneal`,
