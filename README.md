@@ -1,7 +1,7 @@
 ## Welcome to `cellanneal` - The user-friendly application for deconvolving omics data sets.
 
 <p align="center" width="100%">
-    <img width="33%" src="https://github.com/LiBuchauer/cellanneal/img/logo.png">
+    <img width="33%" src="https://github.com/LiBuchauer/cellanneal/blob/master/img/logo.png">
 </p>
 
 `cellanneal` is an application for deconvolving biological mixture data into constituting cell types. It comes both as a python package which includes a command line interface (CLI) and as a graphical software (graphical user interface, GUI) with the entire application bundled into a single executable. The python package with CLI can be downloaded from this repository; the graphical version is available for Microsoft Windows and MacOS and can be downloaded from the [Itzkovitz group website](http://shalevlab.weizmann.ac.il/resources/).
