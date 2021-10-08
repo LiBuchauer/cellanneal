@@ -89,6 +89,28 @@ Installing the graphical software is as simple as downloading it from the [Itzko
 #### 5a. Using the python package
 
 #### 5b. Using the command line interface
+After installing the python package, a single command line command, `cellanneal`,
+becomes available. Note that if you are using `conda` environments, this command will only be available inside the environment into which you installed it and you need to activate this environment via `conda activate my_env` before you can make calls to `cellanneal`.  
+
+`cellanneal` requires three arguments,
+* the path to the mixture data file (\*.csv, \*.txt, \*.xlsx, or \*.xls)  
+* the path to the signature data file (\*.csv, \*.txt, \*.xlsx, or \*.xls)  
+* the path to the folder in which the results are to be stored  
+
+and allows the user to set four parameters,  
+* `bulk_min`, the minimum required gene expression in the mixture  
+* `bulk_max`, the maximum allowd gene expression in the mixture  
+* `min_disp`, the minimum required scaled dispersion across cell types  
+* `maxiter`, the maximum iteration number for `scipy`'s `dual_annealing`
+
+resulting in the following call signature:
+```
+cellanneal [-h] [--bulk_min BULK_MIN] [--bulk_max BULK_MAX]
+                [--disp_min DISP_MIN] [--maxiter MAXITER]
+                bulk_data_path celltype_data_path output_path
+```
+Further information about each parameter can be found in section [Parameters](#4-parameters).
+
 
 #### 5c. Using the graphical software
 

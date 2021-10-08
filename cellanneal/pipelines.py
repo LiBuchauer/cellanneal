@@ -1,7 +1,7 @@
 import time
 
 from .general import make_gene_dictionary, deconvolve, calc_gene_expression
-from .plots import (plot_pies_from_df, plot_mix_heatmap,
+from .plots import (plot_pies, plot_mix_heatmap,
                     plot_mix_heatmap_log, plot_scatter)
 
 
@@ -47,8 +47,7 @@ def cellanneal_pipe(
                     celltype_df=celltype_df,
                     bulk_df=bulk_df,
                     maxiter=maxiter,
-                    gene_dict=gene_dict,
-                    no_local_search=False)
+                    gene_dict=gene_dict)
 
     """ 4) Write results to file."""
     print('\n+++ Writing results to file ... +++')
@@ -113,7 +112,7 @@ def cellanneal_pipe(
         print('\n+++ Storing figures in folder "figures" ... +++')
         try:
             pie_path = figure_folder_path / 'pies_{}.pdf'.format(bulk_file_ID)
-            plot_pies_from_df(all_mix_df, save_path=pie_path)
+            plot_pies(all_mix_df, save_path=pie_path)
 
             heat_path = figure_folder_path / 'heat_{}.pdf'.format(bulk_file_ID)
             plot_mix_heatmap(all_mix_df, rownorm=False, save_path=heat_path)
@@ -167,7 +166,6 @@ def run_cellanneal(
                     celltype_df=celltype_df,
                     bulk_df=bulk_df,
                     maxiter=maxiter,
-                    gene_dict=gene_dict,
-                    no_local_search=False)
+                    gene_dict=gene_dict)
 
     return all_mix_df

@@ -14,7 +14,7 @@ rcParams['axes.prop_cycle'] = cycler(color=[
             '#808000', '#ffd8b1', '#000075', '#808080'])
 
 
-def plot_pies_from_df(mix_df,
+def plot_pies(mix_df,
                       save_path='figures/pies.pdf'):
 
     # for each mixture, plot a pie chart

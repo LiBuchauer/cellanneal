@@ -17,14 +17,14 @@ def init_parser(parser):
     """Initialize parser arguments."""
     parser.add_argument(
         'bulk_data_path', type=str,
-        help=("""Path to bulk data file, csv format with sample names as
-            columns and genes as rows.""")
+        help=("""Path to mixture data file; .csv, .txt, .xlsx or .xls format
+        with sample names as columns and genes as rows.""")
     )
 
     parser.add_argument(
         'celltype_data_path', type=str,
-        help=("""Path to celltype reference data file, csv format with sample
-            names as columns and genes as rows. """)
+        help=("""Path to signature data file; .csv, .txt, .xlsx or .xls format
+        with sample names as columns and genes as rows.""")
     )
 
     parser.add_argument(
@@ -34,13 +34,13 @@ def init_parser(parser):
 
     parser.add_argument(
         '--bulk_min', type=float, default=1e-5,
-        help=("""Minimum relative expression in the bulk sample for a gene
+        help=("""Minimum relative expression in the mixture sample for a gene
             to be considered.""")
     )
 
     parser.add_argument(
         '--bulk_max', type=float, default=0.01,
-        help=("""Maximum relative expression in the bulk sample for a gene
+        help=("""Maximum relative expression in the mixture sample for a gene
             to be considered.""")
     )
 
@@ -52,17 +52,16 @@ def init_parser(parser):
 
     parser.add_argument(
         '--maxiter', type=int, default=1000,
-        help=("""Number of initial values from which to run simulated
-            annealing.""")
+        help=("""Maximum number of iterations for scipy's dual_annealing.""")
     )
 
     return parser
 
 
 def main():
-    """ cellanneal. User-friendly deconvolution of bulk RNA-Seq data.
+    """ cellanneal. User-friendly deconvolution of RNA-Seq mixture data.
 
-    Deconvovles bulk RNA-Seq data into single-cell populations based
+    Deconvovles mixture RNA-Seq data into cell type populations based
     on Spearman's correlation between bulk sample gene expression and
     single-cell based mixture gene expression. Simulated annealing is
     used to find the optimal mixture.

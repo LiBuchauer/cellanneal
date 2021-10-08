@@ -279,7 +279,6 @@ def deconvolve(
             bulk_df,
             maxiter,
             gene_dict,
-            no_local_search
             ):
     # sort bulk df columns alphabetically to ensure consistency
     bulk_df = bulk_df.sort_index(axis=1)
@@ -313,7 +312,7 @@ def deconvolve(
                         bounds=[[0, 1] for x in range(len(celltype_df.columns))],
                         maxiter=maxiter,
                         args=[bulk_ranked_list[i], sc_list[i]],
-                        no_local_search=no_local_search)
+                        no_local_search=False)
             mixture = return_mixture(res.x)
             mixture_list.append(mixture)
         except ValueError:
