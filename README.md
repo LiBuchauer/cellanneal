@@ -100,7 +100,7 @@ Further important points regarding the input data:
 `cellanneal` can be used as part of a `python` workflow or individually via the command line or the graphical software. All three use cases are explained below.
 
 #### 5a. Using the python package
-The python package provides functions for the three main steps of a deconvolution anlysis with `cellanneal`: identification of a gene set for deconvolution, deconvolution using simulated annealing, and plotting the results. A [quick start workflow](https://github.com/LiBuchauer/cellanneal/blob/master/examples/cellanneal_quickstart.ipynb) is available in the examples folder.  
+The python package provides functions for the three main steps of a deconvolution analysis with `cellanneal`: identification of a gene set for deconvolution, deconvolution using simulated annealing, and plotting the results. A [quick start workflow](https://github.com/LiBuchauer/cellanneal/blob/master/examples/cellanneal_quickstart.ipynb) is available in the examples folder.  
 
 In order to use `cellanneal` in your `python` workflow, you need to import it:
 
