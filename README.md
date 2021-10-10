@@ -37,7 +37,7 @@ During the deconvolution process, a computational mixture sample is constructed 
 The python package comes with a set of functions which can be included in python workflows, scripts and notebooks as well as with a command-line entry point to `cellanneal`. The required code can be downloaded from this repository. The graphical software is available for Microsoft Windows and MacOS operating systems and can be downloaded from the [Itzkovitz group website](http://shalevlab.weizmann.ac.il/resources/).
 
 #### 2a. Installing the python package and CLI
-Clone this code repository or download the zipped version and unpack it into a location fo choice.  
+Clone this code repository or download the zipped version and unpack it into a location of choice.  
 
 Installing `cellanneal` into a virtual environment, for example via `anaconda`, is recommended. `cellanneal` has been tested with `python 3.7` and `python 3.8`.
 
