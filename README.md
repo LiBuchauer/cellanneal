@@ -4,7 +4,19 @@
     <img width="17%" src="https://github.com/LiBuchauer/cellanneal/blob/master/img/logo.png">
 </p>
 
-`cellanneal` is an application for deconvolving biological mixture data into constituting cell types. It comes both as a python package which includes a command line interface (CLI) and as a graphical software (graphical user interface, GUI) with the entire application bundled into a single executable. The python package with CLI can be downloaded from this repository; the graphical version is available for Microsoft Windows and MacOS and can be downloaded from the [Itzkovitz group website](http://shalevlab.weizmann.ac.il/resources/).
+`cellanneal` is an application for deconvolving biological mixture data into constituting cell types. It comes both as a python package which includes a command line interface (CLI) and as a graphical software (graphical user interface, GUI) with the entire application bundled into a single executable. The python package with CLI can be downloaded from this repository; the graphical version is available for Microsoft Windows and macOS and can be downloaded from the [zenodo](https://doi.org/10.5281/zenodo.5559545).
+
+| [Download `cellanneal` GUI for  Windows](https://zenodo.org/record/5559545/files/cellanneal_windows.zip?download=1) |
+| --- |
+
+| [Download `cellanneal` GUI for  macOS](https://zenodo.org/record/5559545/files/cellanneal_macos.zip?download=1) |
+| --- |
+
+| IMPORTANT: The graphical software has a startup time of up to one minute. |
+| --- |
+
+| IMPORTANT: On macOS, when opening the graphical software for the first time,  you must do so via right-click --> "Open" and then choose "Open" in the emerging dialogue, [see below for more info](#5c-using-the-graphical-software). |
+| --- |
 
 ### Contents
 1. [How does `cellanneal` work?](#1-how-does-cellanneal-work)  
@@ -34,7 +46,7 @@ During the deconvolution process, a computational mixture sample is constructed 
 ***
 
 ### 2. Installation
-The python package comes with a set of functions which can be included in python workflows, scripts and notebooks as well as with a command-line entry point to `cellanneal`. The required code can be downloaded from this repository. The graphical software is available for Microsoft Windows and MacOS operating systems and can be downloaded from the [Itzkovitz group website](http://shalevlab.weizmann.ac.il/resources/).
+The python package comes with a set of functions which can be included in python workflows, scripts and notebooks as well as with a command-line entry point to `cellanneal`. The required code can be downloaded from this repository. The graphical software is available for Microsoft Windows and macOS operating systems and can be downloaded from [zenodo](https://doi.org/10.5281/zenodo.5559545).
 
 #### 2a. Installing the python package and CLI
 Clone this code repository or download the zipped version and unpack it into a location of choice.  
@@ -67,7 +79,13 @@ For more details on how to use it, see [Using `cellanneal`](#5-using-cellanneal)
 
 #### 2b. Installing the GUI
 
-Installing the graphical software is as simple as downloading it from the [Itzkovitz group website](http://shalevlab.weizmann.ac.il/resources/). **Please note that the GUI has an initial start-up time of up to one minute**. For more information on how to use the GUI, see [Using the graphical software](#5c-using-the-graphical-software).
+Installing the graphical software is as simple as downloading the correct version for your operating system [zenodo](https://doi.org/10.5281/zenodo.5559545) and unzipping the content. The archive contains an executable file (the `cellanneal` application), an example mixture data file and an example signature data file.  **Please note that the GUI has an initial start-up time of up to one minute**.
+
+* **macOS**: Under most security settings, macOS does not allow to open software from unidentified developers via double-click. To circumvent this, right-click (secondary click) onto the cellanneal executable and choose "Open" at the top of the emerging context menu. This primes a dialogue in which you can then press "Open". Subsequently, the software will also be accessible via double-click.
+
+* **Windows**: Antiviral software may inhibit the launching of the software - it may be necessary to set an exception or click "Allow" when asked whether to procede.
+
+For more information on how to use the GUI, see [Using the graphical software](#5c-using-the-graphical-software).
 
 ***
 
