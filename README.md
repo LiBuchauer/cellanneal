@@ -15,7 +15,7 @@
 | IMPORTANT: The graphical software has a startup time of up to one minute. |
 | --- |
 
-| IMPORTANT: On macOS, when opening the graphical software for the first time,  you must do so via right-click --> "Open" and then choose "Open" in the emerging dialogue, [see below for more info](#5c-using-the-graphical-software). |
+| IMPORTANT: On macOS, when opening the graphical software for the first time,  you must do so via right-click --> "Open" and then choose "Open" in the emerging dialogue, [see below for more info](#2b-installing-the-gui). |
 | --- |
 
 ### Contents
