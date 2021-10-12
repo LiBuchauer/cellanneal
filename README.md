@@ -4,12 +4,14 @@
     <img width="17%" src="https://github.com/LiBuchauer/cellanneal/blob/master/img/logo.png">
 </p>
 
-`cellanneal` is an application for deconvolving biological mixture data into constituting cell types. It comes both as a python package which includes a command line interface (CLI) and as a graphical software (graphical user interface, GUI) with the entire application bundled into a single executable. The python package with CLI can be downloaded from this repository; the graphical version is available for Microsoft Windows and macOS and can be downloaded from [zenodo](https://doi.org/10.5281/zenodo.5559545).
+`cellanneal` is an application for deconvolving biological mixture data into constituting cell types. It comes both as a python package which includes a command line interface (CLI) and as a graphical software (graphical user interface, GUI) with the entire application bundled into a single executable. The python package with CLI can be downloaded from this repository; the graphical version is available for Microsoft Windows and macOS and can be downloaded from [zenodo](https://doi.org/10.5281/zenodo.5559545). [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5559545.svg)](https://doi.org/10.5281/zenodo.5559545)
 
-| [Download `cellanneal` GUI for  Windows](https://zenodo.org/record/5559545/files/cellanneal_windows.zip?download=1) |
+
+
+| [Download `cellanneal` graphical software for  Windows](https://zenodo.org/record/5559545/files/cellanneal_windows.zip?download=1) |
 | --- |
 
-| [Download `cellanneal` GUI for  macOS](https://zenodo.org/record/5559545/files/cellanneal_macos.zip?download=1) |
+| [Download `cellanneal` graphical software for  macOS](https://zenodo.org/record/5559545/files/cellanneal_macos.zip?download=1) |
 | --- |
 
 | IMPORTANT: The graphical software has a startup time of up to one minute. |
@@ -215,4 +217,5 @@ This folder contains one CSV file per mixture sample in the input data. Based on
 * Why can my data not be imported?
 Please make sure that your data is formatted as described in the [Input data section](#3-requirements-for-input-data). Common pitfalls include:
     * excel files downloaded from publications contain a title row (e. g. "Supplementary Table 2")
-    *  
+    * excel may have converted some of your gene names to dates (e.g. "MAR1", "SEPT9"...)
+    * CSV files have an unequal number of columns in the first row (the row with the sample or cell type names) compared to subsequent rows because the first row looks like this `sample1, sample2, sample3` instead of `gene_name, sample1, sample2, sample3` as it should be (in the subsequent data rows, the first column contains the gene name).
