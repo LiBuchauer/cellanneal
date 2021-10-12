@@ -1,8 +1,0 @@
-# for widnows, replace line continuation things with ^ and
-# colon with semicolon
-
-pyinstaller --onedir \
---add-data="/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/logo_orange.png:img" \
---add-data="/Users/lisa/X/lisabu/cellanneal_gui_dev/cellanneal/cellanneal-gui/cellanneal_button.png:img" \
-
-cellgui.py
