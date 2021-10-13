@@ -219,3 +219,6 @@ Please make sure that your data is formatted as described in the [Input data sec
     * excel files downloaded from publications contain a title row (e. g. "Supplementary Table 2")
     * excel may have converted some of your gene names to dates (e.g. "MAR1", "SEPT9"...)
     * CSV files have an unequal number of columns in the first row (the row with the sample or cell type names) compared to subsequent rows because the first row looks like this `sample1, sample2, sample3` instead of `gene_name, sample1, sample2, sample3` as it should be (in the subsequent data rows, the first column contains the gene name).
+
+* What happens to mitochondrial genes? I noticed they are not part of my output.
+Mitochondrial genes (gene names starting with "MT-", "Mt-", "mt-") are removed from the gene list on which deconvolution is based in the `cellanneal` workflow. This happens after genes are selected based on minimum and maximum expression thresholds.
