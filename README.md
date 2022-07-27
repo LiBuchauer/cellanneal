@@ -210,15 +210,19 @@ This folder contains one CSV file per mixture sample in the input data. Based on
 
 ***
 
-### 6. Frequently Asked Questions
-* How small/large should my gene sets be?
+### 7. Frequently Asked Questions
+* How small/large should my gene sets be?  
 `cellanneal` draws its robustness and ability to identify small cell populations from its permissive gene selection strategy. Ideally, we want to include every gene which we believe to carry information (i.e. which is expressed above the noise level and has at least some meaningful variability between cell types). Very large gene sets (~5000 genes and above) may lead to long runtimes, but if the data quality allows, the user should aim to have gene set sizes upwards of 2000 or even 3000 genes.
 
-* Why can my data not be imported?
+* Why can my data not be imported?  
 Please make sure that your data is formatted as described in the [Input data section](#3-requirements-for-input-data). Common pitfalls include:
     * excel files downloaded from publications contain a title row (e. g. "Supplementary Table 2")
     * excel may have converted some of your gene names to dates (e.g. "MAR1", "SEPT9"...)
     * CSV files have an unequal number of columns in the first row (the row with the sample or cell type names) compared to subsequent rows because the first row looks like this `sample1, sample2, sample3` instead of `gene_name, sample1, sample2, sample3` as it should be (in the subsequent data rows, the first column contains the gene name).
 
-* What happens to mitochondrial genes? I noticed they are not part of my output.
+* What happens to mitochondrial genes? I noticed they are not part of my output.  
 Mitochondrial genes (gene names starting with "MT-", "Mt-", "mt-") are removed from the gene list on which deconvolution is based in the `cellanneal` workflow. This happens after genes are selected based on minimum and maximum expression thresholds.
+
+* My run fails with error `"Error: Sample XXX could not be deconvolved.Possibly the gene set for this sample is too small. See online documentation for more info."` when using the python module even though the selected gene set is large.  
+This can be due to gene name duplications in either the signature file or the mixture file. Try to run `mixture_df = mixture_df.groupby(mixture_df.index).sum()` and/or  `signature_df = signature_df.groupby(signature_df.index).sum()` prior to running `cellanneal.deconvolve()`
+
