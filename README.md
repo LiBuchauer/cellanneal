@@ -55,6 +55,9 @@ Clone this code repository or download the zipped version and unpack it into a l
 
 Installing `cellanneal` into a virtual environment, for example via `anaconda`, is recommended. `cellanneal` has been tested with `python 3.7` and `python 3.8`.
 
+    conda create --name cellanneal python==3.8
+    conda activate cellanneal
+
 It is recommended to install `cellanneal`'s dependencies first; if using `conda`:
 
     conda install numpy scipy matplotlib pandas seaborn xlrd openpyxl
@@ -225,4 +228,3 @@ Mitochondrial genes (gene names starting with "MT-", "Mt-", "mt-") are removed f
 
 * My run fails with error `"Error: Sample XXX could not be deconvolved.Possibly the gene set for this sample is too small. See online documentation for more info."` when using the python module even though the selected gene set is large.  
 This can be due to gene name duplications in either the signature file or the mixture file. Try to run `mixture_df = mixture_df.groupby(mixture_df.index).sum()` and/or  `signature_df = signature_df.groupby(signature_df.index).sum()` prior to running `cellanneal.deconvolve()`
-
