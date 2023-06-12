@@ -16,50 +16,71 @@ from .pipelines import cellanneal_pipe
 def init_parser(parser):
     """Initialize parser arguments."""
     parser.add_argument(
-        'bulk_data_path', type=str,
-        help=("""Path to mixture data file; .csv, .txt, .xlsx or .xls format
-        with sample names as columns and genes as rows.""")
+        "bulk_data_path",
+        type=str,
+        help=(
+            """Path to mixture data file; .csv, .txt, .xlsx or .xls format
+        with sample names as columns and genes as rows."""
+        ),
     )
 
     parser.add_argument(
-        'celltype_data_path', type=str,
-        help=("""Path to signature data file; .csv, .txt, .xlsx or .xls format
-        with sample names as columns and genes as rows.""")
+        "celltype_data_path",
+        type=str,
+        help=(
+            """Path to signature data file; .csv, .txt, .xlsx or .xls format
+        with sample names as columns and genes as rows."""
+        ),
     )
 
     parser.add_argument(
-        'output_path', type=str,
-        help=("""Path to folder in which to store the results. """)
+        "output_path",
+        type=str,
+        help=("""Path to folder in which to store the results. """),
     )
 
     parser.add_argument(
-        '--bulk_min', type=float, default=1e-5,
-        help=("""Minimum relative expression in the mixture sample for a gene
-            to be considered.""")
+        "--bulk_min",
+        type=float,
+        default=1e-5,
+        help=(
+            """Minimum relative expression in the mixture sample for a gene
+            to be considered."""
+        ),
     )
 
     parser.add_argument(
-        '--bulk_max', type=float, default=0.01,
-        help=("""Maximum relative expression in the mixture sample for a gene
-            to be considered.""")
+        "--bulk_max",
+        type=float,
+        default=0.01,
+        help=(
+            """Maximum relative expression in the mixture sample for a gene
+            to be considered."""
+        ),
     )
 
     parser.add_argument(
-        '--disp_min', type=float, default=0.5,
-        help=("""Minimum scaled dispersion (var/mean) relative to other
-            genes of similar expression for a gene to be considered.""")
+        "--disp_min",
+        type=float,
+        default=0.5,
+        help=(
+            """Minimum scaled dispersion (var/mean) relative to other
+            genes of similar expression for a gene to be considered."""
+        ),
     )
 
     parser.add_argument(
-        '--maxiter', type=int, default=1000,
-        help=("""Maximum number of iterations for scipy's dual_annealing.""")
+        "--maxiter",
+        type=int,
+        default=1000,
+        help=("""Maximum number of iterations for scipy's dual_annealing."""),
     )
 
     return parser
 
 
 def main():
-    """ cellanneal. User-friendly deconvolution of RNA-Seq mixture data.
+    """cellanneal. User-friendly deconvolution of RNA-Seq mixture data.
 
     Deconvovles mixture RNA-Seq data into cell type populations based
     on Spearman's correlation between bulk sample gene expression and
@@ -83,7 +104,8 @@ def main():
     """
     # get a parser object, initialise the inputs and read them into args
     my_parser = argparse.ArgumentParser(
-        description=('cellanneal deconvolves bulk RNA-Seq data.'))
+        description=("cellanneal deconvolves bulk RNA-Seq data.")
+    )
     args = init_parser(my_parser).parse_args()
 
     # grab the individual inputs for further use
@@ -103,12 +125,12 @@ def main():
     try:
         bfile = bulk_data_path
         # depending on extension, use different import function
-        if bfile.name.split(".")[-1] in ["csv", 'txt']:
+        if bfile.name.split(".")[-1] in ["csv", "txt"]:
             bulk_df = read_csv(bfile, index_col=0, sep=None)
         elif bfile.name.split(".")[-1] in ["xlsx"]:
-            bulk_df = read_excel(bfile, index_col=0, engine='openpyxl')
+            bulk_df = read_excel(bfile, index_col=0, engine="openpyxl")
         elif bfile.name.split(".")[-1] in ["xls"]:
-            bulk_df = read_excel(bfile, index_col=0, engine='xlrd')
+            bulk_df = read_excel(bfile, index_col=0, engine="xlrd")
         else:
             raise ImportError
         # here, in order to make further course case insensitive,
@@ -120,9 +142,11 @@ def main():
         # avoid further issues
         bulk_df = bulk_df.fillna(0)
     except ValueError:
-        print("""Your bulk data file could not be imported.
+        print(
+            """Your bulk data file could not be imported.
         Please check the documentation for format requirements
-        and look at the example bulk data files.\n""")
+        and look at the example bulk data files.\n"""
+        )
         print("+++ Aborted. +++")
         return 0
 
@@ -131,12 +155,12 @@ def main():
     try:
         # depending on extension, use different import function
         cfile = celltype_data_path
-        if cfile.name.split(".")[-1] in ["csv", 'txt']:
+        if cfile.name.split(".")[-1] in ["csv", "txt"]:
             celltype_df = read_csv(cfile, index_col=0, sep=None)
         elif cfile.name.split(".")[-1] in ["xlsx"]:
-            celltype_df = read_excel(cfile, index_col=0, engine='openpyxl')
+            celltype_df = read_excel(cfile, index_col=0, engine="openpyxl")
         elif cfile.name.split(".")[-1] in ["xls"]:
-            celltype_df = read_excel(cfile, index_col=0, engine='xlrd')
+            celltype_df = read_excel(cfile, index_col=0, engine="xlrd")
         else:
             raise ImportError
         # here, in order to make further course case insensitive,
@@ -148,9 +172,11 @@ def main():
         # avoid further issues
         celltype_df = celltype_df.fillna(0)
     except ValueError:
-        print("""Your celltype data file could not be imported.
+        print(
+            """Your celltype data file could not be imported.
         Please check the documentation for format requirements
-        and look at the example celltype data files.""")
+        and look at the example celltype data files."""
+        )
         print("+++ Aborted. +++")
         return 0
 
@@ -164,4 +190,5 @@ def main():
         bulk_min,
         bulk_max,
         maxiter,
-        output_path)
+        output_path,
+    )

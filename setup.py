@@ -9,37 +9,29 @@ setup(
     name="cellanneal",
     version="0.1.0",
     url="https://github.com/libuchauer/cellanneal",
-    license='MIT',
-
+    license="MIT",
     author="Lisa Buchauer",
     author_email="lisa.buchauer@posteo.de",
-
     description="A user-friendly application for deconvolving bulk RNAseq samples.",
     long_description=long_description,
     packages=find_packages(),
-
     # package dependencies
     install_requires=[
-            'numpy',
-            'scipy',
-            'matplotlib',
-            'pandas',
-            'seaborn',
-            'xlrd',
-            'openpyxl'],
-
-    classifiers=[
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        "numpy",
+        "scipy",
+        "matplotlib",
+        "pandas",
+        "seaborn",
+        "xlrd",
+        "openpyxl",
     ],
-
-    entry_points = {
-        'console_scripts': [
-            'cellanneal = cellanneal.__main__:main'
-            ]
-        }
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+    ],
+    entry_points={"console_scripts": ["cellanneal = cellanneal.__main__:main"]},
 )
