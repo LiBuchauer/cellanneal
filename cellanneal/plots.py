@@ -32,8 +32,7 @@ rcParams["axes.prop_cycle"] = cycler(
 )
 
 
-def plot_pies(mix_df, save_path="figures/pies.pdf"):
-
+def plot_pies(mix_df, save_path=None):
     # for each mixture, plot a pie chart
     plot_num = np.shape(mix_df)[0] + 1
     fig, axes = subplots(
@@ -69,11 +68,11 @@ def plot_pies(mix_df, save_path="figures/pies.pdf"):
     lax.legend(
         pie[0], plot_df.columns, loc="lower center", ncol=2, bbox_to_anchor=(0.7, 0)
     )
+    if save_path is not None:
+        savefig(save_path, bbox_inches="tight")
 
-    savefig(save_path, bbox_inches="tight")
 
-
-def plot_mix_heatmap(mix_df, rownorm=False, save_path="figures/heatmap.pdf"):
+def plot_mix_heatmap(mix_df, rownorm=False, save_path=None):
     fig, ax = subplots(
         figsize=(
             10 / np.shape(mix_df)[1] * np.shape(mix_df)[0],
@@ -93,7 +92,7 @@ def plot_mix_heatmap(mix_df, rownorm=False, save_path="figures/heatmap.pdf"):
         plot_df = mix_df
 
     if rownorm:
-        tdf = plot_df.T.sort_index(0)
+        tdf = plot_df.T.sort_index(axis=0)
         ax = heatmap(
             tdf.div(tdf.max(axis=1), axis=0),
             linewidths=0.5,
@@ -104,7 +103,7 @@ def plot_mix_heatmap(mix_df, rownorm=False, save_path="figures/heatmap.pdf"):
         ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
     else:
         ax = heatmap(
-            plot_df.T.sort_index(0),
+            plot_df.T.sort_index(axis=0),
             linewidths=0.5,
             square=True,
             cmap="viridis",
@@ -117,10 +116,11 @@ def plot_mix_heatmap(mix_df, rownorm=False, save_path="figures/heatmap.pdf"):
     ax.set_ylim(bottom + 0.5, top - 0.5)
     ax.invert_yaxis()
 
-    savefig(save_path, bbox_inches="tight")
+    if save_path is not None:
+        savefig(save_path, bbox_inches="tight")
 
 
-def plot_mix_heatmap_log(mix_df, rownorm=False, save_path="figures/heatmap_log.pdf"):
+def plot_mix_heatmap_log(mix_df, rownorm=False, save_path=None):
     fig, ax = subplots(
         figsize=(
             10 / np.shape(mix_df)[1] * np.shape(mix_df)[0],
@@ -144,7 +144,7 @@ def plot_mix_heatmap_log(mix_df, rownorm=False, save_path="figures/heatmap_log.p
     for col in plot_df.columns:
         plot_df[col] = np.log10(plot_df[col])
     if rownorm:
-        tdf = plot_df.T.sort_index(0)
+        tdf = plot_df.T.sort_index(axis=0)
         ax = heatmap(
             tdf.div(tdf.max(axis=1), axis=0),
             linewidths=0.5,
@@ -155,7 +155,7 @@ def plot_mix_heatmap_log(mix_df, rownorm=False, save_path="figures/heatmap_log.p
         ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
     else:
         ax = heatmap(
-            plot_df.T.sort_index(0),
+            plot_df.T.sort_index(axis=0),
             linewidths=0.5,
             square=True,
             cmap="viridis",
@@ -168,10 +168,11 @@ def plot_mix_heatmap_log(mix_df, rownorm=False, save_path="figures/heatmap_log.p
     ax.set_ylim(bottom + 0.5, top - 0.5)
     ax.invert_yaxis()
 
-    savefig(save_path, bbox_inches="tight")
+    if save_path is not None:
+        savefig(save_path, bbox_inches="tight")
 
 
-def plot_1D_lines(mix_df, save_path="figures/lines.pdf"):
+def plot_1D_lines(mix_df, save_path=None):
     # if correlation values are included in the mix_df,
     # they should not be part of the pie
     corr_list = []
@@ -212,13 +213,12 @@ def plot_1D_lines(mix_df, save_path="figures/lines.pdf"):
     # adjust spacing
     subplots_adjust(hspace=0.2, wspace=0.4)
     # save
-    savefig(save_path, bbox_inches="tight")
+    if save_path is not None:
+        savefig(save_path, bbox_inches="tight")
 
 
 # function for pie plots from one lcm position set of results
-def plot_scatter(
-    mix_df, bulk_df, celltype_df, gene_dict, save_path="figures/scatter.pdf"
-):
+def plot_scatter(mix_df, bulk_df, celltype_df, gene_dict, save_path=None):
     # if correlation values are included in the mix_df, remove
     corr_list = []
     if "rho_Spearman" in mix_df.columns:
@@ -299,4 +299,5 @@ def plot_scatter(
             ax.set_visible(False)
 
     fig.tight_layout()
-    savefig(save_path, bbox_inches="tight")
+    if save_path is not None:
+        savefig(save_path, bbox_inches="tight")
