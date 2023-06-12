@@ -34,7 +34,7 @@ For these reasons, computational deconvolution methods are gaining popularity in
 
 However, least squares-based optimization is faced with a particular challenge in bulk RNAseq deconvolution because of the highly skewed nature of mRNA copy number distributions, ranging from less than 1 to more than 10,000 average mRNA copies per cell [@li2016comprehensive; @schwanhausser2011global]. In such settings, optimization results may be strongly influenced by few highly expressed genes and are thus not robust to noise or platform effects influencing the readout of these genes. Identifying the right genes for deconvolution becomes a task in itself [@aliee2021autogenes]. As a result, deconvolution methods may yield inferred mixed gene expression vectors that do not correlate well with measured bulk gene expression. 
 
-Here, we introduce `cellanneal`, a python-based software for deconvolving bulk RNA sequencing data. `cellanneal` relies on the optimization of Spearman's rank correlation coefficient between experimental and computational mixture gene expression vectors using simulated annealing. `cellanneal` can be used as a python package or via a command line interface, but importantly also provides a simple graphical user interface which is distributed as a single executable file for user convenience. The python package is available at [https://github.com/LiBuchauer/cellanneal](https://github.com/LiBuchauer/cellanneal), the graphical software can be downloaded at [http://shalevlab.weizmann.ac.il/resources](http://shalevlab.weizmann.ac.il/resources).
+Here, we introduce `cellanneal`, a python-based software for deconvolving bulk RNA sequencing data. `cellanneal` relies on the optimization of Spearman's rank correlation coefficient between experimental and computational mixture gene expression vectors using simulated annealing. `cellanneal` can be used as a python package or via a command line interface, but importantly also provides a simple graphical user interface which is distributed as a single executable file for user convenience.
 
 # Statement of need
 
@@ -50,10 +50,10 @@ The python package provides functions for the three main steps of a deconvolutio
 
 `cellanneal` runs which were started from either the command line or the graphical user interface produce a collection of result files including tabular deconvolution results (cell type fractions for each sample) and figures illustrating these cell type distributions. Further, `cellanneal` computes and stores the gene-wise fold change between the observed bulk expression and the estimated expression based on the inferred cell type composition. This enables identifying genes for which expression may be specifically induced or inhibited in the bulk sample compared to the single cell reference. Such genes may be of biological or medical interest.
 
-`cellanneal` relies on the python packages `scipy` [@2020SciPy-NMeth], `numpy` [@harris2020array], `pandas` [@reback2020panda], `seaborn` [@Waskom2021], `matplotlib` [@Hunter:2007] and `tkinter` [@lundh1999introduction].
+`cellanneal` relies on the python packages `scipy` [@2020SciPy-NMeth], `numpy` [@harris2020array], `pandas` [@reback2020pandas], `seaborn` [@Waskom2021], `matplotlib` [@Hunter:2007] and `tkinter` [@lundh1999introduction].
 
 # Citations
-Examples of research projects using cellanneal include [@egozi2023single] and [@berkova2022terminal].
+Examples of published research projects using cellanneal include [@egozi2023single] and [@berkova2022terminal].
 
 # Acknowledgements
 
