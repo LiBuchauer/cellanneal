@@ -25,6 +25,7 @@
 2. [Installation](#2-installation)  
     a. [python package and command line interface](#2a-installing-the-python-package-and-cli)  
     b. [graphical software](#2b-installing-the-gui)  
+    c. [testing the installation](#2c-testing-your-installation)
 3. [Requirements for input data files](#3-requirements-for-input-data)  
 4. [Parameters](#4-parameters)  
 5. [Using `cellanneal`](#5-using-cellanneal)  
@@ -91,6 +92,20 @@ Installing the graphical software is as simple as downloading the correct versio
 * **Windows**: Antiviral software may inhibit the launching of the software - it may be necessary to set an exception or click "Allow" when asked whether to procede.
 
 For more information on how to use the GUI, see [Using the graphical software](#5c-using-the-graphical-software).
+
+#### 2c. Testing your installation
+
+The repository contains example data from a publication on liver cancer microenvironments at `examples/example_data/`. Use this data to test your installation as described below to produce a set of outputs, consisting of tabular data and figures, as shown in `examples/example_output/`. 
+
+#### python package
+Run the quick start jupyter notebook at `examples/cellaneal_quickstart.ipynb` or copy the code from the [web rendering of the notebook](https://github.com/LiBuchauer/cellanneal/blob/master/examples/cellanneal_quickstart.ipynb) into your python console and execute it there.
+
+#### command line interface
+In a shell, navigate to the `cellanneal` base directory (where this `README` lives), specify your desired output folder for storing `cellanneal`'s results as the last argument and run the following command:  
+`cellanneal examples/example_data/mixture_data_liver_tumor.csv examples/example_data/signature_data_human_liver.csv output_directory`
+
+#### GUI
+Open the GUI as described [below](#5c-using-the-graphical-software), load the example data files (`"examples/example_data/mixture_data_liver_tumor.csv"` into field "Select mixture data" and `"examples/example_data/signature_data_human_liver.csv"` into field "Select signature data"), specify an output directory to store the results and click the `run cellanneal` button.
 
 ***
 

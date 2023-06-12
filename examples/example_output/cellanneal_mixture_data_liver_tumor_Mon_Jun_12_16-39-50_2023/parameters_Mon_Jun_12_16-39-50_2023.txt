@@ -1,0 +1,8 @@
+parameters and data used for this cellanneal run (Mon_Jun_12_16-39-50_2023)
+
+mixture data: examples/example_data/mixture_data_liver_tumor.csv
+signature data: examples/example_data/signature_data_human_liver.csv
+minimum expression in mixture: 1e-05
+maximum expression in mixture: 0.01
+minimum dispersion: 0.5
+maximum number of iterations: 1000
