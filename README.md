@@ -98,7 +98,7 @@ For more information on how to use the GUI, see [Using the graphical software](#
 The repository contains example data from a publication on liver cancer microenvironments at `examples/example_data/`. Use this data to test your installation as described below to produce a set of outputs, consisting of tabular data and figures, as shown in `examples/example_output/`. 
 
 #### python package
-Run the quick start jupyter notebook at `examples/cellaneal_quickstart.ipynb` or copy the code from the [web rendering of the notebook](https://github.com/LiBuchauer/cellanneal/blob/master/examples/cellanneal_quickstart.ipynb) into your python console and execute it there.
+Run the quick start jupyter notebook at `examples/cellanneal_quickstart.ipynb` or copy the code from the [web rendering of the notebook](https://github.com/LiBuchauer/cellanneal/blob/master/examples/cellanneal_quickstart.ipynb) into your python console and execute it there.
 
 #### command line interface
 In a shell, navigate to the `cellanneal` base directory (where this `README` lives), specify your desired output folder for storing `cellanneal`'s results as the last argument and run the following command:  
