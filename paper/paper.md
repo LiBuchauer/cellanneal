@@ -48,7 +48,16 @@ The python package and command line interface are available at [https://github.c
 
 The python package provides functions for the three main steps of a deconvolution analysis with `cellanneal`: identification of a gene set for deconvolution, deconvolution using simulated annealing, and plotting the results. A quick start workflow is available as part of the documentation. For the command line interface and the graphical user interface, these three steps are combined into one call (click).
 
-`cellanneal` runs which were started from either the command line or the graphical user interface produce a collection of result files including tabular deconvolution results (cell type fractions for each sample) and figures illustrating these cell type distributions. Further, `cellanneal` computes and stores the gene-wise fold change between the observed bulk expression and the estimated expression based on the inferred cell type composition. This enables identifying genes for which expression may be specifically induced or inhibited in the bulk sample compared to the single cell reference. Such genes may be of biological or medical interest.
+`cellanneal` runs which were started from either the command line or the graphical user interface produce a collection of result files including tabular deconvolution results (cell type fractions for each sample) and figures illustrating these cell type distributions. Further, `cellanneal` computes and stores the gene-wise fold change between the observed bulk expression and the estimated expression based on the inferred cell type composition. This enables identifying genes for which expression may be specifically induced or inhibited in the bulk sample compared to the single cell reference. Such genes may be of biological or medical interest.  
+Figures produced by `cellanneal` include a heatmap showing sample compositions (\autoref{fig:heatmap}), pie charts showing sample compositions (\autoref{fig:pie}), and scatter plots showing correlation between experimental bulk gene expression values and their `cellanneal`-derived counterparts from the best identified computational mixture (\autoref{fig:scatter}).
+
+
+![A heatmap produced by `cellanneal`. Constituting cell types are on the y-axis, deconvolved bulk sample names on the x-axis. The colour scale shows the fractional presence of cell type in each bulk.\label{fig:heatmap}](heatmap_example.png)
+
+![Pie charts produced by `cellanneal`. Each pie corresponds to one deconvolved bulk sample from the input data.\label{fig:pie}](piechart_example.png)
+
+![Gene correlation scatter plots produced by `cellanneal` Each panel corresponds to one deconvolved bulk sample from the input data. Each dot represents a gene used during deconvolution. The x-axis shows the experimentally measured expression of each gene after normalizing so that the total count sum is 1. The y-axis shows the normalized expression of each gene in the best identified synthetic bulk mixed from cell type signature data .\label{fig:scatter}](scatter_example.png)
+
 
 `cellanneal` relies on the python packages `scipy` [@2020SciPy-NMeth], `numpy` [@harris2020array], `pandas` [@reback2020pandas], `seaborn` [@Waskom2021], `matplotlib` [@Hunter:2007] and `tkinter` [@lundh1999introduction].
 
