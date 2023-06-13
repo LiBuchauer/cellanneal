@@ -52,7 +52,7 @@ The python package provides functions for the three main steps of a deconvolutio
 Figures produced by `cellanneal` include a heatmap showing sample compositions (\autoref{fig:heatmap}), pie charts showing sample compositions (\autoref{fig:pie}), and scatter plots showing correlation between experimental bulk gene expression values and their `cellanneal`-derived counterparts from the best identified computational mixture (\autoref{fig:scatter}).
 
 
-![A heatmap produced by `cellanneal`. Constituting cell types are on the y-axis, deconvolved bulk sample names on the x-axis. The colour scale shows the fractional presence of cell type in each bulk.\label{fig:heatmap}](heatmap_example.png)
+![A heatmap produced by `cellanneal`. Constituting cell types are on the y-axis, deconvolved bulk sample names on the x-axis. The colour scale shows the fractional presence of cell type in each bulk.\label{fig:heatmap}](heatmap_example.png){ width=50% }
 
 ![Pie charts produced by `cellanneal`. Each pie corresponds to one deconvolved bulk sample from the input data.\label{fig:pie}](piechart_example.png)
 
