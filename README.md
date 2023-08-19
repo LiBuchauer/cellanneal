@@ -56,7 +56,7 @@ Clone this code repository or download the zipped version and unpack it into a l
 
 Installing `cellanneal` into a virtual environment, for example via `anaconda`, is recommended. `cellanneal` has been tested with `python 3.7` and `python 3.8`.
 
-    conda create --name cellanneal python==3.8
+    conda create --name cellanneal python=3.8
     conda activate cellanneal
 
 It is recommended to install `cellanneal`'s dependencies first; if using `conda`:
