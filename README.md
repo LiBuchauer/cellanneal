@@ -52,20 +52,42 @@ During the deconvolution process, a computational mixture sample is constructed 
 The python package comes with a set of functions which can be included in python workflows, scripts and notebooks as well as with a command-line entry point to `cellanneal`. The required code can be downloaded from this repository. The graphical software is available for Microsoft Windows and macOS operating systems and can be downloaded from [zenodo](https://doi.org/10.5281/zenodo.5559545).
 
 #### 2a. Installing the python package and CLI
+
 Clone this code repository or download the zipped version and unpack it into a location of choice.  
 
-Installing `cellanneal` into a virtual environment, for example via `anaconda`, is recommended. `cellanneal` has been tested with `python 3.7` and `python 3.8`.
+Installing `cellanneal` into a virtual environment, for example via `anaconda`, is recommended. `cellanneal` has been tested with `python 3.8`.
 
     conda create --name cellanneal python=3.8
     conda activate cellanneal
 
-It is recommended to install `cellanneal`'s dependencies first; if using `conda`:
+It is recommended to install `cellanneal`'s dependencies first; __if using `conda`__:
 
     conda install numpy scipy matplotlib pandas seaborn xlrd openpyxl
 
-If using pip:
+Alternatively, environment creation and package install can be done jointly via the provided environment file `environment.yml`:
+
+    conda env create -f environment.yml
+    conda activate cellanneal
+
+__If using pip__ (please note that the `pip` route does not allow to specify the python version at this stage - you must ensure the correct version prior to running this):
 
     pip install numpy scipy matplotlib pandas seaborn xlrd openpyxl
+
+Or via the provided specification file `requirements.txt`:
+
+    pip install -r requirements.txt
+
+For manual installs, it is recommended to check your package versions comply with the following list:
+
+```python
+numpy>=1.24
+scipy>=1.9
+matplotlib>=3.7
+pandas>=1.5
+seaborn>=0.12
+xlrd>=2.0
+openpyxl>=3.0
+```
 
 Next, navigate into the `cellanneal` directory (`cellanneal-master`, the directory containing the file `setup.py`) on the command line. There, irrespective of whether you used pip or conda above, execute the command
 
