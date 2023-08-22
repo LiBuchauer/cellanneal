@@ -89,7 +89,7 @@ xlrd>=2.0
 openpyxl>=3.0
 ```
 
-Next, navigate into the `cellanneal` directory (`cellanneal-master`, the directory containing the file `setup.py`) on the command line. There, irrespective of whether you used pip or conda above, execute the command
+Next, navigate into the `cellanneal` directory (`cellanneal-master`, the directory containing the file `setup.py`) on the command line. There, __irrespective of whether you used pip or conda above__, execute the command
 
     pip install .
 
