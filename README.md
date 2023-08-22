@@ -67,7 +67,7 @@ If using pip:
 
     pip install numpy scipy matplotlib pandas seaborn xlrd openpyxl
 
-Next, navigate into the `cellanneal` directory (`cellanneal-master`, the directory containing the file `setup.py`) on the command line. There, execute the command
+Next, navigate into the `cellanneal` directory (`cellanneal-master`, the directory containing the file `setup.py`) on the command line. There, irrespective of whether you used pip or conda above, execute the command
 
     pip install .
 
