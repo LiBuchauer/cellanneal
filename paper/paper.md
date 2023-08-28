@@ -1,5 +1,5 @@
 ---
-title: '`cellanneal`: A user-friendly deconvolution software for omics data'
+title: '`cellanneal`: A user-friendly deconvolution software for transcriptomics data'
 tags:
   - bioinformatics
   - computational biology
