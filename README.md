@@ -37,6 +37,7 @@
     b. [figures](#6b-folder-figures)  
     c. [genewise comparison](#6c-folder-genewise-comparison)  
 7. [FAQs](#7-frequently-asked-questions)  
+8. [Contributing and tracking issues](#8-contributing-and-tracking-issues)
 
 
 ***
@@ -265,3 +266,8 @@ Mitochondrial genes (gene names starting with "MT-", "Mt-", "mt-") are removed f
 
 * My run fails with error `"Error: Sample XXX could not be deconvolved.Possibly the gene set for this sample is too small. See online documentation for more info."` when using the python module even though the selected gene set is large.  
 This can be due to gene name duplications in either the signature file or the mixture file. Try to run `mixture_df = mixture_df.groupby(mixture_df.index).sum()` and/or  `signature_df = signature_df.groupby(signature_df.index).sum()` prior to running `cellanneal.deconvolve()`
+
+***
+
+### 8. Contributing and tracking issues
+Please visit [this file](CONTRIBUTING.md) to learn more about how to contribute to cell anneal, track issues and get support.
