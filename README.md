@@ -1,4 +1,4 @@
-## Welcome to `cellanneal` - The user-friendly application for deconvolving omics data sets.
+## Welcome to `cellanneal` - The user-friendly application for deconvolving transcriptomics data sets.
 
 <p align="center" width="100%">
     <img width="17%" src="https://github.com/LiBuchauer/cellanneal/blob/master/img/logo.png">
