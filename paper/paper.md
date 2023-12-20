@@ -59,7 +59,7 @@ Figures produced by `cellanneal` include a heatmap showing sample compositions (
 ![Gene correlation scatter plots produced by `cellanneal` Each panel corresponds to one deconvolved bulk sample from the input data. Each dot represents a gene used during deconvolution. The x-axis shows the experimentally measured expression of each gene after normalizing so that the total count sum is 1. The y-axis shows the normalized expression of each gene in the best identified synthetic bulk mixed from cell type signature data .\label{fig:scatter}](scatter_example.png)
 
 
-`cellanneal` relies on the python packages `scipy` [@2020SciPy-NMeth], `numpy` [@harris2020array], `pandas` [@reback2020pandas], `seaborn` [@Waskom2021], `matplotlib` [@Hunter:2007] and `tkinter` [@lundh1999introduction].
+`cellanneal` relies on the python packages `scipy` [@2020SciPy-NMeth], `numpy` [@harris2020array], `pandas` [@reback2020pandas], `seaborn` [@Waskom2021] and `matplotlib` [@Hunter:2007].
 
 # Citations
 Examples of published research projects using cellanneal include [@egozi2023single] and [@berkova2022terminal].
