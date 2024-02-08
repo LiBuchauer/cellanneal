@@ -4,7 +4,7 @@
     <img width="17%" src="https://github.com/LiBuchauer/cellanneal/blob/master/img/logo.png">
 </p>
 
-`cellanneal` is an application for deconvolving biological mixture data into constituting cell types. It comes both as a python package which includes a command line interface (CLI) and as a graphical software (graphical user interface, GUI) with the entire application bundled into a single executable. The python package with CLI can be downloaded from this repository; the graphical version is available for Microsoft Windows and macOS and can be downloaded from [zenodo](https://doi.org/10.5281/zenodo.5559545). If `cellanneal` is useful for your research, please cite [the preprint](https://arxiv.org/abs/2110.08209).
+`cellanneal` is an application for deconvolving biological mixture data into constituting cell types. It comes both as a python package which includes a command line interface (CLI) and as a graphical software (graphical user interface, GUI) with the entire application bundled into a single executable. The python package with CLI can be downloaded from this repository; the graphical version is available for Microsoft Windows and macOS and can be downloaded from [zenodo](https://doi.org/10.5281/zenodo.5559545). If `cellanneal` is useful for your research, please cite the JOSS paper: [![DOI](https://joss.theoj.org/papers/10.21105/joss.05610/status.svg)](https://doi.org/10.21105/joss.05610).
 
 
 
